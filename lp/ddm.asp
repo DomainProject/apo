@@ -5,7 +5,7 @@ runnable_on(A,cpu) :- actor(A).
 runnable_on(5..8,gpu).
 runnable_on(6..8,fpga).
 
-% msg_exch_rate(A1,A2,R) holds iff A1 sends A2 R messages per second (msg/tw)
+% msg_exch_rate(A1,A2,R) holds iff A1 and A2 R messages per time window (msg/tw)
 msg_exch_rate(1,2,10).
 msg_exch_rate(1,3,20).
 msg_exch_rate(1,4,10).
