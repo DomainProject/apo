@@ -28,3 +28,5 @@ where: `A1` and `A2` are actors, and `M` is the number of messages per time wind
 TODO: useful messages that represents the "degree of parallelism".
 
 NOTES: Tightly coupled actors should be placed on the same computing unit (?).
+
+msg_exch_cost(U1,U2,C). msg exchange cost between U1 and U2.
