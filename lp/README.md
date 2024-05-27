@@ -11,7 +11,7 @@ Each computing unit `U`
 - has a **type** represented by `cu_type(U,T)`,
 where `T` is the computing unit type (e.g., `cu_type(1,gpu)`), and 
 - has a **throughput** represented by `throughput(U,W)`,
-where `W` is the computing unit throughtput measured as *tasks for time window* (t/tw).
+where `W` is the computing unit throughput measured as *tasks for time window* (t/tw).
 
 Each actor `A` 
 - has a workload `W` represented by `workload(A,W)`,
@@ -19,14 +19,12 @@ measured as *tasks for time window* (t/tw), and
 - its code can be executed on **at least one** computing unit of type `T`,
 i.e., `runnable_on(A,T)`.
 
-The messages exchanged between actors is represented by a **strictly upper triangular matrix**, encoded by the following predicate.
+WORK IN PROGRESS:
 
-`msg_exch_rate(A1,A2,M)`
+Messages exchanged between actors are represented by a **strictly upper triangular matrix**, encoded by 
+`msg_exch_rate(A1,A2,M)`,
+where: `A1` and `A2` are actors, and `M` is the number of messages per time window (msg/tw) exchanged between `A1` and `A2`.
 
-holds iff `A1` and `A2` exchanges `M` messages per time window (msg/tw).
+TODO: useful messages that represents the "degree of parallelism".
 
-
-
-
-
-
+NOTES: Tightly coupled actors should be placed on the same computing unit (?).
