@@ -34,3 +34,5 @@ NOTES: Tightly coupled actors should be placed on the same computing unit (?).
 msg_exch_cost(U1,U2,C). msg exchange cost between U1 and U2.
 
 `mutual_annoyance(A1, A2, val)`: quanto due agenti si danno fastidio a vicenda. Da gestire (a livello di Runtime Monitoring module) con una media esponenziale (?).
+
+migration_cost(U1,U1) costo di migrazione tra due cu
