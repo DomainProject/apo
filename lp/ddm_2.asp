@@ -30,5 +30,4 @@ tot_vcu(T) :- T = #count{ U : vcu_of(A,U) }.
 
 % utility directives
 #show vcu_of/2.
-%#show tot_vcu/1.
-%#show related/2.
+#show tot_vcu/1.
