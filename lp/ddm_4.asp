@@ -15,7 +15,9 @@ msg_exch_rate(1,5,40).
 msg_exch_rate(6,7,35).
 msg_exch_rate(7,8,20).
 
-% actor workload (task/s)
+% actor workload (task/tw)
+% workload(A,W): W is the number of tasks to be executed by the actor A
+% TODO workload -> forecast_tasks (task in coda per essere processati)
 workload(1..4,25).
 workload(5,20). 
 workload(6..7,50).
@@ -30,12 +32,14 @@ cu_type(1..20,cpu).
 cu_type(21..24,gpu).
 cu_type(25,fpga).
 
-% CU throughput (task/s)
+% CU throughput (task/tw)
+% TODO: change name of the predicate: throughput -> processed_tasks (tw)
+% (numero di task processati nella time window/tempo per processarli)
 throughput(1..20,200).
 throughput(21..24,500).
 throughput(25,300).
 
-% energy consumption (W)
+% energy consumption (J/tw)
 energy(fpga,75).
 energy(cpu,200).
 energy(gpu,300).
@@ -50,6 +54,8 @@ cu_workload(U,T) :- cu(U), T = #sum{ W,A : run_on(A,U), workload(A,W) }. % sum W
 
 % cu_overload(U,O) iff O is the overload of U
 cu_overload(U,O) :- cu_workload(U,W), throughput(U,T), W > T, O = W-T. 
+% cu_overload(U,O) :- forecast_task(U,W), capacity(U,T), W > T, O = W-T.
+% capacity = throughput(task/s) * tw (s) 
 
 % - optimization: workload 
 #minimize{ O @ 1 : cu_overload(U,O) }.
@@ -81,11 +87,12 @@ cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
 
 
 % mutual_annoyance(A1,A2,N) holds iff 
-% A1 and A2 interfer with each other when running on the same cu with a noise N
+% A1 and A2 experienced N rollbacks (when executed on different CUs)
 mutual_annoyance(1,2,20).
 mutual_annoyance(1,3,10).
 
-vcu_noise(N) :- N = #sum{ C,A1,A2: mutual_annoyance(A1,A2,C), run_on(A1,U), run_on(A2,U) }.
+vcu_noise(N) :- N = #sum{ C,A1,A2: mutual_annoyance(A1,A2,C), 
+                run_on(A1,U), run_on(A2,U) }.
 
 % - optimization: communication cost
 #minimize{ N @ 3 : vcu_noise(N) }.
