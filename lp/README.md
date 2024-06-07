@@ -11,7 +11,9 @@ Each computing unit `U`
 - has a **type** represented by `cu_type(U,T)`,
 where `T` is the computing unit type (e.g., `cu_type(1,gpu)`), and 
 - has a **throughput** represented by `throughput(U,W)`,
-where `W` is the computing unit throughput measured as *tasks for time window* (t/tw).
+where `W` is the computing unit throughput measured as *tasks for time window* (t/s)
+che l'unità è in grado ti processare
+(numero di task processati nella time window/tempo per processarli)
 
 Each actor `A` 
 - has a workload `W` represented by `workload(A,W)`,
@@ -25,7 +27,10 @@ Exchanging messages has a cost that depends on the type of the computing unit, e
 
 ![](./parallelism.jpg)
 
-`mutual_annoyance(A1,A2,V)`: quanto due agenti si danno fastidio a vicenda. 
+`mutual_annoyance(A1,A2,A)`: quanto due agenti si danno fastidio a vicenda. 
+A1 and A2 interfer with each other when running on the same cu with a noise N
+
+
 
 TODO: Da gestire (a livello di Runtime Monitoring module) con una media esponenziale (?).
 
