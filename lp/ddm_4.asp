@@ -45,7 +45,8 @@ cu_capacity(25,300).
 cu_workload(U,T) :- cu(U), T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }. % sum W (1st component)
 
 % cu_overload(U,O) iff O is the overload of U
-cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,T), W > T, O = W-T. 
+cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C), 
+                    W > C, O = W-C. 
 
 % - optimization: workload 
 #minimize{ O @ 1,U : cu_overload(U,O) }.
@@ -62,7 +63,7 @@ msg_exch_cost(cpu,fpga,2). msg_exch_cost(fpga,cpu,2).
 msg_exch_cost(gpu,fpga,3). msg_exch_cost(fpga,gpu,3). 
 
 % actor communication cost
-% assumption: the costs of exchanging messages on the same cu is irrelevant (*)
+% assumption: the cost of exchanging messages on the same cu is irrelevant (*)
 a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R), 
                  run_on(A1,U1), run_on(A2,U2), U1 != U2, % (*)
                  cu_type(U1,T1), cu_type(U2,T2), 
