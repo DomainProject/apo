@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#include "ddm.h"
+
 bool print_model(clingo_model_t const *model) {
   bool ret = true;
   clingo_symbol_t *atoms = NULL;

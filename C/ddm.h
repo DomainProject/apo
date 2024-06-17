@@ -1,0 +1,11 @@
+// cu
+enum cu_type {CPU=1, GPU=2, FPGA=4};
+
+extern int num_actors;
+struct actor_matrix {
+    int annoyance;
+    int msg_exchange_rate;
+};
+
+extern void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_cost[total_cus][total_cus], short runnable_on[total_actors]);
+extern enum cu_type *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors], int tasks_forecast[total_actors]);
