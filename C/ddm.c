@@ -25,11 +25,11 @@ void ddm_init(
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
-        printf("runnable_on(%d,cpu)",i);
+        printf("runnable_on(%d,cpu).\n",i);
       if (runnable_on[i] & (1 << 2))
-        printf("runnable_on(%d,gpu)",i);
+        printf("runnable_on(%d,gpu).\n",i);
       if (runnable_on[i] & (1 << 3))
-        printf("runnable_on(%d,fpga)",i);
+        printf("runnable_on(%d,fpga).\n",i);
     }
    
     // cu/1
@@ -40,23 +40,23 @@ void ddm_init(
       // cu_type/2
       switch(cus[i]) {
         case CPU:
-          printf("cu_type(%d,cpu)",i);
+          printf("cu_type(%d,cpu).\n",i);
           break;
         case GPU:
-          printf("cu_type(%d,gpu)",i);
+          printf("cu_type(%d,gpu).\n",i);
           break;
         case FPGA:  
-          printf("cu_type(%d,fpga)",i);
+          printf("cu_type(%d,fpga).\n",i);
           break;
       }
       // cu_capacity/2 
-      printf("cu_capacity(%d)",cu_capacity[i]);
+      printf("cu_capacity(%d).\n",cu_capacity[i]);
     }
 
     // msg_exch_cost/3
     for(int i=0; i<total_cus; ++i)
-      for(int j=0; i<total_cus; ++j)
-        printf("msg_exch_cost(%d,%d,%d)",i,j,msg_exch_cost[i][j]);
+      for(int j=0; j<total_cus; ++j)
+        printf("msg_exch_cost(%d,%d,%d).\n",i,j,msg_exch_cost[i][j]);
 
 }
 
@@ -68,31 +68,36 @@ enum cu_type *ddm_optimize(
 {
     // tasks_forecast/2
     for(int i=0; i<total_actors; ++i) {
-      printf("tasks_forecast(%d,%d)",i,tasks_forecast[i]);
+      printf("tasks_forecast(%d,%d).\n",i,tasks_forecast[i]);
     }    
 
     for(int i=0; i<total_actors; ++i) {
       for(int j=0; j<total_actors; ++j) {
         // msg_exchange_rate/3
         if(actors[i][j].msg_exchange_rate)
-          printf("msg_exchange_rate(%d,%d,%d)",i,j,
+          printf("msg_exchange_rate(%d,%d,%d).\n",i,j,
             actors[i][j].msg_exchange_rate);
-        // mutual_annoyance/3
-        if(actors[i][j].annoyance)
-          printf("mutual_annoyance(%d,%d,%d)",i,j,
-            actors[i][j].annoyance);
       }
     } 
+
+    for(int i=0; i<total_actors; ++i) {
+      for(int j=0; j<total_actors; ++j) {
+        // mutual_annoyance/3
+        if(actors[i][j].annoyance)
+          printf("mutual_annoyance(%d,%d,%d).\n",i,j,
+            actors[i][j].annoyance);
+      }
+    }     
 
     // msg_exch_rate/3
 
     // TODO: add get_model to libasp_solver
     // that returns a clingo model (not an array of strings)
-    char *atom, *snd, *end;
-    for(int i=0; i<total_actors; ++i) {
-      atom +=7; // skip run_on(
-      printf("%ld %ld\n", strtol(atom, &snd, 10), strtol(++snd, &end, 10));   
-    }
+   //char *atom, *snd, *end;
+    //for(int i=0; i<total_actors; ++i) {
+    //  atom +=7; // skip run_on(
+    //  printf("%ld %ld\n", strtol(atom, &snd, 10), strtol(++snd, &end, 10));   
+   // }
 
     return NULL;
 }
