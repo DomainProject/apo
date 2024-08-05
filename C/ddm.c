@@ -20,24 +20,23 @@ void ddm_init(
     mapping_cus = cus;
 
     // actor/1
-    printf("actor(1..%d).\n", total_actors);
+    printf("actor(0..%d).\n", total_actors-1);
 
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
         printf("runnable_on(%d,cpu).\n",i);
-      if (runnable_on[i] & (1 << 2))
+      if (runnable_on[i] & (1 << 1))
         printf("runnable_on(%d,gpu).\n",i);
-      if (runnable_on[i] & (1 << 3))
+      if (runnable_on[i] & (1 << 2))
         printf("runnable_on(%d,fpga).\n",i);
     }
    
     // cu/1
-    printf("cu(1..%d).\n", total_cus);
-
-    
-    for(int i=0; i<total_cus; ++i) {
-      // cu_type/2
+    printf("cu(0..%d).\n", total_cus-1);
+   
+    // cu_type/2
+    for(int i=0; i<total_cus; ++i)
       switch(cus[i]) {
         case CPU:
           printf("cu_type(%d,cpu).\n",i);
@@ -49,9 +48,10 @@ void ddm_init(
           printf("cu_type(%d,fpga).\n",i);
           break;
       }
-      // cu_capacity/2 
-      printf("cu_capacity(%d).\n",cu_capacity[i]);
-    }
+
+    // cu_capacity/2 
+    for(int i=0; i<total_cus; ++i)     
+      printf("cu_capacity(%d,%d).\n",i,cu_capacity[i]);
 
     // msg_exch_cost/3
     for(int i=0; i<total_cus; ++i)
