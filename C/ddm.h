@@ -1,3 +1,5 @@
+#include "clingo_solver.h"
+
 // cu
 enum cu_type {CPU=1, GPU=2, FPGA=4};
 
