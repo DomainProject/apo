@@ -145,6 +145,7 @@ enum cu_type *ddm_optimize(
     fclose(file);
     printf("prog_size_approx: %lu, curr_pptr - prog_buff: %lu\n", prog_size_approx, curr_pptr - prog_buff);
 
+    
     // 1. initialize clingo w/program in prog_buff
     const char *argv[] = { "--opt-mode", "opt" };
     const int argc = 2;
@@ -158,12 +159,39 @@ enum cu_type *ddm_optimize(
 
     // 3. extract pairs <actor,cu> from the as (run_on/2 facts)
     get_pairs(model); 
+    
+ 
+    // alernative code using optN and clingo_model_optimality_proven */
+    /*
+    // 1. initialize clingo w/program in prog_buff
+    const char *argv[] = { "--opt-mode", "optN" };
+    const int argc = 2;
+    clingo_ctx *ctxt;
+    init_clingo(prog_buff, argc, argv, &ctxt);
+ 
+    // 2. invoke clingo & get the optimal as
+    clingo_model_t const *model; 
+    bool proven;
+    while( get_model(ctxt, &model) ) {
+      if ( clingo_model_optimality_proven(model,&proven) ) {
+        if(proven) {
+        // 3. extract pairs <actor,cu> from the as (run_on/2 facts)
+          get_pairs(model); 
+          break;
+        }
+      } else {
+        perror("clingo_model_optimality_proven error ");
+        exit(errno);
+      }
+    }
+    */
 
     // 4. free clingo
     free_clingo(ctxt);
 
     return NULL;
 }
+
 
 bool get_pairs(clingo_model_t const *model) {
   bool ret = true;
