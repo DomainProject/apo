@@ -42,7 +42,7 @@ void ddm_init(
    
     // Compute an overapproximation of the memory required to store the ASP program
     prog_size_approx = total_actors * (100 * total_actors + 120) + 
-                       total_cus * (50 * total_cus + 30) + 50 + len;
+                       total_cus * (50 * total_cus + 30) + 60 + len;
 
     if (!(prog_buff = malloc(prog_size_approx))) {
       perror("ddm_init: could not allocate memory for prog_buff");
@@ -57,6 +57,9 @@ void ddm_init(
     curr_pptr += fread(curr_pptr, 1, len, file);
 
     fclose(file);
+
+    // adding facts
+    curr_pptr += sprintf(curr_pptr, "%%%%%% facts\n");
     
     // actor/1
     curr_pptr += sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1);
@@ -143,11 +146,11 @@ enum cu_type *ddm_optimize(
     printf("prog_size_approx: %lu, curr_pptr - prog_buff: %lu\n", prog_size_approx, curr_pptr - prog_buff);
 
     // 1. initialize clingo w/program in prog_buff
-    const char *argv[] = { "test.lp", "--opt-mode", "opt" };
-    const int argc = 3;
+    const char *argv[] = { "--opt-mode", "opt" };
+    const int argc = 2;
     clingo_ctx *ctxt;
     init_clingo(prog_buff, argc, argv, &ctxt);
-    
+ 
     // 2. invoke clingo & get the optimal as
     clingo_model_t const *model, *tmp_model;
     while( get_model(ctxt, &tmp_model) ) 
@@ -161,7 +164,6 @@ enum cu_type *ddm_optimize(
 
     return NULL;
 }
-
 
 bool get_pairs(clingo_model_t const *model) {
   bool ret = true;
