@@ -16,6 +16,7 @@ char *curr_pptr;
 size_t prog_size_approx;
 
 bool get_pairs(clingo_model_t const *model);
+size_t approx_size(int, int);
 
 void ddm_init(
     int total_cus,
@@ -41,8 +42,7 @@ void ddm_init(
     int len = ftell(file);
    
     // Compute an overapproximation of the memory required to store the ASP program
-    prog_size_approx = total_actors * (100 * total_actors + 120) + 
-                       total_cus * (50 * total_cus + 30) + 60 + len;
+    prog_size_approx = approx_size(total_actors,total_cus) + len;
 
     if (!(prog_buff = malloc(prog_size_approx))) {
       perror("ddm_init: could not allocate memory for prog_buff");
@@ -238,4 +238,14 @@ out:
   if (atoms) { free(atoms); }
 
   return ret;
+}
+
+size_t approx_size(int total_actors, int total_cus) {
+
+  size_t prog_size_approx = total_actors * (80 * total_actors + 115) + 
+                            total_cus    * (40 *    total_cus +  60) + 40;
+
+  printf("%lf (MB)\n", (double)prog_size_approx/1048576);
+
+  return prog_size_approx;
 }
