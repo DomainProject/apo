@@ -13,10 +13,13 @@ static int *cu_capacity;
 
 char *prog_buff;
 char *curr_pptr;
-size_t prog_size_approx;
+size_t free_buff;
+int chars_written;
 
 bool get_pairs(clingo_model_t const *model);
-size_t approx_size(int, int);
+void init_buff(int, int, int);
+void extend_buff();
+void update_buff_size(int);
 
 void ddm_init(
     int total_cus,
@@ -42,14 +45,7 @@ void ddm_init(
     int len = ftell(file);
    
     // Compute an overapproximation of the memory required to store the ASP program
-    prog_size_approx = approx_size(total_actors,total_cus) + len;
-
-    if (!(prog_buff = malloc(prog_size_approx))) {
-      perror("ddm_init: could not allocate memory for prog_buff");
-      exit(errno);
-    }
-
-    curr_pptr = prog_buff;
+    init_buff(total_actors, total_cus, len);
     
     // reading core ddm ASP program  
     // Moving pointer to end
@@ -59,48 +55,52 @@ void ddm_init(
     fclose(file);
 
     // adding facts
-    curr_pptr += sprintf(curr_pptr, "%%%%%% facts\n");
+    update_buff_size(sprintf(curr_pptr, "%%%%%% facts\n"));
     
     // actor/1
-    curr_pptr += sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1);
+    update_buff_size(sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1));
 
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
-        curr_pptr += sprintf(curr_pptr, "runnable_on(%d,cpu).\n",i);
+        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,cpu).\n",i));
       if (runnable_on[i] & (1 << 1))
-        curr_pptr += sprintf(curr_pptr, "runnable_on(%d,gpu).\n",i);
+        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,gpu).\n",i));
       if (runnable_on[i] & (1 << 2))
-        curr_pptr += sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i);
+        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
     }
 
     // cu/1
-    curr_pptr += sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1);
+    update_buff_size(sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1));   
    
     // cu_type/2
     for(int i=0; i<total_cus; ++i)
       switch(cus[i]) {
         case CPU:
-          curr_pptr += sprintf(curr_pptr, "cu_type(%d,cpu).\n",i);
+          update_buff_size(sprintf(curr_pptr, "cu_type(%d,cpu).\n",i));
           break;
         case GPU:
-          curr_pptr += sprintf(curr_pptr, "cu_type(%d,gpu).\n",i);
+          update_buff_size(sprintf(curr_pptr, "cu_type(%d,gpu).\n",i));
           break;
         case FPGA:  
-          curr_pptr += sprintf(curr_pptr, "cu_type(%d,fpga).\n",i);
+          update_buff_size(sprintf(curr_pptr, "cu_type(%d,fpga).\n",i));
           break;
       }
 
     // cu_capacity/2 
-    for(int i=0; i<total_cus; ++i)     
-      curr_pptr += sprintf(curr_pptr,
+    for(int i=0; i<total_cus; ++i) {    
+      chars_written = sprintf(curr_pptr,
         "cu_capacity(%d,%d).\n",i,cu_capacity[i]);
+      update_buff_size(chars_written);
+    }
 
     // msg_exch_cost/3
     for(int i=0; i<total_cus; ++i)
-      for(int j=0; j<total_cus; ++j)
-        curr_pptr += sprintf(curr_pptr,
+      for(int j=0; j<total_cus; ++j) {
+        chars_written = sprintf(curr_pptr,
           "msg_exch_cost(%d,%d,%d).\n",i,j,msg_exch_cost[i][j]);
+        update_buff_size(chars_written);
+      }
 
 }
 
@@ -112,25 +112,32 @@ enum cu_type *ddm_optimize(
 {
     // tasks_forecast/2
     for(int i=0; i<total_actors; ++i) {
-      curr_pptr += sprintf(curr_pptr,
+      chars_written = sprintf(curr_pptr,
         "tasks_forecast(%d,%d).\n",i,tasks_forecast[i]);
+      update_buff_size(chars_written);
     }    
 
     for(int i=0; i<total_actors; ++i) {
       for(int j=0; j<total_actors; ++j) {
         // msg_exchange_rate/3
-        if(actors[i][j].msg_exchange_rate)
-          curr_pptr += sprintf(curr_pptr, 
+        if(actors[i][j].msg_exchange_rate) {
+          extend_buff();
+          chars_written = sprintf(curr_pptr, 
             "msg_exch_rate(%d,%d,%d).\n",i,j,actors[i][j].msg_exchange_rate);
+          update_buff_size(chars_written);
+        }
       }
     } 
 
     for(int i=0; i<total_actors; ++i) {
       for(int j=0; j<total_actors; ++j) {
         // mutual_annoyance/3
-        if(actors[i][j].annoyance)
-          curr_pptr += sprintf(curr_pptr,
+        if(actors[i][j].annoyance) {
+          extend_buff();
+          chars_written = sprintf(curr_pptr,
             "mutual_annoyance(%d,%d,%d).\n",i,j,actors[i][j].annoyance);
+          update_buff_size(chars_written);  
+        }
       }
     }
 
@@ -143,8 +150,6 @@ enum cu_type *ddm_optimize(
     }
     fprintf(file, "%s\n", prog_buff);
     fclose(file);
-    printf("prog_size_approx: %lu, curr_pptr - prog_buff: %lu\n", prog_size_approx, curr_pptr - prog_buff);
-
     
     // 1. initialize clingo w/program in prog_buff
     const char *argv[] = { "--opt-mode", "opt" };
@@ -240,12 +245,31 @@ out:
   return ret;
 }
 
-size_t approx_size(int total_actors, int total_cus) {
+void init_buff(int total_actors, int total_cus, int len) {
+/*
+  free_buff = total_actors * (80 * total_actors + 115) + 
+              total_cus    * (40 *    total_cus +  60) + 40 + len;
+*/
+  free_buff = 115 * total_actors + total_cus * (40 * total_cus + 60) + 40 + len;
 
-  size_t prog_size_approx = total_actors * (80 * total_actors + 115) + 
-                            total_cus    * (40 *    total_cus +  60) + 40;
+  if (!(prog_buff = malloc(free_buff))) {
+    perror("ddm_init: could not allocate memory for prog_buff");
+     exit(errno);
+  }
 
-  printf("%lf (MB)\n", (double)prog_size_approx/1048576);
+  curr_pptr = prog_buff;
+}
 
-  return prog_size_approx;
+void extend_buff() {
+  if (free_buff < 32768 ) {
+    if (!(prog_buff = realloc(prog_buff, 32768))) {
+      perror("ddm_init: could not allocate memory for prog_buff");
+      exit(errno);
+    }
+  }
+}
+
+void update_buff_size(int chars_written) {
+    curr_pptr += chars_written;
+    free_buff -= chars_written;
 }
