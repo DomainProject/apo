@@ -18,8 +18,9 @@ cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C),
 % assumption: the cost of exchanging messages on the same cu is irrelevant (*)
 a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R), 
                  run_on(A1,U1), run_on(A2,U2), U1 != U2, % (*)
-                 cu_type(U1,T1), cu_type(U2,T2), 
-                 msg_exch_cost(T1,T2,C1), 
+                 %cu_type(U1,T1), cu_type(U2,T2), 
+                 %msg_exch_cost(T1,T2,C1),
+                 msg_exch_cost(U1,U2,C1), 
                  C = C1*R.
 
 % total communication cost
