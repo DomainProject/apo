@@ -14,12 +14,11 @@ static int *cu_capacity;
 char *prog_buff;
 char *curr_pptr;
 size_t free_buff;
-int chars_written;
 
 bool get_pairs(clingo_model_t const *model);
 void init_buff(int, int, int);
 void extend_buff();
-void update_buff_size(int);
+void update_buff(int);
 
 void ddm_init(
     int total_cus,
@@ -55,52 +54,46 @@ void ddm_init(
     fclose(file);
 
     // adding facts
-    update_buff_size(sprintf(curr_pptr, "%%%%%% facts\n"));
+    update_buff(sprintf(curr_pptr, "\n%%%%%% facts\n"));
     
     // actor/1
-    update_buff_size(sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1));
+    update_buff(sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1));
 
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
-        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,cpu).\n",i));
+        update_buff(sprintf(curr_pptr, "runnable_on(%d,cpu).\n",i));
       if (runnable_on[i] & (1 << 1))
-        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,gpu).\n",i));
+        update_buff(sprintf(curr_pptr, "runnable_on(%d,gpu).\n",i));
       if (runnable_on[i] & (1 << 2))
-        update_buff_size(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
+        update_buff(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
     }
 
     // cu/1
-    update_buff_size(sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1));   
+    update_buff(sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1));   
    
     // cu_type/2
     for(int i=0; i<total_cus; ++i)
       switch(cus[i]) {
         case CPU:
-          update_buff_size(sprintf(curr_pptr, "cu_type(%d,cpu).\n",i));
+          update_buff(sprintf(curr_pptr, "cu_type(%d,cpu).\n",i));
           break;
         case GPU:
-          update_buff_size(sprintf(curr_pptr, "cu_type(%d,gpu).\n",i));
+          update_buff(sprintf(curr_pptr, "cu_type(%d,gpu).\n",i));
           break;
         case FPGA:  
-          update_buff_size(sprintf(curr_pptr, "cu_type(%d,fpga).\n",i));
+          update_buff(sprintf(curr_pptr, "cu_type(%d,fpga).\n",i));
           break;
       }
 
     // cu_capacity/2 
-    for(int i=0; i<total_cus; ++i) {    
-      chars_written = sprintf(curr_pptr,
-        "cu_capacity(%d,%d).\n",i,cu_capacity[i]);
-      update_buff_size(chars_written);
-    }
+    for(int i=0; i<total_cus; ++i)    
+      update_buff(sprintf(curr_pptr,"cu_capacity(%d,%d).\n",i,cu_capacity[i]));
 
     // msg_exch_cost/3
     for(int i=0; i<total_cus; ++i)
-      for(int j=0; j<total_cus; ++j) {
-        chars_written = sprintf(curr_pptr,
-          "msg_exch_cost(%d,%d,%d).\n",i,j,msg_exch_cost[i][j]);
-        update_buff_size(chars_written);
-      }
+      for(int j=0; j<total_cus; ++j)
+        update_buff(sprintf(curr_pptr,"msg_exch_cost(%d,%d,%d).\n",i,j,msg_exch_cost[i][j]));
 
 }
 
@@ -111,20 +104,16 @@ enum cu_type *ddm_optimize(
     int tasks_forecast[total_actors])
 {
     // tasks_forecast/2
-    for(int i=0; i<total_actors; ++i) {
-      chars_written = sprintf(curr_pptr,
-        "tasks_forecast(%d,%d).\n",i,tasks_forecast[i]);
-      update_buff_size(chars_written);
-    }    
+    for(int i=0; i<total_actors; ++i)
+      update_buff(sprintf(curr_pptr,"tasks_forecast(%d,%d).\n",i,tasks_forecast[i]));
 
     for(int i=0; i<total_actors; ++i) {
       for(int j=0; j<total_actors; ++j) {
         // msg_exchange_rate/3
         if(actors[i][j].msg_exchange_rate) {
           extend_buff();
-          chars_written = sprintf(curr_pptr, 
-            "msg_exch_rate(%d,%d,%d).\n",i,j,actors[i][j].msg_exchange_rate);
-          update_buff_size(chars_written);
+          update_buff(sprintf(curr_pptr,
+            "msg_exch_rate(%d,%d,%d).\n",i,j,actors[i][j].msg_exchange_rate));
         }
       }
     } 
@@ -134,9 +123,8 @@ enum cu_type *ddm_optimize(
         // mutual_annoyance/3
         if(actors[i][j].annoyance) {
           extend_buff();
-          chars_written = sprintf(curr_pptr,
-            "mutual_annoyance(%d,%d,%d).\n",i,j,actors[i][j].annoyance);
-          update_buff_size(chars_written);  
+          update_buff(sprintf(curr_pptr,
+            "mutual_annoyance(%d,%d,%d).\n",i,j,actors[i][j].annoyance));
         }
       }
     }
@@ -254,7 +242,7 @@ void init_buff(int total_actors, int total_cus, int len) {
 
   if (!(prog_buff = malloc(free_buff))) {
     perror("ddm_init: could not allocate memory for prog_buff");
-     exit(errno);
+    exit(errno);
   }
 
   curr_pptr = prog_buff;
@@ -269,7 +257,7 @@ void extend_buff() {
   }
 }
 
-void update_buff_size(int chars_written) {
+void update_buff(int chars_written) {
     curr_pptr += chars_written;
     free_buff -= chars_written;
 }

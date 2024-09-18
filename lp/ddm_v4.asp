@@ -42,6 +42,3 @@ annoyance(N) :- N = #sum{ C,A1,A2:
 
 % utility directives
 #show run_on/2.
-%#show annoyance/1.
-%#show cu_overload/2.
-%#show a_cc/3.
