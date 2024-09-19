@@ -31,7 +31,7 @@ void ddm_init(
     num_cus = total_cus;
     mapping_cus = cus;
 
-    FILE *file = fopen("../lp/ddm_v4.asp", "r");
+    FILE *file = fopen("../lp/ddm_v5.asp", "r");
     if (file == NULL) {
        perror("Error opening file");
        exit(errno);
@@ -59,6 +59,7 @@ void ddm_init(
     // actor/1
     update_buff(sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1));
 
+    /*
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
@@ -68,6 +69,10 @@ void ddm_init(
       if (runnable_on[i] & (1 << 2))
         update_buff(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
     }
+    */
+    // runnable_on_class/2
+    for(int i=0; i<total_actors; ++i)
+      update_buff(sprintf(curr_pptr, "runnable_on_class(%d,%d).\n",i,runnable_on[i]));  
 
     // cu/1
     update_buff(sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1));   
