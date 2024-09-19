@@ -1,7 +1,17 @@
 % -----
 % rules for distributing actor(s) on cu(s)
-% each actor can run on a computing unit only (if runnable_on)
-1 { run_on(A,U) : cu(U), runnable_on(A,T), cu_type(U,T) } 1 :- actor(A).
+% each actor can run on a computing unit only (if runnable_on_class)
+1 { run_on(A,U) : cu(U), runnable_on_class(A,C), class_type(C,T), cu_type(U,T) } 1 :- actor(A).
+
+% TODO: use an alternative encoding w/bitand &
+class_type(1,cpu).
+                    class_type(2,gpu).
+class_type(3,cpu).  class_type(3,gpu).
+                                        class_type(4,fpga).
+class_type(5,cpu).                      class_type(5,fpga).
+                    class_type(6,gpu).  class_type(6,fpga).
+class_type(7,cpu).  class_type(7,gpu).  class_type(7,fpga).
+
 
 % T is the total workload of cu U
 cu_workload(U,T) :- cu(U), T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }. % sum W (1st component)
@@ -18,8 +28,7 @@ cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C),
 % assumption: the cost of exchanging messages on the same cu is irrelevant (*)
 a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R), 
                  run_on(A1,U1), run_on(A2,U2), U1 != U2, % (*)
-                 cu_type(U1,T1), cu_type(U2,T2), 
-                 msg_exch_cost(T1,T2,C1),
+                 msg_exch_cost(U1,U2,C1), 
                  C = C1*R.
 
 % total communication cost
