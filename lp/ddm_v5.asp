@@ -1,6 +1,7 @@
 % -----
 % rules for distributing actor(s) on cu(s)
 % each actor can run on a computing unit only (if runnable_on_class)
+%1 { run_on(A,U) : cu(U), runnable_on(A,T), cu_type(U,T) } 1 :- actor(A).
 1 { run_on(A,U) : cu(U), runnable_on_class(A,C), class_type(C,T), cu_type(U,T) } 1 :- actor(A).
 
 % TODO: use an alternative encoding w/bitand &
