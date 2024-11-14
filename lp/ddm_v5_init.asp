@@ -1,7 +1,7 @@
 % actor(s) and message(s)
 actor(1..8).
 
-runnable_on_class(1..4,1).
+runnable_on_class(1..4,1). % cpu
 runnable_on_class(5..8,3). % cpu & gpu
 runnable_on_class(6..8,7). % cpu & gpu & fpga
 
@@ -24,9 +24,9 @@ tasks_forecast(8,80).
 
 % -------------------
 % computing unit(s)
-% cpu w/20 cores, 4 gpu, 1 fpga
 cu(1..25).
 
+% cpu w/20 cores, 4 gpu, 1 fpga
 cu_type(1..20,cpu).
 cu_type(21..24,gpu).
 cu_type(25,fpga).
