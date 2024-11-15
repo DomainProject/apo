@@ -52,7 +52,7 @@ int main(int argc, char const **argv) {
     };
 
 
-  ddm_init(total_cus,total_actors,cus,msg_exch_cost,runnable_on,cu_capacity);
+  ddm_init(total_cus,total_actors,cus,msg_exch_cost,runnable_on);
 
   // <annoynace,msg_exchange_rate>
   struct actor_matrix actors[NACT][NACT] = {
@@ -69,7 +69,9 @@ int main(int argc, char const **argv) {
   int tasks_forecast[NACT] = { 50,50,50,50,20,50,50,80 };
 
  
-  enum cu_type *res = ddm_optimize(total_actors,actors,tasks_forecast);
+  int *res = ddm_optimize(
+    total_actors,actors,tasks_forecast,
+    total_cus,cu_capacity);
 
   return 0;
 }

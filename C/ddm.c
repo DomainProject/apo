@@ -15,7 +15,7 @@ char *prog_buff;
 char *curr_pptr;
 size_t free_buff;
 
-bool get_pairs(clingo_model_t const *model);
+bool get_pairs(clingo_model_t const *model, int *pairs);
 void init_buff(int, int, int);
 void extend_buff();
 void update_buff(int);
@@ -25,13 +25,12 @@ void ddm_init(
     int total_actors,
     enum cu_type *cus,
     int msg_exch_cost[total_cus][total_cus],
-    short runnable_on[total_actors],
-    int cu_capacity[total_cus])
+    short runnable_on[total_actors])
 {
     num_cus = total_cus;
     mapping_cus = cus;
 
-    FILE *file = fopen("../lp/ddm_v4.asp", "r");
+    FILE *file = fopen("../lp/ddm_v5.asp", "r");
     if (file == NULL) {
        perror("Error opening file");
        exit(errno);
@@ -59,6 +58,7 @@ void ddm_init(
     // actor/1
     update_buff(sprintf(curr_pptr, "actor(0..%d).\n", total_actors-1));
 
+    /*
     // runnable_on/2
     for(int i=0; i<total_actors; ++i) {
       if (runnable_on[i] & 1)
@@ -68,6 +68,10 @@ void ddm_init(
       if (runnable_on[i] & (1 << 2))
         update_buff(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
     }
+    */
+    // runnable_on_class/2
+    for(int i=0; i<total_actors; ++i)
+      update_buff(sprintf(curr_pptr, "runnable_on_class(%d,%d).\n",i,runnable_on[i]));  
 
     // cu/1
     update_buff(sprintf(curr_pptr, "cu(0..%d).\n", total_cus-1));   
@@ -86,10 +90,6 @@ void ddm_init(
           break;
       }
 
-    // cu_capacity/2 
-    for(int i=0; i<total_cus; ++i)    
-      update_buff(sprintf(curr_pptr,"cu_capacity(%d,%d).\n",i,cu_capacity[i]));
-
     // msg_exch_cost/3
     for(int i=0; i<total_cus; ++i)
       for(int j=0; j<total_cus; ++j)
@@ -98,14 +98,20 @@ void ddm_init(
 }
 
 // Restituisce un vettore in cui nella posizione i-esima è conservato il dispositivo su cui deve girare l'attore i-esimo
-enum cu_type *ddm_optimize(
+int *ddm_optimize(
     int total_actors,
     struct actor_matrix actors[total_actors][total_actors],
-    int tasks_forecast[total_actors])
+    int tasks_forecast[total_actors],
+    int total_cus,
+    int cu_capacity[total_cus])
 {
     // tasks_forecast/2
     for(int i=0; i<total_actors; ++i)
       update_buff(sprintf(curr_pptr,"tasks_forecast(%d,%d).\n",i,tasks_forecast[i]));
+
+    // cu_capacity/2 
+    for(int i=0; i<total_cus; ++i)    
+      update_buff(sprintf(curr_pptr,"cu_capacity(%d,%d).\n",i,cu_capacity[i]));
 
     for(int i=0; i<total_actors; ++i) {
       for(int j=0; j<total_actors; ++j) {
@@ -151,9 +157,18 @@ enum cu_type *ddm_optimize(
       model = tmp_model;
 
     // 3. extract pairs <actor,cu> from the as (run_on/2 facts)
-    get_pairs(model); 
+    int *pairs = (int*)malloc(sizeof(int) * total_actors);
+    if (!pairs) {
+      perror("ddm_init: could not allocate memory for prog_buff");
+      exit(errno);
+    }
+    get_pairs(model, pairs); 
+
+    // 4. debugging: print pairs
+    for(int i=0; i<total_actors; ++i)
+      printf("%2d -> %2d\n", i, pairs[i]);
     
- 
+     
     // alernative code using optN and clingo_model_optimality_proven */
     /*
     // 1. initialize clingo w/program in prog_buff
@@ -182,11 +197,11 @@ enum cu_type *ddm_optimize(
     // 4. free clingo
     free_clingo(ctxt);
 
-    return NULL;
+    return pairs;
 }
 
 
-bool get_pairs(clingo_model_t const *model) {
+bool get_pairs(clingo_model_t const *model, int *pairs) {
   bool ret = true;
   clingo_symbol_t *atoms = NULL;
   size_t atoms_n;
@@ -217,7 +232,7 @@ bool get_pairs(clingo_model_t const *model) {
 
     char *atom = str + 7; // skip run_on(
     char *snd, *end;
-    printf("%ld %ld\n", strtol(atom, &snd, 10), strtol(++snd, &end, 10));     
+    pairs[(int)strtol(atom, &snd, 10)] = (int)strtol(++snd, &end, 10);
 
   }
 

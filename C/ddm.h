@@ -14,9 +14,10 @@ extern void ddm_init(
     int total_actors, 
     enum cu_type *cus, 
     int msg_exch_cost[total_cus][total_cus], 
-    short runnable_on[total_actors],
-    int cu_capacity[total_cus]);
-extern enum cu_type *ddm_optimize(
+    short runnable_on[total_actors]);
+extern int *ddm_optimize(
     int total_actors, 
     struct actor_matrix actors[total_actors][total_actors], 
-    int tasks_forecast[total_actors]);
+    int tasks_forecast[total_actors],
+    int total_cus,
+    int cu_capacity[total_cus]);
