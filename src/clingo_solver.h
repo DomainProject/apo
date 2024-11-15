@@ -1,4 +1,4 @@
-//#include <clingo.h>
+// #include <clingo.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -9,10 +9,10 @@
 #include <clingo.h>
 
 typedef struct cctx {
-  clingo_control_t *ctl;
-  clingo_solve_handle_t *handle;
-  int parts_l;
-  clingo_part_t *parts;
+	clingo_control_t *ctl;
+	clingo_solve_handle_t *handle;
+	int parts_l;
+	clingo_part_t *parts;
 } clingo_ctx;
 
 extern bool init_clingo(char const *program, int argc, char const **argv, clingo_ctx **cs);
