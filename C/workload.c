@@ -3,6 +3,12 @@
 #include <time.h>
 #include <math.h>
 
+// Devo tenere traccia di:
+// - Dove stanno girando i vari LP
+// - Quanti eventi sono stati eseguiti per finestra temporale su ciascuna CU
+// - Qual è la sorgente dei rollback, per calcolare un valore di annoyance
+// - Tutti i valori che passo al solver devono essere interi
+
 #define MAX_LPS 10  // Maximum number of logical processes
 #define MAX_EVENTS 1000  // Maximum number of events per LP
 
