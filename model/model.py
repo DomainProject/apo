@@ -17,6 +17,16 @@ def assignment3(num_actors,cus):
 def assignment4(num_actors,cus):
   return ['fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1']
 
+def assignment5(num_actors,cus):
+  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
+
+def assignment6(num_actors,cus):
+  return ['fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
+
+def assignment7(num_actors,cus):
+  return ['fpga_0', 'gpu_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0']
+
+
 def all_cpu(num_actors,cus):
   return ['cpu_0']*num_actors
 
@@ -27,50 +37,34 @@ def all_fpga(num_actors,cus):
   return ['fpga_0']*num_actors
 
 
-def compute_total_work(assignment):
-  num_actors = len(assignment)
-  total_work = workload[:]    #total (own + received) units per sec
-  total_anno = [0]*num_actors #total annoying (subset of received) units per sec
-
-  for i in range(num_actors):
-    for j in range(num_actors):
-      total_work[i] += comm_matrix[j][i]
-      if not on_same_unit(assignment, i,j):
-          total_anno[i] += anno_matrix[j][i]
-  return total_work, total_anno
-
-
-def compute_annoyance_cost(total_work, total_anno):
-  num_actors = len(total_work)
-  eff_anno = [anno_cost]*num_actors #latency in us
-  for i in range(num_actors):
-    eff_anno[i] *= float(total_anno[i])/total_work[i] #expected annoyance cost, aka (annoyance cost)*(probability of being annoyed)
-  return eff_anno
-
-def compute_communication_cost(assignment, total_work):
+def compute_communication_cost(assignment, total_input_rate):
   num_actors = len(assignment)
   fres = []
+
   for i in range(num_actors):
     tmp = {}                        # communication rate for actor I towards a specific device
     for k in cu_types: tmp[k] = 0       
 
-    tot = 0                         # total output communication rate
+    total_output_rate = 0                         # total output communication rate
+    for j in range(num_actors):
+      total_output_rate    += comm_matrix[i][j]       
+    expected_fan_out = total_input_rate[i]/total_output_rate
+
 
     my_device = get_dev_from_cu(assignment[i])
     
     for j in range(num_actors):
-      tot    += comm_matrix[i][j]       
       if on_same_unit(assignment, i,j): continue #no cost when communicating to the same  computing unit
-
       k = get_dev_from_cu(assignment[j])
       tmp[k] += comm_matrix[i][j]
+    
+    
+    for k in tmp: tmp[k] = float(tmp[k]) / total_output_rate #probability to communicate with a specific device
+    for k in tmp: tmp[k] = float(tmp[k]) *comm_unitary_cost * communication_costs[my_device][k] * expected_fan_out #expected cost for communicating with a specific device
 
-    for k in tmp: float(tmp[k]) / tot #probability to communicate with a specific device
-
-    for k in tmp: float(tmp[k]) * communication_costs[my_device][k] #weighted cost for communicating with a specific device
     res = 0
-    for k in tmp: res+=float(tmp[k]) #expected communication cost per individual communication
-    fres +=[res*tot/total_work[i]] #total expected communication 
+    for k in tmp: res+=float(tmp[k]) 
+    fres +=[res] #total expected communication 
   return fres
 
 
@@ -95,43 +89,65 @@ def assignment_renaming(assignment):
 
 def compute_whole_model(cu_units, assignment, log=False):
   if log: print(f"assignment:{assignment}")
-  total_work,total_anno = compute_total_work(assignment)
-  if log: print(f"eff_load:{[task_cost]*num_actors}")
-  eff_anno = compute_annoyance_cost(total_work, total_anno)
-  if log: print(f"eff_anno:{eff_anno}")
-  eff_comm = compute_communication_cost(assignment, total_work)
-  if log: print(f"eff_comm:{eff_comm}")
+  num_actors = len(assignment)
 
+  total_input_rate = [0]*num_actors #total annoying (subset of received) units per sec
+  total_annoy_rate = [0]*num_actors #total (own + received) units per sec
+
+  for i in range(num_actors):
+    for j in range(num_actors):
+      total_input_rate[i] += comm_matrix[j][i]
+      total_annoy_rate[i] += anno_matrix[j][i]
+
+  eff_comm = compute_communication_cost(assignment, total_input_rate)
+  if log: print(f"total_input_rate:{total_input_rate}")
+  if log: print(f"total_annoy_rate:{total_annoy_rate}")
+  
   latencies_per_actor  = [0]*num_actors
   for i in range(num_actors):
-    latencies_per_actor[i] += eff_comm[i] + eff_anno[i] + task_cost
+    p_annoy = total_annoy_rate[i]/total_input_rate[i]
+    latencies_per_actor[i] += eff_comm[i] + task_unit_costs[i] + p_annoy*task_anno_costs[i]
+
+  if log: print(f"actor_eff_late:{latencies_per_actor}")
 
   latencies_per_cu = {}
   for i in range(num_actors):
       cu = assignment[i]
-      if cu not in latencies_per_cu: latencies_per_cu[cu] = {'sum':0, 'load':0}
-      latencies_per_cu[cu]['sum']  += latencies_per_actor[i]*total_work[i]    
-      latencies_per_cu[cu]['load'] += total_work[i]
+      if cu not in latencies_per_cu: latencies_per_cu[cu] = {'sum':0, 'load':0, 'acts':0}
+      latencies_per_cu[cu]['sum']  += latencies_per_actor[i]*total_input_rate[i]   
+      latencies_per_cu[cu]['load'] += total_input_rate[i]
+      latencies_per_cu[cu]['acts'] += 1
 
   for cu in latencies_per_cu:
     latencies_per_cu[cu]['lat'] = latencies_per_cu[cu]['sum']/latencies_per_cu[cu]['load']
+    del latencies_per_cu[cu]['sum']
+
+  if log: print(f"dev_avg_late_rel:{[(latencies_per_cu[x]['lat'],x) for x in latencies_per_cu]}")
+
 
   for cu in latencies_per_cu:
-    dev = cu.split('_')[0]
+    dev = get_dev_from_cu(cu)
     latencies_per_cu[cu]['lat'] /= cu_types[dev]['relative_speed']
-    if latencies_per_cu[cu]['load'] > cu_types[dev]['capacity_cu']:
-        latencies_per_cu[cu]['lat'] *= cu_types[dev]['overload_penalty'] * (latencies_per_cu[cu]['load'] - cu_types[dev]['capacity_cu'])
+
+  if log: print(f"dev_avg_late_abs:{[(latencies_per_cu[x]['lat'],x) for x in latencies_per_cu]}")
+
+  for cu in latencies_per_cu:
+    dev = get_dev_from_cu(cu)
+    if latencies_per_cu[cu]['acts'] > cu_types[dev]['capacity_cu']:
+        latencies_per_cu[cu]['lat'] *= 1+cu_types[dev]['overload_penalty'] * (latencies_per_cu[cu]['acts'] - cu_types[dev]['capacity_cu'])
+    
+  if log: print(f"dev_avg_late_eff:{[(latencies_per_cu[x]['lat'],x) for x in latencies_per_cu]}")
 
   tot = 0
   for cu in latencies_per_cu:
-    tot += 1000.0*1000.0/latencies_per_cu[cu]['lat']
-    print(f"{cu}\t:{latencies_per_cu[cu]['lat']} us - {1000.0*1000.0/latencies_per_cu[cu]['lat']} task per sec - {latencies_per_cu[cu]['load']}")
+    tot += min(1.0/latencies_per_cu[cu]['lat'], latencies_per_cu[cu]['load'])
+    if log: print(f"{cu}\t:{latencies_per_cu[cu]['lat']} ms - {1.0/latencies_per_cu[cu]['lat']} task per msec - {latencies_per_cu[cu]['load']}")
     #print(f"{cu}:\t{1000.0*1000.0/latencies_per_cu[cu]['lat']} task per sec")
 
-  if log: print(f"total th: {tot} task per sec")    
+  if log: print(f"total th: {tot*1000} task per sec")    
   if log: print()
 
-  return tot
+  return tot*1000
 
 cu_units = build_cunits()
 global_solutions = {}
@@ -152,7 +168,6 @@ print(progress,end_cnts,modulo)
 
 
 for assignment in itertools.product(cu_units, repeat=num_actors):
-  break
   assignment = list(assignment)
   assignment = assignment_renaming(assignment)
 
@@ -175,6 +190,7 @@ for sol in res_sol:
 print(res_thr)
 
 
-for f in [all_cpu, all_gpu, all_fpga, assignment1, assignment2, assignment3, assignment4]:
+#for f in [all_cpu, all_gpu, all_fpga, assignment1, assignment2, assignment3, assignment4, assignment5]:
+for f in [assignment6, assignment7]:
     assignment = f(num_actors, cu_units)
     tot = compute_whole_model(cu_units, assignment, True)

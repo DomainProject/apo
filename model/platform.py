@@ -3,14 +3,12 @@ cu_types = {
     'num_units':2,            # numer of computing unit per this device
     'relative_speed':1.0,     # relative speed w.r.t. to slowest device (1.0 is the slowest)
     'capacity_cu':4,          # per computing unit capacity in terms of task units before being overloaded
-    'overload_penalty':2    # slowing factor for running as overloaded
+    'overload_penalty':10    # slowing factor for running as overloaded
     },
-'gpu' : {'num_units':1, 'relative_speed':5 , 'capacity_cu':2, 'overload_penalty': 20},
+'gpu' : {'num_units':1, 'relative_speed':5 , 'capacity_cu':2, 'overload_penalty': 30},
 'fpga': {'num_units':1, 'relative_speed':10, 'capacity_cu':1, 'overload_penalty': 60},
 }
 
-task_unitary_cost= 50  # microseconds to execute a task in the slowest cu
-comm_unitary_cost= 100   # microseconds to send a task with the faster communication channel
 
 #all the following is commu_unitary_costs
 communication_costs = {}
@@ -35,5 +33,8 @@ def get_dev_from_cu(cu_unit_label):
   return cu_unit_label.split('_')[0]
 
 
-def on_same_unit(assignment,i,j):
+def on_same_device(assignment,i,j):
   return get_dev_from_cu(assignment[i]) == get_dev_from_cu(assignment[j])
+
+def on_same_unit(assignment,i,j):
+  return assignment[i] == assignment[j]
