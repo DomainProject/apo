@@ -66,6 +66,7 @@ int main(int argc, char const **argv)
 
 
 	int *res = ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	res = ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
 
 	return 0;
 }

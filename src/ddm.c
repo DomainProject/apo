@@ -13,8 +13,9 @@ static int num_cus;
 static enum cu_type *mapping_cus;
 static int *cu_capacity;
 
-char *prog_buff;
-char *curr_pptr = LDVAR(ddm_v5_asp);
+char *prog_buff, *base_prog_buff;
+unsigned char *base_program = LDVAR(ddm_v5_asp);
+char *curr_pptr = NULL;
 size_t free_buff;
 
 bool get_pairs(clingo_model_t const *model, int *pairs);
@@ -93,12 +94,18 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 	for(int i = 0; i < total_cus; ++i)
 		for(int j = 0; j < total_cus; ++j)
 			update_buff(sprintf(curr_pptr, "msg_exch_cost(%d,%d,%d).\n", i, j, msg_exch_cost[i][j]));
+
+	// Note the end of the base program
+	base_prog_buff = curr_pptr;
 }
 
 // Restituisce un vettore in cui nella posizione i-esima è conservato il dispositivo su cui deve girare l'attore i-esimo
 int *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], int total_cus, int cu_capacity[total_cus])
 {
+	// Reset program buffer
+	curr_pptr = base_prog_buff;
+
 	// tasks_forecast/2
 	for(int i = 0; i < total_actors; ++i)
 		update_buff(sprintf(curr_pptr, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]));
@@ -209,7 +216,7 @@ bool get_pairs(clingo_model_t const *model, int *pairs)
 	}
 
 	// allocate required memory to hold all the symbols
-	if(!(atoms = malloc(sizeof(*atoms) * atoms_n))) { // AP: this memory is leaked
+	if(!(atoms = malloc(sizeof(*atoms) * atoms_n))) {
 		clingo_set_error(clingo_error_bad_alloc, "could not allocate memory for atoms");
 		goto error;
 	}
@@ -235,7 +242,8 @@ bool get_pairs(clingo_model_t const *model, int *pairs)
 
 		char *atom = str + 7; // skip run_on(
 		char *snd, *end;
-		pairs[(int)strtol(atom, &snd, 10)] = (int)strtol(++snd, &end, 10);
+		int idx = (int)strtol(atom, &snd, 10);
+		pairs[idx] = (int)strtol(++snd, &end, 10);
 	}
 
 	goto out;
@@ -264,11 +272,11 @@ void init_buff(int total_actors, int total_cus, size_t len)
 		perror("ddm_init: could not allocate memory for prog_buff");
 		exit(errno);
 	}
-
-	curr_pptr = prog_buff;
+	memcpy(prog_buff, base_program, len);
+	curr_pptr = prog_buff + len;
 }
 
-void extend_buff()
+void extend_buff(void)
 {
 	if(free_buff < 32768) {
 		if(!(prog_buff = realloc(prog_buff, 32768))) {
