@@ -25,7 +25,7 @@ Messages exchanged between actors are represented by a **strictly upper triangul
 where: `A1` and `A2` are actors, and `M` is the number of messages per time window (msg/tw) exchanged between `A1` and `A2`.
 Exchanging messages has a cost that depends on the type of the computing unit, encoded by `msg_exch_cost(U1,U2,C)`.
 
-![](./parallelism.jpg)
+![](parallelism.jpg)
 
 `mutual_annoyance(A1,A2,A)`: quanto due agenti si danno fastidio a vicenda. 
 A1 and A2 interfer with each other when running on the same cu with a noise N
