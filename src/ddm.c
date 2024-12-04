@@ -154,8 +154,18 @@ int *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 
 	// 2. invoke clingo & get the optimal as
 	clingo_model_t const *model, *tmp_model;
-	while(get_model(ctxt, &tmp_model))
+	//size_t costs_size = 3;
+    //int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);	
+	while(get_model(ctxt, &tmp_model)) {
 		model = tmp_model;
+		/*
+        clingo_model_cost(model, costs, costs_size);
+		printf("costs: ");		
+	    for(int i=0; i<costs_size; ++i)
+		   printf("%li ", costs[i]);		
+		printf("\n");
+		*/
+	}  
 
 	// 3. extract pairs <actor,cu> from the as (run_on/2 facts)
 	int *pairs = (int *)malloc(sizeof(int) * total_actors);
