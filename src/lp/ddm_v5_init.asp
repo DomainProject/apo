@@ -1,11 +1,11 @@
 % num. of actor(s)
 actor(1..8).
 
-% runnable_on_class(A,C) holds iff
-% A can run on the cus beloning to class C
-runnable_on_class(1..4,1). % cpu
-runnable_on_class(5..8,3). % cpu & gpu
-runnable_on_class(6..8,7). % cpu & gpu & fpga
+% runnable_on(A,C) holds iff
+% A can run on the cus beloning to class C (octal value)
+runnable_on(1..4,1). % cpu
+runnable_on(5..8,3). % cpu & gpu
+runnable_on(6..8,7). % cpu & gpu & fpga
 
 % msg_exch_rate(A1,A2,R) holds iff 
 % A1 and A2 exchange R messages per time window (msg/tw).
