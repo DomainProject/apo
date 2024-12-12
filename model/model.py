@@ -1,30 +1,30 @@
-from application import *
-from platform import *
+from mod2.application import *
+from mod2.platform import *
 
 def assignment1(num_actors,cus):
   assignment = []
   while(len(assignment) < num_actors):
     for cu in cus:
         assignment += [cu]
-  return sorted(assignment[:num_actors])
+  return assignment[:num_actors] #sorted(assignment[:num_actors])
 
-def assignment2(num_actors,cus):
-  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'gpu_0', 'fpga_0']
-
-def assignment3(num_actors,cus):
-  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'gpu_0', 'fpga_0']
-
-def assignment4(num_actors,cus):
-  return ['fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1']
-
-def assignment5(num_actors,cus):
-  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
-
-def assignment6(num_actors,cus):
-  return ['fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
-
-def assignment7(num_actors,cus):
-  return ['fpga_0', 'gpu_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0']
+#def assignment2(num_actors,cus):
+#  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'gpu_0', 'fpga_0']
+#
+#def assignment3(num_actors,cus):
+#  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'gpu_0', 'fpga_0']
+#
+#def assignment4(num_actors,cus):
+#  return ['fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1']
+#
+#def assignment5(num_actors,cus):
+#  return ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
+#
+#def assignment6(num_actors,cus):
+#  return ['fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1']
+#
+#def assignment7(num_actors,cus):
+#  return ['fpga_0', 'gpu_0', 'gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0']
 
 
 def all_cpu(num_actors,cus):
@@ -189,8 +189,9 @@ for sol in res_sol:
     print(sol)
 print(res_thr)
 
+print("PREDEFINED")
 
-#for f in [all_cpu, all_gpu, all_fpga, assignment1, assignment2, assignment3, assignment4, assignment5]:
-for f in [assignment6, assignment7]:
+for f in [all_cpu, all_gpu, all_fpga, assignment1]: #, assignment2, assignment3, assignment4, assignment5]:
+#for f in [assignment6, assignment7]:
     assignment = f(num_actors, cu_units)
     tot = compute_whole_model(cu_units, assignment, True)
