@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "ddm.h"
+#include "../src/ddm.h"
 
 #define NCUS 25
 #define NACT 8
@@ -65,7 +65,8 @@ int main(int argc, char const **argv)
 	int tasks_forecast[NACT] = {50, 50, 50, 50, 20, 50, 50, 80};
 
 
-	int *res = ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	int *res = ddm_poll();
 
 	return 0;
 }

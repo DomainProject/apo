@@ -18,10 +18,10 @@ unsigned char *base_program = LDVAR(ddm_v5_asp);
 char *curr_pptr = NULL;
 size_t free_buff;
 
-bool get_pairs(clingo_model_t const *model, int *pairs);
-void init_buff(int, int, size_t);
-void extend_buff(void);
-void update_buff(int);
+static bool get_pairs(clingo_model_t const *model, int *pairs);
+static void init_buff(int, int, size_t);
+static void extend_buff(void);
+static void update_buff(int);
 
 void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_cost[total_cus][total_cus],
     short runnable_on[total_actors])
@@ -99,10 +99,21 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 	base_prog_buff = curr_pptr;
 }
 
+
+// Refactor and remove!
+static int stateful_total_actors;
+static clingo_model_t const *stateful_model;
+static clingo_ctx *ctxt;
+
+
 // Restituisce un vettore in cui nella posizione i-esima è conservato il dispositivo su cui deve girare l'attore i-esimo
-int *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
+void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], int total_cus, int cu_capacity[total_cus])
 {
+	// Refactor and remove!
+	stateful_total_actors = total_actors;
+
+
 	// Reset program buffer
 	curr_pptr = base_prog_buff;
 
@@ -149,34 +160,40 @@ int *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 	// 1. initialize clingo w/program in prog_buff
 	const char *argv[] = {"--opt-mode", "opt"};
 	const int argc = 2;
-	clingo_ctx *ctxt;
+	//	clingo_ctx *ctxt;
 	init_clingo(prog_buff, argc, argv, &ctxt);
 
 	// 2. invoke clingo & get the optimal as
 	clingo_model_t const *model, *tmp_model;
-	//size_t costs_size = 3;
-    //int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);	
+	// size_t costs_size = 3;
+	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
 	while(get_model(ctxt, &tmp_model)) {
 		model = tmp_model;
 		/*
-        clingo_model_cost(model, costs, costs_size);
-		printf("costs: ");		
+	clingo_model_cost(model, costs, costs_size);
+		printf("costs: ");
 	    for(int i=0; i<costs_size; ++i)
-		   printf("%li ", costs[i]);		
+		   printf("%li ", costs[i]);
 		printf("\n");
 		*/
-	}  
+	}
 
+	// TODO: Remove!!!
+	stateful_model = model;
+}
+
+int *ddm_poll(void)
+{
 	// 3. extract pairs <actor,cu> from the as (run_on/2 facts)
-	int *pairs = (int *)malloc(sizeof(int) * total_actors);
+	int *pairs = (int *)malloc(sizeof(int) * stateful_total_actors);
 	if(!pairs) {
 		perror("ddm_init: could not allocate memory for prog_buff");
 		exit(errno);
 	}
-	get_pairs(model, pairs);
+	get_pairs(stateful_model, pairs);
 
 	// 4. debugging: print pairs
-	for(int i = 0; i < total_actors; ++i)
+	for(int i = 0; i < stateful_total_actors; ++i)
 		printf("%2d -> %2d\n", i, pairs[i]);
 
 
@@ -212,7 +229,7 @@ int *ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 }
 
 
-bool get_pairs(clingo_model_t const *model, int *pairs)
+static bool get_pairs(clingo_model_t const *model, int *pairs)
 {
 	bool ret = true;
 	clingo_symbol_t *atoms = NULL;
@@ -270,7 +287,7 @@ out:
 	return ret;
 }
 
-void init_buff(int total_actors, int total_cus, size_t len)
+static void init_buff(int total_actors, int total_cus, size_t len)
 {
 	/*
 	  free_buff = total_actors * (80 * total_actors + 115) +
@@ -286,7 +303,7 @@ void init_buff(int total_actors, int total_cus, size_t len)
 	curr_pptr = prog_buff + len;
 }
 
-void extend_buff(void)
+static void extend_buff(void)
 {
 	if(free_buff < 32768) {
 		if(!(prog_buff = realloc(prog_buff, 32768))) {
@@ -296,8 +313,19 @@ void extend_buff(void)
 	}
 }
 
-void update_buff(int chars_written)
+static void update_buff(int chars_written)
 {
 	curr_pptr += chars_written;
 	free_buff -= chars_written;
+}
+
+
+int our_function(int num_numbers, int const *restrict numbers)
+{
+	int i;
+	int sum = 0;
+	for(i = 0; i < num_numbers; i++) {
+		sum += numbers[i];
+	}
+	return sum;
 }
