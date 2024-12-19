@@ -1,17 +1,16 @@
 % -----
 % rules for distributing actor(s) on cu(s)
-% each actor can run on a computing unit only (if runnable_on_class)
-%1 { run_on(A,U) : cu(U), runnable_on(A,T), cu_type(U,T) } 1 :- actor(A).
-1 { run_on(A,U) : cu(U), runnable_on_class(A,C), class_type(C,T), cu_type(U,T) } 1 :- actor(A).
+% each actor can run on a computing unit only (if runnable_on)
+1 { run_on(A,U) : cu(U), runnable_on(A,O), oct_dev(O,D), cu_type(U,D) } 1 :- actor(A).
 
-% TODO: use an alternative encoding w/bitand &
-class_type(1,cpu).
-                    class_type(2,gpu).
-class_type(3,cpu).  class_type(3,gpu).
-                                        class_type(4,fpga).
-class_type(5,cpu).                      class_type(5,fpga).
-                    class_type(6,gpu).  class_type(6,fpga).
-class_type(7,cpu).  class_type(7,gpu).  class_type(7,fpga).
+% oct_dev: pairs octal (value) - device (name)  
+oct_dev(1,cpu).
+                oct_dev(2,gpu).
+oct_dev(3,cpu). oct_dev(3,gpu).
+                                oct_dev(4,fpga).
+oct_dev(5,cpu).                 oct_dev(5,fpga).
+                oct_dev(6,gpu). oct_dev(6,fpga).
+oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 
 % T is the total workload of cu U

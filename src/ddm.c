@@ -71,7 +71,7 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 	*/
 	// runnable_on_class/2
 	for(int i = 0; i < total_actors; ++i)
-		update_buff(sprintf(curr_pptr, "runnable_on_class(%d,%d).\n", i, runnable_on[i]));
+		update_buff(sprintf(curr_pptr, "runnable_on(%d,%d).\n", i, runnable_on[i]));
 
 	// cu/1
 	update_buff(sprintf(curr_pptr, "cu(0..%d).\n", total_cus - 1));
