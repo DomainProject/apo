@@ -14,7 +14,7 @@ static enum cu_type *mapping_cus;
 static int *cu_capacity;
 
 char *prog_buff, *base_prog_buff;
-unsigned char *base_program = LDVAR(ddm_v5_asp);
+unsigned char *base_program = NULL; // LDVAR(ddm_v5_asp); // ***
 char *curr_pptr = NULL;
 size_t free_buff;
 
@@ -29,28 +29,22 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 	num_cus = total_cus;
 	mapping_cus = cus;
 
-	//	FILE *file = fopen("../lp/ddm_v5.asp", "r");
-	//	if(file == NULL) {
-	//		perror("Error opening file");
-	//		exit(errno);
-	//	}
+    /*  -------------------------------------  */
+	int fd = open("lp/ddm_v5.asp", O_RDONLY);
+	if(fd == -1) {
+		perror("open error");
+		exit(errno);
+	}
 
-	// Moving pointer to end
-	//	fseek(file, 0, SEEK_END);
+	int len = lseek(fd, 0, SEEK_END);
+	base_program = (unsigned char *)mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
+	/*  -------------------------------------  */
 
-	// Getting position of pointer
-	//	int len = ftell(file);
-	size_t len = LDLEN(ddm_v5_asp);
+	//size_t len = LDLEN(ddm_v5_asp);
+	/*  -------------------------------------  */
 
 	// Compute an overapproximation of the memory required to store the ASP program
 	init_buff(total_actors, total_cus, len);
-
-	// reading core ddm ASP program
-	// Moving pointer to end
-	//	fseek(file, 0, SEEK_SET);
-	//	curr_pptr += fread(curr_pptr, 1, len, file);
-	//
-	//	fclose(file);
 
 	// adding facts
 	update_buff(sprintf(curr_pptr, "\n%%%%%% facts\n"));
@@ -58,17 +52,6 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 	// actor/1
 	update_buff(sprintf(curr_pptr, "actor(0..%d).\n", total_actors - 1));
 
-	/*
-	// runnable_on/2
-	for(int i=0; i<total_actors; ++i) {
-	  if (runnable_on[i] & 1)
-	    update_buff(sprintf(curr_pptr, "runnable_on(%d,cpu).\n",i));
-	  if (runnable_on[i] & (1 << 1))
-	    update_buff(sprintf(curr_pptr, "runnable_on(%d,gpu).\n",i));
-	  if (runnable_on[i] & (1 << 2))
-	    update_buff(sprintf(curr_pptr, "runnable_on(%d,fpga).\n",i));
-	}
-	*/
 	// runnable_on_class/2
 	for(int i = 0; i < total_actors; ++i)
 		update_buff(sprintf(curr_pptr, "runnable_on(%d,%d).\n", i, runnable_on[i]));
