@@ -151,6 +151,7 @@ int *ddm_optimize(
     double remaining_time = TIMEOUT; 
 	double waiting_time = (double)1/POLL_FREQ; // check four times per second
 	bool result;
+	bool proven;
 	// size_t costs_size = 3;
 	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
 
@@ -183,6 +184,15 @@ int *ddm_optimize(
 					printf("\n");
 					*/
 				}
+				if(!clingo_model_optimality_proven(model,&proven)) {
+					perror(clingo_error_message());
+					exit(clingo_error_code());						
+				}
+				if(proven)
+					printf("Proven!\n");
+				else
+					printf("Not proven\n");
+
 			    // exit the loop 
 				break;
 			}
