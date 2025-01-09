@@ -70,7 +70,7 @@ int main(int argc, char const **argv)
 
 	int *res = NULL;
 	
- 	while ( (res = ddm_poll(total_actors,true,cctx)) == NULL )
+ 	while ( (res = ddm_poll(true,cctx)) == NULL )
 	  usleep(500);
 
 	ddm_free(cctx);

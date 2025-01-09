@@ -13,7 +13,7 @@ unsigned char *base_program = NULL; // LDVAR(ddm_v5_asp); // ***
 char *curr_pptr = NULL;
 size_t free_buff;
 
-static bool get_pairs(clingo_model_t const *model, int *pairs);
+static int *get_pairs(clingo_model_t const *model);
 static void init_buff(int, int, size_t);
 static void extend_buff(void);
 static void update_buff(int);
@@ -145,7 +145,7 @@ void ddm_optimize(
 	}
 }
 
-int *ddm_poll(int total_actors, bool stop_on_optimal, clingo_ctx *cctx) {
+int *ddm_poll(bool stop_on_optimal, clingo_ctx *cctx) {
 	
 	// 1. invoke clingo & get the optimal as
 	static clingo_model_t const *model = NULL;
@@ -186,18 +186,8 @@ int *ddm_poll(int total_actors, bool stop_on_optimal, clingo_ctx *cctx) {
 	    // tmp_model == NULL: there are no more models (the last found is the optimal model) OR 
 		// tmp_model != NULL && stop_on_optimal == false: a model has been found and it does no matter if it is the optimal model
 		// 2. extract pairs <actor,cu> from the as (run_on/2 facts)
-		int *pairs = (int *)malloc(sizeof(int) * total_actors);
-		if(!pairs) {
-			perror("ddm_init: could not allocate memory for prog_buff");
-			exit(errno);
-		}
-		get_pairs(model, pairs);
+		return get_pairs(model);
 
-		// 3. debugging: print pairs
-		for(int i = 0; i < total_actors; ++i)
-			printf("%2d -> %2d\n", i, pairs[i]);
-
-		return pairs;
 	} else
       // no result (yet)
    	  return NULL;
@@ -207,7 +197,7 @@ void ddm_free(clingo_ctx *cctx) {
 	free_clingo(cctx);
 }
 
-static bool get_pairs(clingo_model_t const *model, int *pairs)
+static int *get_pairs(clingo_model_t const *model)
 {
 	bool ret = true;
 	clingo_symbol_t *atoms = NULL;
@@ -224,6 +214,12 @@ static bool get_pairs(clingo_model_t const *model, int *pairs)
 	if(!(atoms = malloc(sizeof(*atoms) * atoms_n))) {
 		clingo_set_error(clingo_error_bad_alloc, "could not allocate memory for atoms");
 		goto error;
+	}
+
+	int *pairs = (int *)malloc(sizeof(int) * atoms_n);
+	if(!pairs) {
+		perror("ddm_init: could not allocate memory for prog_buff");
+		exit(errno);
 	}
 
 	// retrieve the symbols in the model
@@ -251,10 +247,14 @@ static bool get_pairs(clingo_model_t const *model, int *pairs)
 		pairs[idx] = (int)strtol(++snd, &end, 10);
 	}
 
+	// debugging: print pairs
+	for(int i = 0; i < atoms_n; ++i)
+		printf("%2d -> %2d\n", i, pairs[i]);	
+
 	goto out;
 
 error:
-	ret = false;
+	return NULL;
 
 out:
 	// number of atoms in the model
@@ -262,7 +262,7 @@ out:
 		free(atoms);
 	}
 
-	return ret;
+	return pairs;
 }
 
 static void init_buff(int total_actors, int total_cus, size_t len)
