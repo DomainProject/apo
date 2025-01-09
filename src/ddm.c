@@ -8,11 +8,6 @@
 // gcc ddm_driver.c ddm.c -I/opt/homebrew/Cellar/clingo/5.6.2/include
 // -I/Users/emanuele/repos/ABALearn/miscellanea/libasp_solver  -L/opt/homebrew/Cellar/clingo/5.6.2/lib
 // -L/Users/emanuele/repos/ABALearn/miscellanea/libasp_solver -lclingo_solver -lclingo
-
-static int num_cus;
-static enum cu_type *mapping_cus;
-static int *cu_capacity;
-
 char *prog_buff, *base_prog_buff;
 unsigned char *base_program = NULL; // LDVAR(ddm_v5_asp); // ***
 char *curr_pptr = NULL;
@@ -29,9 +24,6 @@ int POLL_FREQ = 4;
 void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_cost[total_cus][total_cus],
     short runnable_on[total_actors])
 {
-	num_cus = total_cus;
-	mapping_cus = cus;
-
     /*  ------------- BEGIN TEMPORARY CODE -----------  */
 	int fd = open("lp/ddm_v5.asp", O_RDONLY);
 	if(fd == -1) {
@@ -90,12 +82,13 @@ void ddm_init(int total_cus, int total_actors, enum cu_type *cus, int msg_exch_c
 
 
 // Restituisce un vettore in cui nella posizione i-esima è conservato il dispositivo su cui deve girare l'attore i-esimo
-int *ddm_optimize(
+void ddm_optimize(
 	int total_actors, 
 	struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], 
 	int total_cus, 
-	int cu_capacity[total_cus])
+	int cu_capacity[total_cus],
+	clingo_ctx **cctx)
 {
 	// Reset program buffer
 	curr_pptr = base_prog_buff;
@@ -140,122 +133,78 @@ int *ddm_optimize(
 	fprintf(file, "%s\n", prog_buff);
 	fclose(file);
 
-	// 1. initialize clingo w/program in prog_buff
+	// initialize clingo w/program in prog_buff
 	const char *argv[] = {"--opt-mode", "opt"};
 	const int argc = 2;
-	clingo_ctx *cctx;
-	init_clingo_mode(prog_buff, argc, argv, clingo_solve_mode_async | clingo_solve_mode_yield, &cctx);
+	init_clingo_mode(prog_buff, argc, argv, clingo_solve_mode_async | clingo_solve_mode_yield, cctx);
 
-	// 2. invoke clingo & get the optimal as
-	clingo_model_t const *model, *tmp_model;
-    double remaining_time = TIMEOUT; 
-	double waiting_time = (double)1/POLL_FREQ; // check four times per second
+	// get the first model
+	if(!clingo_solve_handle_resume((*cctx)->handle)) {
+		perror(clingo_error_message());
+		exit(clingo_error_code());
+	}
+}
+
+int *ddm_poll(int total_actors, bool stop_on_optimal, clingo_ctx *cctx) {
+	
+	// 1. invoke clingo & get the optimal as
+	static clingo_model_t const *model = NULL;
+	clingo_model_t const *tmp_model = NULL;
 	bool result;
-	bool proven;
+	// bool proven;
 	// size_t costs_size = 3;
 	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
 
-    // search for the optimal model until timeout
-    while(remaining_time > 0) {
-		// get a model
-		if(!clingo_solve_handle_resume(cctx->handle)) {
+    // poll clingo to check if a result is ready
+    clingo_solve_handle_wait(cctx->handle, 0, &result);	
+
+	// check whether the search has finished
+	if(result) {
+		if(!clingo_solve_handle_model(cctx->handle, &tmp_model)) {
 			perror(clingo_error_message());
 			exit(clingo_error_code());
 		}
-		// search for a model by polling clingo every 'waiting_time' seconds
-		while(remaining_time > 0) {
-			// wait for 'waiting_time' to check if the next result is ready
-        	clingo_solve_handle_wait(cctx->handle, waiting_time, &result);
-			remaining_time -= waiting_time;
-			// check whether the search has finished
-			if(result) {
-				if(!clingo_solve_handle_model(cctx->handle, &tmp_model)) {
+		// replace model with the last one (NULL means there are no more models)
+		if(tmp_model) {
+			model = tmp_model;
+			/*
+			clingo_model_cost(model, costs, costs_size);
+			printf("costs: ");
+	    	for(int i=0; i<costs_size; ++i)
+		   		printf("%li ", costs[i]);
+			printf("\n");
+			*/
+		    // if stop_on_optimal is set, then resume the search for the next model & return NULL
+			if(stop_on_optimal) {    	  	
+				if(!clingo_solve_handle_resume(cctx->handle)) {
 					perror(clingo_error_message());
 					exit(clingo_error_code());
 				}
-				// replace model with the last one (NULL means there are no more models)
-				if(tmp_model) {
-					model = tmp_model;
-					/*
-					clingo_model_cost(model, costs, costs_size);
-					printf("costs: ");
-	    			for(int i=0; i<costs_size; ++i)
-		   				printf("%li ", costs[i]);
-					printf("\n");
-					*/
-				}
-				if(!clingo_model_optimality_proven(model,&proven)) {
-					perror(clingo_error_message());
-					exit(clingo_error_code());						
-				}
-				if(proven)
-					printf("Proven!\n");
-				else
-					printf("Not proven\n");
-
-			    // exit the loop 
-				break;
+				return NULL;
 			}
+		} 
+	    // tmp_model == NULL: there are no more models (the last found is the optimal model) OR 
+		// tmp_model != NULL && stop_on_optimal == false: a model has been found and it does no matter if it is the optimal model
+		// 2. extract pairs <actor,cu> from the as (run_on/2 facts)
+		int *pairs = (int *)malloc(sizeof(int) * total_actors);
+		if(!pairs) {
+			perror("ddm_init: could not allocate memory for prog_buff");
+			exit(errno);
 		}
-        // if there are no more models, exit the loop
-		if(!tmp_model)
-			break;
-	}
+		get_pairs(model, pairs);
 
-    // stops the running search (if any) and releases the handle
-	if(!clingo_solve_handle_cancel(cctx->handle)) {
-		perror(clingo_error_message());
-		exit(clingo_error_code());
-	}	
+		// 3. debugging: print pairs
+		for(int i = 0; i < total_actors; ++i)
+			printf("%2d -> %2d\n", i, pairs[i]);
 
-	if(!model) {
-		perror("ddm_optimize: no model found! UNSAT?");
-		free_clingo(cctx);
-	}
+		return pairs;
+	} else
+      // no result (yet)
+   	  return NULL;
+}
 
-	// 3. extract pairs <actor,cu> from the as (run_on/2 facts)
-	int *pairs = (int *)malloc(sizeof(int) * total_actors);
-	if(!pairs) {
-		perror("ddm_init: could not allocate memory for prog_buff");
-		exit(errno);
-	}
-	get_pairs(model, pairs);
-
-	// 4. debugging: print pairs
-	for(int i = 0; i < total_actors; ++i)
-		printf("%2d -> %2d\n", i, pairs[i]);
-
-
-	// alernative code using optN and clingo_model_optimality_proven */
-	/*
-	// 1. initialize clingo w/program in prog_buff
-	const char *argv[] = { "--opt-mode", "optN" };
-	const int argc = 2;
-	clingo_ctx *cctx;
-	init_clingo(prog_buff, argc, argv, &cctx);
-
-	// 2. invoke clingo & get the optimal as
-	clingo_model_t const *model;
-	bool proven;
-	while( get_model(cctx, &model) ) {
-	  if ( clingo_model_optimality_proven(model,&proven) ) {
-	    if(proven) {
-	    // 3. extract pairs <actor,cu> from the as (run_on/2 facts)
-	      get_pairs(model);
-	      break;
-	    }
-	  } else {
-	    perror("clingo_model_optimality_proven error ");
-	    exit(errno);
-	  }
-	}
-	*/
-
-	// 4. free clingo
+void ddm_free(clingo_ctx *cctx) {
 	free_clingo(cctx);
-
-	return pairs;
-
 }
 
 static bool get_pairs(clingo_model_t const *model, int *pairs)

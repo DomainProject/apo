@@ -64,8 +64,16 @@ int main(int argc, char const **argv)
 
 	int tasks_forecast[NACT] = {50, 50, 50, 50, 20, 50, 50, 80};
 
+	clingo_ctx *cctx = NULL;
 
-	int *res = ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity, &cctx);
+
+	int *res = NULL;
+	
+ 	while ( (res = ddm_poll(total_actors,true,cctx)) == NULL )
+	  usleep(500);
+
+	ddm_free(cctx);
 
 	return 0;
 }
