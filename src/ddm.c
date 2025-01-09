@@ -227,8 +227,7 @@ static int *get_pairs(clingo_model_t const *model)
 		goto error;
 	}
 
-	int i = 0;
-	for(it = atoms, ie = atoms + atoms_n; it != ie; ++it, ++i) {
+	for(it = atoms, ie = atoms + atoms_n; it != ie; ++it) {
 		size_t n;
 
 		// determine size of the string representation of the next symbol in the model
