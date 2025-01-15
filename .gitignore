@@ -1,5 +1,10 @@
+__pycache__
 .DS_Store
 .vscode
 a.out
 .idea
 build/*
+libclingo_solver.so
+clingo_solver.o
+ddm_tmp.asp
+ddm_test

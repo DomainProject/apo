@@ -88,8 +88,12 @@ bool init_clingo_progfilename(char const *progfilename, int argc, char const **a
 	return init_clingo(((char *)data), argc, argv, cctx);
 }
 
-
 bool init_clingo(char const *program, int argc, char const **argv, clingo_ctx **cctx)
+{
+	return init_clingo_mode(program,argc,argv,clingo_solve_mode_yield,cctx);
+}
+
+bool init_clingo_mode(char const *program, int argc, char const **argv, enum clingo_solve_mode_e mode, clingo_ctx **cctx)
 {
 	char const *error_message;
 	bool ret = true;
@@ -126,7 +130,7 @@ bool init_clingo(char const *program, int argc, char const **argv, clingo_ctx **
 	}
 
 	// get a solve handle
-	if(!clingo_control_solve(cctx_tmp->ctl, clingo_solve_mode_yield, NULL, 0, NULL, NULL, &cctx_tmp->handle)) {
+	if(!clingo_control_solve(cctx_tmp->ctl, mode, NULL, 0, NULL, NULL, &cctx_tmp->handle)) {
 		goto error;
 	}
 
