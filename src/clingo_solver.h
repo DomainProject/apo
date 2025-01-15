@@ -15,7 +15,8 @@ typedef struct cctx {
 	clingo_part_t *parts;
 } clingo_ctx;
 
-extern bool init_clingo(char const *program, int argc, char const **argv, clingo_ctx **cs);
+extern bool init_clingo(char const *program, int argc, char const **argv, clingo_ctx **cs); // solve mode: clingo_solve_mode_yield
+extern bool init_clingo_mode(char const *program, int argc, char const **argv, enum clingo_solve_mode_e mode, clingo_ctx **cctx);
 extern bool init_clingo_progfilename(char const *progfilename, int argc, char const **argv, clingo_ctx **cctx);
 extern bool get_model(clingo_ctx *cs, clingo_model_t const **model);
 extern bool clingo_model_to_strings(clingo_model_t const *model, size_t *as_n, char **as[]);

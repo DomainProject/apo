@@ -26,7 +26,7 @@
 #define EXTLD(NAME)                                                                                                    \
 	extern const unsigned char _binary_##NAME##_start[];                                                           \
 	extern const unsigned char _binary_##NAME##_end[];
-#define LDVAR(NAME) _binary_##NAME##_start
+#define LDVAR(NAME) (unsigned char *)_binary_##NAME##_start
 #define LDLEN(NAME) ((_binary_##NAME##_end) - (_binary_##NAME##_start))
 #endif
 

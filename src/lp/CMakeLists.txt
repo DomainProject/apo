@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023-2024 Alessandro Pellegrini <a.pellegrini@ing.uniroma2.it>
+# SPDX-FileCopyrightText: 2023-2025 Alessandro Pellegrini <a.pellegrini@ing.uniroma2.it>
 # SPDX-License-Identifier: GPL-3.0-only
 
 set(resources

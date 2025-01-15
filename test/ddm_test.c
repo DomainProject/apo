@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "ddm.h"
+#include "../src/ddm.h"
 
 #define NCUS 25
 #define NACT 8
@@ -52,7 +52,7 @@ int main(int argc, char const **argv)
 
 	// <annoynace,msg_exchange_rate>
 	struct actor_matrix actors[NACT][NACT] = {
-	    {{0, 0}, {20, 10}, {10, 20}, {0, 10}, {0, 1}, {0, 0}, {0, 0}, {0, 0}}, // 0
+	    {{0, 0}, {20, 10}, {10, 20}, {0, 10}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, // 0
 	    {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},      // 1
 	    {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},      // 2
 	    {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},      // 3
@@ -64,16 +64,18 @@ int main(int argc, char const **argv)
 
 	int tasks_forecast[NACT] = {50, 50, 50, 50, 20, 50, 50, 80};
 
-	clingo_ctx *cctx = NULL;
+	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	int *res;
 
-	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity, &cctx);
+	while((res = ddm_poll()) == NULL) {
+		printf(".");
+	}
+	printf("\n");
 
-	int *res = NULL;
-	
- 	while ( (res = ddm_poll(true,cctx)) == NULL )
-	  usleep(500);
+	for(int i = 0; i < total_actors; ++i) {
+		printf("%2d -> %2d\n", i, res[i]);
+	}
 
-	ddm_free(cctx);
 
 	return 0;
 }
