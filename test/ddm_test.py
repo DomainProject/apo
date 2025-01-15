@@ -61,6 +61,6 @@ def test_ddm():
     res = None
     while res is None:
         res = ddm_poll()
-    print(res)
     result_values = [res[i] for i in range(total_actors)]
-    print(result_values)
+    expected = [11, 11, 11, 11, 0, 20, 20, 20]
+    assert result_values == expected

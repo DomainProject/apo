@@ -56,4 +56,7 @@ _domainddm.ddm_poll.restype = ctypes.POINTER(ctypes.c_int)
 
 
 def ddm_poll():
-    return _domainddm.ddm_poll()
+    ret = _domainddm.ddm_poll()
+    if not ret:
+        return None
+    return ret
