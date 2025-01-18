@@ -1,4 +1,4 @@
-from metasimulation.ddm import ddm_prepare_actor_matrix, ddm_init, ddm_optimize, ddm_poll
+from src.ddm import ddm_prepare_actor_matrix, ddm_init, ddm_optimize, ddm_poll
 
 
 def test_ddm():

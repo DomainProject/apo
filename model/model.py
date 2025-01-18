@@ -1,5 +1,5 @@
-from mod2.application import *
-from mod2.platform import *
+from mod1.application import *
+from mod1.hardware import *
 
 def assignment1(num_actors,cus):
   assignment = []

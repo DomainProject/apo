@@ -49,3 +49,15 @@ def on_same_unit(assignment,i,j):
 def get_communication_latency(dev_a, dev_b):
   if dev_a == dev_b: return 0
   return communication_costs[get_dev_from_cu(dev_a)][get_dev_from_cu(dev_b)]*comm_unitary_cost
+
+def get_capacity_vector():
+    res = []
+    for k in cu_types:
+        res += [cu_types[k]['capacity_cu']]*cu_types[k]['num_units']
+    return res
+
+def convert_ddm_assignment_to_sim_assingment(ddm_assignment):
+    # ddm_assignment is a list of integers, where each integer represents the computing unit index
+    # we need to convert it to a list of strings, where each string represents the computing unit label
+    cunits = build_cunits()
+    return [cunits[i] for i in ddm_assignment]

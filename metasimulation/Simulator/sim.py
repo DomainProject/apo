@@ -1,13 +1,12 @@
 from enum import Enum
 from heapq import *
 
-
 wall_clock_time_events = []
 verbose=False
 
 class EVT(Enum):
 
-	STAT = 0
+	TIME_WINDOW = 0
 	RCV  = 1
 	EXE_BGN = 2
 	EXE_END = 3
@@ -54,3 +53,9 @@ def dequeue_event(debug=verbose):
 	if debug: print("SCHEDULING DEVICE",t )
 	return t
 
+def get_events_count_vector_in_next_window(window_size, actors):
+	res = [0]*actors
+	for e in wall_clock_time_events:
+		if e[0] < window_size and e[3] != -1:
+			res[e[3]] += 1
+	return res
