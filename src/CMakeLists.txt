@@ -6,7 +6,7 @@ find_package(Clingo REQUIRED)
 message(STATUS "Clingo include dirs: ${Clingo_INCLUDE_DIRS}")
 message(STATUS "Clingo libraries: ${Clingo_LIBRARIES}")
 
-add_library(domainddm SHARED ddm.c clingo_solver.c)
+add_library(domainddm SHARED ddm.c dynstr.c clingo_solver.c)
 target_link_libraries(domainddm PRIVATE clingo resources)
 target_include_directories(domainddm PRIVATE ${Clingo_INCLUDE_DIRS})
 

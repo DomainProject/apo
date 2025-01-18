@@ -7,9 +7,9 @@
 #define NCUS 25
 #define NACT 8
 
-int main(int argc, char const **argv)
+int main(void)
 {
-	int total_cus = NCUS;
+int total_cus = NCUS;
 	int total_actors = NACT;
 	enum cu_type cus[NCUS] = {
 	    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0-19
@@ -75,7 +75,7 @@ int main(int argc, char const **argv)
 	for(int i = 0; i < total_actors; ++i) {
 		printf("%2d -> %2d\n", i, res[i]);
 	}
-
+	free(res);
 
 	return 0;
 }
