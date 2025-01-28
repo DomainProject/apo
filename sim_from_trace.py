@@ -23,19 +23,36 @@ def check_and_install_new_binding(operations, wct_ts):
 
 
 from metasimulation.SimulationModel.State import State as SimulationState
-from metasimulation.window_operations.ddm_operations import DdmOperations
-
 import metasimulation.SimulationEngine.sim as Simulator
 from metasimulation.SimulationEngine.sim import *
 from metasimulation.SimulationModel.event_handlers import *
 from metasimulation.SimulationParameters.global_constants import *
 
+from metasimulation.window_operations.ddm_operations    import DdmOperations    
+from metasimulation.window_operations.metis_operations  import MetisOperations  
+from metasimulation.window_operations.random_operations import RandomOperations 
+from metasimulation.window_operations.null_operations  import NullOperations   
+
+
+
 
 sim_state = SimulationState(sys.argv[1])
-sim_state.init_simulator_queue()
+operations_array = [ NullOperations(sim_state), DdmOperations(sim_state), MetisOperations(sim_state), RandomOperations(sim_state) ]
 
-# TODO: use sys.argv[1] to change the instantiated object
-operations = DdmOperations(sim_state)
+if len(sys.argv) < 3:
+    op_index = 0
+else:
+    op_index = int(sys.argv[2])
+
+if op_index < 0 or op_index >= (len(operations_array)):
+    print("you should pass a proper index for window_operations for accesing this array ",operations_array)
+    exit(1)
+
+operations = operations_array[op_index]
+
+print(f"using {operations} for rebalancing")
+
+sim_state.init_simulator_queue()
 
 rebalance_in_progress = False
 rebalance_completed = True
