@@ -1,336 +1,161 @@
 import sys
 
-from Simulator.sim import *
-from hardware import *
-from metasimulation.window_operations.ddm_operations import DdmOperations
 
-skip_queue_validation = True
-
-traces = load_trace(sys.argv[1])  # load trace
-num_actors = len(traces)
-
-ending_simulation = False
-time_window_size = 500  # milliseconds
-task_unit_costs = [0.020] * num_actors  # milliseconds to execute an event
-task_anno_costs = [0.100] * num_actors  # milliseconds to undo an event
-
-annoyance = []  # [[0.0]*num_actors]*num_actors
-communication = []  # [[0.0]*num_actors]*num_actors
-
-for i in range(num_actors):
-    annoyance += [[]]
-    communication += [[]]
-    for j in range(num_actors):
-        annoyance[i] += [0]
-        communication[i] += [0]
-
-last_ts_idx = [-1] * num_actors
-committed_idxs = [0] * num_actors
-init_set = set([])
-assignment = []
-min_vt = float('inf')
-
-
-def pack_task(ts, a_id_dst, idx, from_id):
-    return (ts, a_id_dst, idx, from_id)
-
-
-def validate_task_queue(queue, size):
-    if skip_queue_validation: return
-    if not ending_simulation: assert size == len(queue)
-
-    ins = set([])
-    for _, id, _, _ in queue:
-        ins.add(id)
-    assert len(queue) == len(ins)
-
-
-def check_and_install_new_binding(operations):
-    global assignment
-    binding = operations.delayed_on_window(num_actors, assignment)
-    if binding is None:
-        return False
-    if binding != assignment:
-        assignment = binding
-        # Now we have to recreate the queues. All pending messages must be moved from the previous assignment to the new one
-        # TODO: please verify this code!
-        cu_units = sorted(build_cunits())
-        cu_units_data = {}
-        for k in cu_units:    cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
-        for a_id in range(len(assignment)):
-            heappush(cu_units_data[assignment[a_id]]['queue'], pack_task(0, a_id, 0, num_actors))
-            cu_units_data[assignment[a_id]]['len'] += 1
-        for cu in cu_units_data:
-            validate_task_queue(cu_units_data[cu]['queue'], cu_units_data[cu]['len'])
-            schedule_event(0, cu, EVT.EXE_BGN)
+def check_and_install_new_binding(operations, wct_ts):
+    binding = operations.delayed_on_window()
+    if binding is None: return False
+    
+    print("got _assignment ")
+    
+    if binding != sim_state.get_assignment() and sim_state._pending_assigment != binding:
+        sim_state.put_pending_assignment(binding)
+        print("new binding", binding)
+        to_updated = set([])
+        for i in range(len(sim_state._assignment)):
+            if sim_state._pending_assignment[i] != sim_state._assignment[i]:
+                to_updated.add(sim_state._assignment[i])
+        for cu in to_updated:
+            Simulator.schedule_event(wct_ts, cu, EVT.REASSIGN)
+    else:
+        print("same binding", binding)
     return True
 
 
-def simulation():
-    global assignment
-    global ending_simulation
-    global communication
-    global annoyance
-    global min_vt
 
-    last_ts_idx = [-1] * num_actors
-    committed_idxs = [0] * num_actors
-
-    cu_units = sorted(build_cunits())
-    cu_units_data = {}
-    for k in cu_units:    cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
-
-    print(f"starting assignment...", end='')
-    cnt = 0
-    for k in sorted(traces.keys()):
-        assignment += [cu_units[cnt]]
-        cnt = (cnt + 1) % len(cu_units)
-    assignment = ['gpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_0']
-    print(f"done")
-
-    print(f"populate device queue...", end='')
-    for a_id in range(len(assignment)):
-        heappush(cu_units_data[assignment[a_id]]['queue'], pack_task(0, a_id, 0, num_actors))
-        cu_units_data[assignment[a_id]]['len'] += 1
-    print(f"done")
-
-    print(f"populate simulator queue...", end='')
-    for cu in cu_units_data:
-        validate_task_queue(cu_units_data[cu]['queue'], cu_units_data[cu]['len'])
-        schedule_event(0, cu, EVT.EXE_BGN)
-    schedule_event(time_window_size, 0, EVT.TIME_WINDOW)
-    print(f"done")
-
-    # TODO: use sys.argv[1] to change the instantiated object
-    operations = DdmOperations()
-
-    print("BEGIN SIMULATION LOOP")
-
-    rebalance_in_progress = False
-
-    while is_there_any_pending_evt():
-        wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from = dequeue_event()
-
-        # Time Window Event
-        if evt_t == EVT.TIME_WINDOW and not rebalance_in_progress:
-            min_vt = operations.on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs,
-                                          time_window_size, communication, annoyance)
-            rebalance_in_progress = True
-            schedule_event(wct_ts + time_window_size, 0, EVT.TIME_WINDOW)
-            continue
-
-        cu_data = cu_units_data[cur_cu]
-        validate_task_queue(cu_data['queue'], cu_data['len'])
-
-        s = f"past wall clock time event {cur_cu}: {wct_ts}, {cu_data['last_wct']} evt: {(wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from)}"
-        assert wct_ts >= cu_data['last_wct'], s
-        cu_data['last_wct'] = wct_ts
-
-        # the device can start the processing of the highest priority actor
-        # schedules the EXE_END event
-        if evt_t == EVT.EXE_BGN:    begin_exec(cur_cu, cu_data['queue'], cu_data['last_wct'])
-        validate_task_queue(cu_data['queue'], cu_data['len'])
-
-        # the device has received some task from some other device
-        # this do not schedule anything, it just updates task queue of the device
-        if evt_t == EVT.RCV:
-            assert assignment[a_id] == cur_cu
-            recv(cu_data['queue'], a_id, a_ts, actor_from)
-            validate_task_queue(cu_data['queue'], cu_data['len'])
-
-        # the device has completed its non-preemptable execution
-        # now check received messages in the meantime
-        # if this event is out-of-order,  reschedule this type of event to manage the cost for solving inconstencies
-        # if it is in order, schedule EXE_BGN
-        if evt_t == EVT.EXE_END:    end_exec(cur_cu, cu_data['queue'], cu_data['last_wct'])
-        validate_task_queue(cu_data['queue'], cu_data['len'])
-
-        # Poll for a rebalancing solution
-        if rebalance_in_progress:
-            if check_and_install_new_binding(operations):
-                rebalance_in_progress = False
-                print(f"REBALANCE DONE @ {wct_ts}")
-
-        # print(cu_data['queue'])
-    # build application.py for throughput estimator
-    for i in range(num_actors):
-        for j in range(num_actors):
-            communication[j][i] = communication[j][i] / min_vt
-            annoyance[j][i] = annoyance[j][i] / min_vt
-
-    print(f"END SIMULATION LOOP @ {min_vt}")
-    f = open('application.py', 'w')
-    f.write(f"num_actors        = {num_actors}       \n")
-    f.write(f"task_unit_costs   = {task_unit_costs}  \n")
-    f.write(f"task_anno_costs   = {task_anno_costs}  \n")
-    f.write(f"comm_unitary_cost = {comm_unitary_cost}    \n")
-
-    f.write(f"comm_matrix = [\n")
-    for i in range(num_actors):
-        f.write(f"{communication[i]}")
-        if i != num_actors - 1:        f.write(f",")
-        f.write(f"\n")
-    f.write(f"]\n")
-
-    f.write(f"anno_matrix      = [\n")
-    for i in range(num_actors):
-        f.write(f"{annoyance[i]}")
-        if i != num_actors - 1:        f.write(f",")
-        f.write(f"\n")
-    f.write(f"]\n")
+from metasimulation.SimulationModel.State import State as SimulationState
+from metasimulation.window_operations.ddm_operations import DdmOperations
+from metasimulation.window_operations.base_operations import BaseOperations
+import metasimulation.SimulationEngine.sim as Simulator
+from metasimulation.SimulationEngine.sim import *
+from metasimulation.SimulationModel.event_handlers import *
+from metasimulation.SimulationParameters.global_constants import *
 
 
-def begin_exec(cur_cu, queue, last_wct):
-    global ending_simulation
-    if len(queue) == 0:
-        return  # no events for this device
-    else:
-        initial = len(queue)
+sim_state = SimulationState(sys.argv[1])
+sim_state.init_simulator_queue()
 
-        vts, actor_id, _, _ = queue[0]  # get next task for this device according to task priority
-        actor_evt_idx = last_ts_idx[actor_id] + 1  # get next step from trace
-        # print("PEEK FROM DEVICE QUEUE", vts, actor_id, "EVT IDX", actor_evt_idx)
+# TODO: use sys.argv[1] to change the instantiated object
+operations = DdmOperations(sim_state)
+base_ops = BaseOperations()
 
-        end_exe_wct = last_wct
-        end_exe_wct += task_unit_costs[actor_id]  # simulate execution
+print(f"BEGIN SIMULATION LOOP")
 
-        # just for knowing if all actors have been initiated
-        if vts == 0:
-            if actor_id not in init_set: init_set.add(actor_id)
-            if len(init_set) == num_actors: print("END ACTOR INIT")
+rebalance_in_progress = False
+rebalance_completed = True
+rebalance_period = 4
+rebalance_cnt = 0
 
-        # execute all steps of the trace with same ts
-        while True:
-            # simulate task send
-            a_dest_id = traces[actor_id][actor_evt_idx][2]
-            a_dest_ts = traces[actor_id][actor_evt_idx][1]
-            a_dest_cu = assignment[a_dest_id]
+while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
+    wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from = Simulator.dequeue_event()
+    # Time Window Event
+    if evt_t == EVT.TIME_WINDOW:
+        communication, annoyance = sim_state.get_state_matrix()
 
-            # emulate send cost
-            end_exe_wct += get_communication_latency(cur_cu, a_dest_cu)
+        if wct_ts > 0:
+            min_vt = base_ops.on_window(
+                sim_state.get_cunits_data(), 
+                wct_ts, 
+                sim_state.get_can_end(), 
+                sim_state.get_gvt(), 
+                sim_state.commit(),
+                time_window_size, 
+                communication, 
+                annoyance
+            )
+            if not rebalance_in_progress and rebalance_completed:
+                rebalance_cnt += 1
+                if (rebalance_cnt % rebalance_period) == 0:
+                    min_vt = operations.on_window(
+                        sim_state.get_cunits_data(), 
+                        wct_ts, 
+                        sim_state.get_can_end(), 
+                        sim_state.get_gvt(), 
+                        sim_state.commit(),
+                        time_window_size, 
+                        communication, 
+                        annoyance
+                    )
+                    rebalance_in_progress = True
+                    rebalance_completed = False
 
-            schedule_event(end_exe_wct, a_dest_cu, EVT.RCV, (a_dest_id, a_dest_ts, actor_id))
-            # print("sent",cu_data['last_wct'], a_dest_cu, "RECEIVE", a_dest_id, a_dest_ts, actor_id)
+            sim_state.serialize_stat(wct_ts)
+            print()
+        Simulator.schedule_event(wct_ts + time_window_size, "", EVT.TIME_WINDOW)
 
-            actor_evt_idx += 1
-            if actor_evt_idx >= len(traces[actor_id]) or vts != traces[actor_id][actor_evt_idx][
-                0]:  # send all output events for the current event
-                break
+        continue
 
-        # update device queue
-        if actor_evt_idx < len(traces[actor_id]):
-            heapreplace(queue, pack_task(traces[actor_id][actor_evt_idx][0], actor_id, actor_evt_idx, num_actors))
+    cu_data = sim_state.get_cunit_data(cur_cu)
+    sim_state.validate_task_queue(cur_cu)
+
+    s = f"past wall clock time event {cur_cu}: {wct_ts}, {cu_data['last_wct']} evt: {(wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from)}"
+    assert wct_ts >= cu_data['last_wct'], s
+    cu_data['last_wct'] = wct_ts
+
+    # the device can start the processing of the highest priority actor
+    # schedules the EXE_END event
+    if evt_t == EVT.EXE_BGN:
+        #this might get empty due to migration  
+        if len(cu_data['queue']) > 0: 
+            begin_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
+        
+    # the device has received some task from some other device
+    # this do not schedule anything, it just updates task queue of the device
+    if evt_t == EVT.RCV:        
+        if sim_state._assignment[a_id] != cur_cu:
+            print("ON A DIFFERENT DEVICE", cur_cu, sim_state._assignment[a_id])
+            Simulator.schedule_event(wct_ts+0.1, sim_state._assignment[a_id], EVT.RCV, (a_id, a_ts, actor_from))
         else:
-            # an actor has ended its trace - stop the metasimulation with uncommitted stuff within the simulation
-            if not ending_simulation: print("ENDED TRACE", actor_id)
-            ending_simulation = True
-            heappop(queue)
+            recv(sim_state, cu_data['queue'], a_id, a_ts, actor_from, cu_data['last_wct'])
 
-        # last_ts_idx[actor_id] = actor_evt_idx
-        schedule_event(end_exe_wct, cur_cu, EVT.EXE_END)
-        if not ending_simulation: assert initial == len(queue)
+    # the device has completed its non-preemptable execution
+    # now check received messages in the meantime
+    # if this event is out-of-order,  reschedule this type of event to manage the cost for solving inconstencies
+    # if it is in order, schedule EXE_BGN
+    if evt_t == EVT.EXE_END:   
+        ok = end_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
 
+        if ok  and 'bind' in cu_data and cu_data['bind']:
+            i = 0
+            while i < len(cu_data['queue']):
+                a = cu_data['queue'][i]
+                if sim_state._assignment[a.get_id()] != sim_state._pending_assignment[a.get_id()]:
+                    Simulator.schedule_event(wct_ts, sim_state._pending_assignment[a.get_id()], EVT.BIND, (a.get_id(), 0, a.get_id()))
+                    del cu_data['queue'][i]
+                    cu_data['len'] -= 1
+                else:
+                    i+=1
+            cu_data['bind'] = False
+        
+    if evt_t == EVT.REASSIGN: cu_data['bind'] = True
 
-def end_exec(cur_cu, queue, last_wct):
-    global ending_simulation
+    if evt_t == EVT.BIND:
+        if len(cu_data['queue']) == 0:
+            Simulator.schedule_event(wct_ts, cur_cu, EVT.EXE_BGN)
 
-    if len(queue) == 0: return
+        heappush(cu_data['queue'], sim_state._actors[a_id])
+        cu_data['len'] += 1
+        sim_state._assignment[a_id] = cur_cu
+        #print("PST", wct_ts, sim_state._assignment)
+        if sim_state._assignment == sim_state._pending_assignment and not rebalance_completed:
+            print(f"REBALANCE COMPLETED @ {wct_ts} resched @ {wct_ts + time_window_size}")
+            #for cu in sim_state.get_cunits_data():
+            #    print(cu, sim_state.get_cunits_data()[cu], len(sim_state.get_cunits_data()[cu]['queue']))
+            rebalance_completed = True
 
-    initial = len(queue)
-    a_ts, a_id, actor_evt_id, from_id = queue[0]
-    last_exec_ts = traces[a_id][last_ts_idx[a_id]][0]
+    sim_state.validate_task_queue(cur_cu)
 
-    # received a out-of-order task, hence realign
-    end_exe_wct = last_wct
-    if last_ts_idx[a_id] >= 0 and a_ts < last_exec_ts:
+    # Poll for a rebalancing solution
+    if rebalance_in_progress and not rebalance_completed:
+        if check_and_install_new_binding(operations, wct_ts):
+            rebalance_in_progress = False
+            print(f"REBALANCE STARTED @ {wct_ts}")
+            #print("PST", wct_ts, sim_state._assignment)
 
-        end_exe_wct += task_unit_costs[a_id]
+# build application.py for throughput estimator
 
-        # print("managing out of order task", a_ts, "vs", last_exec_ts, "to",  a_id, "from", from_id, "last_idx", last_ts_idx[a_id], queue)
+sim_state.commit()
 
-        outputs = {}
-        while last_ts_idx[a_id] >= 0 and a_ts <= traces[a_id][last_ts_idx[a_id]][0]:
-            dst_id = traces[a_id][last_ts_idx[a_id]][2]
-            dst_ts = traces[a_id][last_ts_idx[a_id]][1]
-
-            if dst_id != a_id:
-                if dst_id not in outputs: outputs[dst_id] = float('inf')
-                outputs[dst_id] = min(outputs[dst_id], dst_ts)
-                # print("FOUND ANTIMESSAGE")
-            last_ts_idx[a_id] -= 1
-
-        for dst_id in outputs:
-            dst_cu = assignment[dst_id]
-            end_exe_wct += get_communication_latency(cur_cu, dst_cu)
-            schedule_event(end_exe_wct, dst_cu, EVT.RCV, (dst_id, dst_ts, a_id))
-
-        j = -1
-        cnt = 0
-        for i in range(len(queue)):
-            if queue[i][1] == a_id:
-                j = i
-                cnt += 1
-
-        # print(len(annoyance), a_id,i,j,queue)
-        if not ending_simulation:
-            if j < 0 or i >= len(queue) or cnt != 1: print(a_id, i, j, cnt, queue)
-            if j < 0 or i >= len(queue) or cnt != 1: print(assignment)
-            assert i < len(queue)
-            assert cnt == 1
-            assert j >= 0
-
-        queue[j] = pack_task(a_ts, a_id, last_ts_idx[a_id], num_actors)
-        heapify(queue)
-        # if not found:
-        #	heappush(queue, pack_task(a_ts, a_id, last_ts_idx[a_id], num_actors) )
-
-        # print(cur_cu, last_wct, "ROLLBACK", a_id, found)
-        schedule_event(end_exe_wct, cur_cu, EVT.EXE_END)
-        # print(assignment)
-        # exit()
-    else:
-        while last_exec_ts == traces[a_id][last_ts_idx[a_id]][0]:
-            last_ts_idx[a_id] += 1
-            if last_ts_idx[a_id] >= len(traces[a_id]):  # send all output events for the current event
-                break
-
-        schedule_event(end_exe_wct, cur_cu, EVT.EXE_BGN)
-    if not ending_simulation: assert initial == len(queue)
+print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ GVT {wct_ts} @ SVT {sim_state.get_gvt()}")
 
 
-def recv(queue, a_id, a_ts, actor_from):
-    global annoyance, communication
-    initial = len(queue)
-    if initial == 0: return
-    ins = set([])
-    j = -1
-    cnt = 0
-    for i in range(len(queue)):
-        ins.add(queue[i][1])
-        if queue[i][1] == a_id:
-            j = i
-            cnt += 1
 
-    # print(len(annoyance), a_id,i,j,queue)
-
-    if not ending_simulation:
-        if j < 0 or i >= len(queue) or cnt != 1: print(a_id, i, j, queue)
-        if j < 0 or i >= len(queue) or cnt != 1: print(assignment)
-        assert i < len(queue)
-        assert cnt == 1
-        assert j >= 0
-
-    communication[a_id][actor_from] += 1
-
-    if j < 0 or queue[j][0] <= a_ts: return  # in order hence go on
-
-    # print(a_id, actor_from)
-    annoyance[a_id][actor_from] += 1
-    queue[j] = pack_task(a_ts, a_id, -1, actor_from)
-    heapify(queue)  # resort queue
-
-    assert initial == len(queue)
-
-
-if __name__ == "__main__":
-    simulation()
