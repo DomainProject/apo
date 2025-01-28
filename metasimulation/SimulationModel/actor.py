@@ -55,17 +55,22 @@ class Actor():
 
     def fix_executed(self):
         cnt=0
-        while self._executed[-1] >= self.next_ts():
+        while len(self._executed) > 0 and self._executed[-1] >= self.next_ts():
             self._executed.pop()
             cnt+=1
         return cnt
+
     def do_reverse(self):
-        self._last_from_trace -= 1
+        if  self._last_from_trace > -1:
+            self._last_from_trace -= 1
 
     def fix_bound(self):
-        self._last_lvt = max(self._executed[-1], self._trace[self._last_from_trace][0])
-
-
+        last_exec_a = 0
+        last_exec_b = 0
+        if len(self._executed) > 0: last_exec_a = self._executed[-1]
+        if self._last_from_trace > -1: last_exec_b = self._trace[self._last_from_trace][0]
+        self._last_lvt = max(last_exec_a, last_exec_b)
+        
     def last_trace(self):
         return self._trace[self._last_from_trace]
 
