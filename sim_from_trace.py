@@ -38,15 +38,19 @@ sim_state.init_simulator_queue()
 operations = DdmOperations(sim_state)
 base_ops = BaseOperations()
 
-print(f"BEGIN SIMULATION LOOP")
-
 rebalance_in_progress = False
 rebalance_completed = True
-rebalance_period = 4
 rebalance_cnt = 0
+
+
+print(f"BEGIN SIMULATION LOOP")
 
 while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from = Simulator.dequeue_event()
+    #if wct_ts > 100: 
+        #sim_state.set_can_end(True)
+        #continue
+    
     # Time Window Event
     if evt_t == EVT.TIME_WINDOW:
         communication, annoyance = sim_state.get_state_matrix()
@@ -85,7 +89,6 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
         continue
 
     cu_data = sim_state.get_cunit_data(cur_cu)
-    sim_state.validate_task_queue(cur_cu)
 
     s = f"past wall clock time event {cur_cu}: {wct_ts}, {cu_data['last_wct']} evt: {(wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from)}"
     assert wct_ts >= cu_data['last_wct'], s
@@ -142,8 +145,6 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
             #    print(cu, sim_state.get_cunits_data()[cu], len(sim_state.get_cunits_data()[cu]['queue']))
             rebalance_completed = True
 
-    sim_state.validate_task_queue(cur_cu)
-
     # Poll for a rebalancing solution
     if rebalance_in_progress and not rebalance_completed:
         if check_and_install_new_binding(operations, wct_ts):
@@ -152,8 +153,6 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
             #print("PST", wct_ts, sim_state._assignment)
 
 # build application.py for throughput estimator
-
-sim_state.commit()
 
 print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ GVT {wct_ts} @ SVT {sim_state.get_gvt()}")
 

@@ -74,11 +74,6 @@ class State():
         print(f"done")
 
 
-        print(f"Validate device queue...", end='')
-        for cu in self._cu_units_data:
-            validate_task_queue(self._cu_units_data[cu]['queue'], self._cu_units_data[cu]['len'])
-        print(f"done")
-
     def put_pending_assignment(self, assignment):
         self._pending_assignment = assignment
 
@@ -95,10 +90,6 @@ class State():
 
     def get_cunit_data(self, cur_cu):  return self._cu_units_data[cur_cu]
     def get_cunits_data(self):         return self._cu_units_data
-
-    def validate_task_queue(self, cur_cu): 
-        data = self.get_cunit_data(cur_cu)
-        validate_task_queue(data['queue'], data['len'])
 
     def add_to_init_set(self, aid):
         self._init_set.add(aid)
@@ -223,13 +214,3 @@ def load_trace(path):
     for k in traces:
         traces[k] = sorted(traces[k], key=lambda x:x[0])
     return traces
-
-def validate_task_queue(queue, size):
-    global skip_queue_validation
-    if skip_queue_validation: return
-    if not ending_simulation: assert size == len(queue)
-
-    ins = set([])
-    for actor in queue:
-        ins.add(actor.get_id())
-    assert len(queue) == len(ins)
