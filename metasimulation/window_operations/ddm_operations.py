@@ -22,8 +22,6 @@ class DdmOperations(WindowOperations):
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, min_vt, committed, time_window_size,
                   communication, annoyance):
-        min_vt = super().on_window(cu_units_data, wct_ts, ending_simulation, min_vt, committed, time_window_size,
-                  communication, annoyance)
 
         actor_matrix = []
         num_actors = len(communication)

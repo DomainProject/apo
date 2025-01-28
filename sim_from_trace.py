@@ -24,7 +24,7 @@ def check_and_install_new_binding(operations, wct_ts):
 
 from metasimulation.SimulationModel.State import State as SimulationState
 from metasimulation.window_operations.ddm_operations import DdmOperations
-from metasimulation.window_operations.base_operations import BaseOperations
+
 import metasimulation.SimulationEngine.sim as Simulator
 from metasimulation.SimulationEngine.sim import *
 from metasimulation.SimulationModel.event_handlers import *
@@ -36,7 +36,6 @@ sim_state.init_simulator_queue()
 
 # TODO: use sys.argv[1] to change the instantiated object
 operations = DdmOperations(sim_state)
-base_ops = BaseOperations()
 
 rebalance_in_progress = False
 rebalance_completed = True
@@ -56,16 +55,12 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
         communication, annoyance = sim_state.get_state_matrix()
 
         if wct_ts > 0:
-            min_vt = base_ops.on_window(
-                sim_state.get_cunits_data(), 
-                wct_ts, 
-                sim_state.get_can_end(), 
-                sim_state.get_gvt(), 
-                sim_state.commit(),
-                time_window_size, 
-                communication, 
-                annoyance
-            )
+
+
+            gvt = sim_state.get_gvt() 
+            committed = sim_state.commit()
+            print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", committed / time_window_size)
+
             if not rebalance_in_progress and rebalance_completed:
                 rebalance_cnt += 1
                 if (rebalance_cnt % rebalance_period) == 0:
@@ -73,8 +68,8 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                         sim_state.get_cunits_data(), 
                         wct_ts, 
                         sim_state.get_can_end(), 
-                        sim_state.get_gvt(), 
-                        sim_state.commit(),
+                        gvt, 
+                        committed,
                         time_window_size, 
                         communication, 
                         annoyance
@@ -83,7 +78,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                     rebalance_completed = False
 
             sim_state.serialize_stat(wct_ts)
-            print()
+
         Simulator.schedule_event(wct_ts + time_window_size, "", EVT.TIME_WINDOW)
 
         continue
@@ -154,7 +149,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
 
 # build application.py for throughput estimator
 
-print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ GVT {wct_ts} @ SVT {sim_state.get_gvt()}")
+print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ WT {wct_ts} @ GVT {sim_state.get_gvt()}")
 
 
 
