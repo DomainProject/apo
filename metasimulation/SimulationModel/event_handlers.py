@@ -83,31 +83,26 @@ def end_exec(sim_state, cur_cu, queue, last_wct):
         #print("ROLLING BACK STUFF")
         end_exe_wct += global_constants.task_anno_costs
 
-        #if 'cpu_0' in cur_cu:     print(f"Managing out of order task for {cur_actor}", a_ts, "vs", last_exec_ts)
+        #print(f"Managing out of order task for {cur_actor}", a_ts, "vs", last_exec_ts)
 
         outputs = {}
-        #print("FIX EXECUTED", cur_actor._executed[-1], last_exec_ts, a_ts, cur_actor._executed,  cur_actor.next_ts())
+        #print("FIX EXECUTED", cur_actor._executed[-1], last_exec_ts, a_ts, cur_actor._executed[-5:],  cur_actor.next_ts())
         aborted = cur_actor.fix_executed()
-        #print("FIX EXECUTED", cur_actor._executed[-1], last_exec_ts, a_ts, cur_actor._executed,  cur_actor.next_ts())
+        #print("FIX EXECUTED", cur_actor._executed[-1], last_exec_ts, a_ts, cur_actor._executed[-5:],  cur_actor.next_ts())
+        #print("FIX EXECUTED last_executed", cur_actor._executed[-1], "target", a_ts, "next", cur_actor.next_ts(), "curr", cur_actor.curr_ts(), last_exec_ts)
         sim_state._total_aborts[a_id] += aborted
         sim_state._round_aborts[a_id] += aborted
         
-        while cur_actor.curr_ts() >= cur_actor.next_ts():
-            #print(cur_actor.curr_ts(), cur_actor.next_ts())
+        while cur_actor.curr_ts() >= a_ts:
             dst_id = cur_actor.last_trace()[2]
             dst_ts = cur_actor.last_trace()[1]
 
             if dst_id != a_id:
                 if dst_id not in outputs: outputs[dst_id] = float('inf')
                 outputs[dst_id] = min(outputs[dst_id], dst_ts)
-                # print("FOUND ANTIMESSAGE")
             cur_actor.do_reverse()
             cur_actor.fix_bound()
-        #print(cur_actor.curr_ts(), cur_actor.next_ts())
 
-        #print("generating antimessages", a_id, outputs)
-        #if 'cpu_0' in cur_cu:      print(outputs)
-        
         for dst_id in outputs:
             dst_cu = sim_state.get_assignment()[dst_id]
             dst_ts = outputs[dst_id]
