@@ -64,7 +64,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
             if not rebalance_in_progress and rebalance_completed:
                 rebalance_cnt += 1
                 if (rebalance_cnt % rebalance_period) == 0:
-                    min_vt = operations.on_window(
+                    operations.on_window(
                         sim_state.get_cunits_data(), 
                         wct_ts, 
                         sim_state.get_can_end(), 

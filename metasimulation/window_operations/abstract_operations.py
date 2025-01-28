@@ -7,13 +7,13 @@ from metasimulation.SimulationModel.event_handlers import EVT
 class WindowOperations(ABC):
 
     @abstractmethod
-    def __init__(self):
+    def __init__(self, sim_state):
         pass
 
     @abstractmethod
     def on_window(self, cu_units_data, wct_ts, ending_simulation, min_vt, committed, time_window_size,
                   communication, annoyance):
-        return float('inf')
+        pass
         
     @abstractmethod
     def delayed_on_window(self):
