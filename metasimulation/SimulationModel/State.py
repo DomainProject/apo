@@ -9,6 +9,7 @@ from heapq import *
 
 
 class State():
+    _verbose = verbose
     _trace_path = []
     _traces = []
     _annoyance_matrix = []
@@ -25,16 +26,20 @@ class State():
     _pending_assigment = []
     _gvt = -1-0
 
-    def __init__(self, path):
-
-        print(f"Loading trace {path}...", end='')
+    def __init__(self, path, assignment=None, verbose=True, traces=None):
+        self._verbose = verbose
+        if self._verbose: print(f"Loading trace {path}...", end='')
         self._trace_path = path
-        self._traces = load_trace(path)
-        print("Done")
+        if traces != None:
+            self._traces = traces
+        else:
+            self._traces = load_trace(path)
+
+        if self._verbose: print("Done")
 
         self._num_actors = len(self._traces)
 
-        print(f"Building annoyance_matrix and communication_matrix for {self._num_actors} actors...", end='')
+        if self._verbose: print(f"Building annoyance_matrix and communication_matrix for {self._num_actors} actors...", end='')
         for i in range(self._num_actors):
             self._annoyance_matrix += [[]]
             self._communication_matrix += [[]]
@@ -43,46 +48,48 @@ class State():
             for j in range(self._num_actors):
                 self._annoyance_matrix[i] += [0]
                 self._communication_matrix[i] += [0]
-        print("Done")
+        if self._verbose: print("Done")
 
 
-        print(f"Loading hardware configuration...", end='')
+        if self._verbose: print(f"Loading hardware configuration...", end='')
         cu_units = sorted(hardware.build_cunits())
-        print("Done")
+        if self._verbose: print("Done")
 
-        print(f"Building computing units...", end='')
+        if self._verbose: print(f"Building computing units...", end='')
         for k in cu_units:    
             self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
-        print("Done")
+        if self._verbose: print("Done")
 
-        print(f"Building assignment...", end='')
-        cnt = 0
-        for k in range(self._num_actors):
-            self._assignment += [cu_units[cnt]]
-            cnt = (cnt + 1) % len(cu_units)
-        self._assignment = ['gpu_0', 'gpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0']
-        #self._assignment = ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
-        print(self._assignment)
-        print(f"done")
+        if self._verbose: print(f"Building assignment...", end='')
+        if assignment == None:
+            cnt = 0
+            for k in range(self._num_actors):
+                self._assignment += [cu_units[cnt]]
+                cnt = (cnt + 1) % len(cu_units)
+            self._assignment = ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
+            if self._verbose: print(self._assignment)
+        else:
+            self._assignment = assignment
+        if self._verbose: print(f"done")
 
-        print(f"Populate device queue with new actors...", end='')
+        if self._verbose: print(f"Populate device queue with new actors...", end='')
         for a_id in range(len(self._assignment)):
             a = Actor(a_id, self._traces[a_id])
             self._actors += [a]
             heappush(self._cu_units_data[self._assignment[a_id]]['queue'], a)
             self._cu_units_data[self._assignment[a_id]]['len'] += 1
-        print(f"done")
+        if self._verbose: print(f"done")
 
 
     def put_pending_assignment(self, assignment):
         self._pending_assignment = assignment
 
     def init_simulator_queue(self):
-        print(f"Populate simulator queue...", end='')
+        if self._verbose: print(f"Populate simulator queue...", end='')
         for cu in self._cu_units_data:
             schedule_event(0, cu, EVT.EXE_BGN)
         schedule_event(0, "", EVT.TIME_WINDOW)
-        print(f"done")
+        if self._verbose: print(f"done")
 
     def get_cunits(self):     return sorted(self._cu_units_data.keys())
 
@@ -93,7 +100,7 @@ class State():
 
     def add_to_init_set(self, aid):
         self._init_set.add(aid)
-        if len(self._init_set) == self._num_actors: print("END ACTOR INIT")
+        #if len(self._init_set) == self._num_actors: print("END ACTOR INIT")
 
     def get_assignment(self): return self._assignment
 
