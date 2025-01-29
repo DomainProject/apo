@@ -14,9 +14,8 @@ _metisddm = ctypes.CDLL(
 
 _metisddm.ddmmetis_init.argtypes = [
     idx_t,
-    idx_t,
-    ctypes.POINTER(real_t),
-    ctypes.POINTER(real_t)
+    idx_t
+
 ]
 _metisddm.ddmmetis_init.restype = None
 
@@ -26,20 +25,8 @@ import ctypes
 
 def ddmmetis_init(total_actors, cus):
 
-
-    mat_comm_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
-    mat_anno_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
-
-    # Convert each row to a ctypes array and flatten
-    flattened_comm_matrix = [ctypes.c_double(val) for row in comm_matrix for val in row]
-    flattened_anno_matrix = [ctypes.c_double(val) for row in anno_matrix for val in row]
-
-    # Now assign the flattened arrays to the matrix
-    mat_comm_matrix = (ctypes.c_double * len(flattened_comm_matrix))(*flattened_comm_matrix)
-    mat_anno_matrix = (ctypes.c_double * len(flattened_anno_matrix))(*flattened_anno_matrix)
-
     # Call the C function (assuming _metisddm.ddmmetis_init is defined elsewhere)
-    _metisddm.ddmmetis_init(total_actors, cus, mat_comm_matrix, mat_anno_matrix)
+    _metisddm.ddmmetis_init(total_actors, cus)
 
 
 
@@ -48,7 +35,9 @@ _metisddm.metis_partitioning.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
-    ctypes.POINTER(idx_t)
+    ctypes.POINTER(idx_t),
+    ctypes.POINTER(real_t),
+    ctypes.POINTER(real_t)
 ]
 _metisddm.metis_partitioning.restype = None
 
@@ -60,8 +49,25 @@ def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix,
 
     arr_tasks = (idx_t * total_actors)(*tasks_forecast)
     arr_capacity = (idx_t * cus)(*capacity)
+
+    #print(tasks_forecast)
+
+
+    mat_comm_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
+    mat_anno_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
+
+    # Convert each row to a ctypes array and flatten
+    flattened_comm_matrix = [ctypes.c_double(val) for row in comm_matrix for val in row]
+    flattened_anno_matrix = [ctypes.c_double(val) for row in anno_matrix for val in row]
+
+
+    # Now assign the flattened arrays to the matrix
+    mat_comm_matrix = (ctypes.c_double * len(flattened_comm_matrix))(*flattened_comm_matrix)
+    mat_anno_matrix = (ctypes.c_double * len(flattened_anno_matrix))(*flattened_anno_matrix)
+
+
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_partitioning(total_actors, cus, arr_tasks, arr_capacity)
+    _metisddm.metis_partitioning(total_actors, cus, arr_tasks, arr_capacity, mat_comm_matrix, mat_anno_matrix)
 
 
 _metisddm.metis_get_partitioning.argtypes = []

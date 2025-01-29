@@ -4,7 +4,6 @@
 #include "utils.h"
 
 
-
 /**
  *  DEBUG FUNCTION
  * */
@@ -177,6 +176,9 @@ void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t
     }
 
 
+    idx_t sum_edge = 0;
+    
+
     // Fill adjncy array
     for (int i = 0; i < nEdges; i++) {
         idx_t src = edges[i].src;
@@ -258,7 +260,7 @@ idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xad
                         }
                         new_adjncy[index] = adjncy[j]*cus+k;
                         PRINTER() printf("[populate_newadjncy] i %ld \t j %ld \t (h,k) (%ld, %ld) \t new_xadj[i*cus+h] %ld \t (j-s)*cus + k %ld \t index %ld \t value %ld\n", i, j, h, k, new_xadj[i*cus+h], (j-s)*cus + k, index, adjncy[j]*cus+k);
-                        (*new_adjwgt)[index] = adjwgt[j]; // *  msg_exch_cost[h][k];
+                        (*new_adjwgt)[index] = adjwgt[j]; 
                     
                 } ///end for k
                 for (int l = 0; l < h; l++) {

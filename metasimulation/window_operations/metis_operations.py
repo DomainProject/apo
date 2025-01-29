@@ -25,7 +25,6 @@ class MetisOperations(WindowOperations):
         cus = len(build_cunits())
         capacity = get_capacity_vector()
         task_forecast = get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors)
-
         comm_matrix = []
         anno_matrix = []
 
@@ -33,8 +32,8 @@ class MetisOperations(WindowOperations):
             comm_row = []
             anno_row = []
             for j in range(num_actors):
-                comm_row.append(math.ceil(communication[j][i] / min_vt))
-                anno_row.append(math.ceil(annoyance[j][i] / min_vt))
+                comm_row.append(math.ceil(communication[j][i] / wct_ts))
+                anno_row.append(math.ceil(annoyance[j][i] / wct_ts))
             comm_matrix.append(comm_row)
             anno_matrix.append(anno_row)
 

@@ -8,12 +8,14 @@
 #define N_CUS 25
 #define NUM_ACTORS 10
 #define MAX_WEIGHT 10000L
-#define SCALE 1000.0
+#define SCALE 100.0
 
 #define PRINTER() if (0)
 
 extern idx_t cus;
 extern idx_t actors;
+extern idx_t avg_edge_wgt;
+extern idx_t avg_vert_wgt;
 extern real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS];
 extern real_t anno_matrix[NUM_ACTORS][NUM_ACTORS];
 

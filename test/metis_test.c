@@ -39,12 +39,12 @@ int main(void)
 	idx_t total_actors = NUM_ACTORS;
 	idx_t total_cus = N_CU_TYPES;
 
-	ddmmetis_init(total_actors, total_cus, comm_cost_matrix, anno_matrix);
+	ddmmetis_init(total_actors, total_cus);
 
 	idx_t tasks_forecast[NUM_ACTORS] = {50, 50, 50, 50, 20, 50, 50, 80, 10, 10};
     idx_t capacity[N_CU_TYPES] = {4, 4, 2};
 
-	metis_partitioning(total_actors, total_cus, tasks_forecast, capacity);
+	metis_partitioning(total_actors, total_cus, tasks_forecast, capacity, comm_cost_matrix, anno_matrix);
 	int *res;
 
 	/*while((res = ddm_poll()) == NULL) {
