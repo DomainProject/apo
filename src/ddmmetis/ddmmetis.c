@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 #include <metis.h>
 #include "utils.h"
@@ -26,7 +27,6 @@ void ddmmetis_init(idx_t total_actors, idx_t total_cus, real_t input_comm_cost_m
 
     if (input_comm_cost_matrix != NULL) memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
     if (input_anno_matrix != NULL) memcpy(anno_matrix, input_anno_matrix, sizeof(anno_matrix));
-    
 }
 
 
@@ -38,7 +38,7 @@ void metis_init(idx_t actors, idx_t cus, idx_t **xadj, idx_t **adjncy, idx_t **a
     edges = createEdges(actors, comm_cost_matrix, anno_matrix, &nEdges);
 
     idx_t total_actors = (aug) ? actors * cus : actors;
-    generateCSR(total_actors, nEdges, edges, xadj, adjncy, adjwgt); 
+    generateCSR(total_actors, nEdges, edges, xadj, adjncy, adjwgt);
 
     free(edges);
 
@@ -51,18 +51,18 @@ void metis_partitioning(idx_t total_actors, idx_t cus, idx_t *tasks_forecast, id
     idx_t edgeCut;                     // Output: edge cut
     idx_t options[METIS_NOPTIONS];     // Options array
     idx_t *vwgt = tasks_forecast; // Vertex weights (used by metis to balance the partitions)
-    
+
     idx_t ncon = 1;                   // number of weights associated to each vertex
 
     idx_t ubfactor = 30; //default imbalance tolerance
-    //real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1 
+    // real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
 
     idx_t *xadj, *adjncy, *adjwgt;
 
     if (input_comm_cost_matrix != NULL) memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
     if (input_anno_matrix != NULL) memcpy(anno_matrix, input_anno_matrix, sizeof(anno_matrix));
-    
-    
+
+
     metis_init(total_actors, cus, &xadj, &adjncy, &adjwgt, &vwgt, NULL, anno_matrix, 0);
 
     PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -92,16 +92,16 @@ void metis_partitioning(idx_t total_actors, idx_t cus, idx_t *tasks_forecast, id
                 adjwgt[adjncy[j]] = fmax(adjwgt[adjncy[j]]*1000,1);
                 vwgt[i] = fmax(vwgt[i]*10, 1);
                 vwgt[adjncy[j]] = fmax(vwgt[adjncy[j]]*10,1);
-            } 
-        }   
-        PRINTER() printf("\n");
+	    }
+	}
+	PRINTER() printf("\n");
     }
 
     PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
 
     idx_t aug_v = total_actors*cus;
-    idx_t *new_adjwgt;  
+    idx_t *new_adjwgt;
     idx_t *new_vwgt;
 
     idx_t *new_xadj = populate_newxadj(aug_v/cus, cus, xadj, vwgt, &new_vwgt);
@@ -135,8 +135,8 @@ void metis_partitioning(idx_t total_actors, idx_t cus, idx_t *tasks_forecast, id
             if (i != adjncy[j] && part_c[i] == part_c[adjncy[j]]) {
                 PRINTER() printf("vertex %ld and vertex %ld are on the same partition (%ld, %ld) ! Reward them -> (%ld, %ld)\n", i, adjncy[j] , part_c[i], part_c[adjncy[j]], adjwgt[i], adjwgt[adjncy[j]]);
                 adjwgt[i] = fmax(adjwgt[i]*1000, 1); //(scale_weight(adjwgt[i] *exp(-lambda*iteration), SCALE), 1);
-                adjwgt[adjncy[j]] = fmax(adjwgt[adjncy[j]]*1000,1); 
-                vwgt[i] = fmax(vwgt[i]*100, 1);
+		adjwgt[adjncy[j]] = fmax(adjwgt[adjncy[j]] * 1000, 1);
+		vwgt[i] = fmax(vwgt[i]*100, 1);
                 vwgt[adjncy[j]] = fmax(vwgt[adjncy[j]]*100,1);
             }
         }
@@ -159,9 +159,9 @@ void metis_partitioning(idx_t total_actors, idx_t cus, idx_t *tasks_forecast, id
                 adjwgt[adjncy[j]] = fmax(adjwgt[adjncy[j]]*1000,adjwgt[adjncy[j]]);
                 vwgt[i] = fmax(vwgt[i]*10, 1);
                 vwgt[adjncy[j]] = fmax(vwgt[adjncy[j]]*10,1);
-            } 
-        }   
-        PRINTER() printf("\n");
+	    }
+	}
+	PRINTER() printf("\n");
     }
 
     for ( int k = 0; k < total_actors; k++){
@@ -175,7 +175,6 @@ void metis_partitioning(idx_t total_actors, idx_t cus, idx_t *tasks_forecast, id
                 }
             }
         }
-        
     }
 
 
@@ -194,5 +193,4 @@ idx_t * metis_get_partitioning() {
 
     PRINTER() printf("*** PARTITION TO BE INSTALLED **** \n");
     return part_o;
-    
 }
