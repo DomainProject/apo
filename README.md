@@ -22,4 +22,4 @@ cmake -B cmake-build-debug -S . && cd cmake-build-debug && make && cd ..
 
 # Step 3 run the metasimulator
 
-python sim_from_trace.py metasimulation/debug_traces/<trace>.trace
+python sim_from_trace.py metasimulation/debug_traces/<trace>.trace <window_operation_id= 0 null (default) 1 ddm 2 metis 3 random>

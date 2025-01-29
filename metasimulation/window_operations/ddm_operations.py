@@ -1,5 +1,4 @@
 import math
-import time
 
 from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_window
 from metasimulation.window_operations.abstract_operations import WindowOperations
@@ -36,8 +35,7 @@ class DdmOperations(WindowOperations):
         ddm_optimize(num_actors, ddm_prepare_actor_matrix(actor_matrix),
                      get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors), len(cu_units_data),
                      get_capacity_vector())
-        #time.sleep(2)
-        return min_vt
+        
 
     def delayed_on_window(self):
         binding = ddm_poll()

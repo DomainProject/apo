@@ -13,10 +13,7 @@ class MetisOperations(WindowOperations):
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
                   communication, annoyance):
-        if ending_simulation: return float('inf')
-        min_vt = super().on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
-                                   communication, annoyance)
-        return min_vt
+        pass
 
     def delayed_on_window(self):
         cunits = build_cunits()
