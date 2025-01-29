@@ -9,7 +9,8 @@ real_t = ctypes.c_double  # Matches METIS's `real_t` (double)
 
 last_ddm_total_actors_invocation = -1
 
-_metisddm = ctypes.CDLL('./cmake-build-debug/src/libddmmetis.so') ##if launch metis_test.py must be ../cmake-build-debug 
+_metisddm = ctypes.CDLL(
+    './cmake-build-debug/src/libddmmetis.so')  ##if launch metis_test.py must be ../cmake-build-debug
 
 _metisddm.ddmmetis_init.argtypes = [
     idx_t,
@@ -22,8 +23,9 @@ _metisddm.ddmmetis_init.restype = None
 
 import ctypes
 
-def ddmmetis_init(total_actors, cus, comm_matrix, anno_matrix):
-    
+
+def ddmmetis_init(total_actors, cus):
+
 
     mat_comm_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
     mat_anno_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
@@ -51,7 +53,7 @@ _metisddm.metis_partitioning.argtypes = [
 _metisddm.metis_partitioning.restype = None
 
 
-def metis_partitioning(total_actors, cus, tasks_forecast, capacity):
+def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
@@ -72,6 +74,5 @@ def metis_get_partitioning():
     if not part:
         return None
     part = [part[i] for i in range(last_ddm_total_actors_invocation)]
-    
-    return part
 
+    return part
