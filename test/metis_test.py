@@ -1,6 +1,5 @@
 import sys
 import os
-import asyncio
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 
@@ -12,7 +11,7 @@ from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
 
 
 
-async def test_metis():
+def test_metis():
 
     total_cus = len(build_cunits())
     total_actors = num_actors
@@ -40,4 +39,4 @@ async def test_metis():
 
 
 if __name__ == "__main__":
-    asyncio.run(test_metis())
+    test_metis()
