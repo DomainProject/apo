@@ -2,6 +2,7 @@ from src.ddm import ddm_prepare_actor_matrix, ddm_init, ddm_optimize, ddm_poll
 
 
 def test_ddm():
+
     total_cus = 4
     total_actors = 10
     cus = [1, 1, 2, 4]

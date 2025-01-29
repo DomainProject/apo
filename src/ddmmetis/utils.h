@@ -5,19 +5,18 @@
 
 
 #define N_CU_TYPES 3
-#define N_CUS 25
+#define N_CUS 4
 #define NUM_ACTORS 10
 #define MAX_WEIGHT 10000L
 #define SCALE 100.0
 
 #define PRINTER() if (0)
 
-extern idx_t cus;
-extern idx_t actors;
+//extern idx_t actors;
 extern idx_t avg_edge_wgt;
 extern idx_t avg_vert_wgt;
-extern real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS];
-extern real_t anno_matrix[NUM_ACTORS][NUM_ACTORS];
+//extern real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS];
+//extern real_t anno_matrix[NUM_ACTORS][NUM_ACTORS];
 
 // Define the structure
 typedef struct Edge {
@@ -29,7 +28,7 @@ typedef struct Edge {
 
 void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t **adjncy, idx_t **adjwgt);
 Edge * createEdges(idx_t actors, real_t comm_matrix[actors][actors], real_t anno_matrix[actors][actors], idx_t *edge_count);
-idx_t scale_weight(real_t real_weight, double scale_factor);
+idx_t scale_weight(real_t real_weight, float scale_factor);
 
 int is_compatible(int actor, int cu);
 void print_cardinality(void);
@@ -44,4 +43,4 @@ idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xad
 
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
-                        idx_t nParts, idx_t *tpwgts, idx_t *ubvec, idx_t edgeCut, idx_t ubfactor, idx_t **partition, int remap);
+    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t **partition, int remap);
