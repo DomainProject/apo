@@ -61,3 +61,29 @@ def convert_ddm_assignment_to_sim_assingment(ddm_assignment):
     # we need to convert it to a list of strings, where each string represents the computing unit label
     cunits = build_cunits()
     return [cunits[i] for i in ddm_assignment]
+
+
+
+
+## METIS PARTIION CONVERTER
+def convert_metis_assignment_to_sim_assingment(partition):
+
+    assign = []
+    cunits = build_cunits()
+
+    count_dict = {}
+    for index in partition:
+      if index in count_dict:
+        count_dict[index] += 1
+      else:
+        count_dict[index] = 1
+
+    sorted_indices = sorted(count_dict.keys(), key=lambda x: count_dict[x], reverse=True)
+
+    unit_mapping = {index: cunits[i] for i, index in enumerate(sorted_indices)}
+
+    assign = [unit_mapping[i] for i in partition]
+
+    #round robin assignement
+    #assign = [cunits[i] for i in partition]
+    return assign

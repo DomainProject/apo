@@ -1,8 +1,12 @@
 import sys
+import asyncio
+
+
 
 from Simulator.sim import *
 from hardware import *
 from metasimulation.window_operations.ddm_operations import DdmOperations
+from metasimulation.window_operations.metis_operations import MetisOperations
 
 skip_queue_validation = True
 
@@ -45,9 +49,12 @@ def validate_task_queue(queue, size):
     assert len(queue) == len(ins)
 
 
-def check_and_install_new_binding(operations):
+#if using MetisOperations method must be async
+async def check_and_install_new_binding(operations):
     global assignment
-    binding = operations.delayed_on_window(num_actors, assignment)
+    #binding = operations.delayed_on_window(num_actors, assignment)
+    
+    binding = await operations.delayed_on_window(num_actors, assignment) #if using MetisOperations call await
     if binding is None:
         return False
     if binding != assignment:
@@ -66,7 +73,8 @@ def check_and_install_new_binding(operations):
     return True
 
 
-def simulation():
+#if using MetisOperations method must be async
+async def simulation():
     global assignment
     global ending_simulation
     global communication
@@ -102,7 +110,9 @@ def simulation():
     print(f"done")
 
     # TODO: use sys.argv[1] to change the instantiated object
-    operations = DdmOperations()
+    #operations = DdmOperations()
+    
+    operations = MetisOperations()
 
     print("BEGIN SIMULATION LOOP")
 
@@ -113,8 +123,13 @@ def simulation():
 
         # Time Window Event
         if evt_t == EVT.TIME_WINDOW and not rebalance_in_progress:
-            min_vt = operations.on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs,
-                                          time_window_size, communication, annoyance)
+            #min_vt = operations.on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs,
+            #                              time_window_size, communication, annoyance)
+            
+            # if using MetisOperations call with await
+            min_vt =  await operations.on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
+                                     communication, annoyance)
+
             rebalance_in_progress = True
             schedule_event(wct_ts + time_window_size, 0, EVT.TIME_WINDOW)
             continue
@@ -333,4 +348,5 @@ def recv(queue, a_id, a_ts, actor_from):
 
 
 if __name__ == "__main__":
-    simulation()
+    #simulation()
+    asyncio.run(simulation()) #if using MetisOperations simulation() must be called with asyncio

@@ -6,8 +6,24 @@ find_package(Clingo REQUIRED)
 message(STATUS "Clingo include dirs: ${Clingo_INCLUDE_DIRS}")
 message(STATUS "Clingo libraries: ${Clingo_LIBRARIES}")
 
+# Find the Metis library
+#set(Metis_INCLUDE_DIR "/usr/local/include")
+#set(Metis_LIBRARY "/usr/local/lib/libmetis.so")
+
+find_package(Metis REQUIRED)
+message(STATUS "Metis include dirs: ${Metis_INCLUDE_DIR}")
+message(STATUS "Metis libraries: ${Metis_LIBRARY}")
+
+
 add_library(domainddm SHARED ddm.c dynstr.c clingo_solver.c)
+target_include_directories(domainddm PRIVATE ${Clingo_INCLUDE_DIRS} ${Metis_INCLUDE_DIR})
 target_link_libraries(domainddm PRIVATE clingo resources)
-target_include_directories(domainddm PRIVATE ${Clingo_INCLUDE_DIRS})
+
+
+add_library(ddmmetis SHARED ./ddmmetis/ddmmetis.c ./ddmmetis/utils.c)
+target_include_directories(domainddm PRIVATE ${Clingo_INCLUDE_DIRS} ${Metis_INCLUDE_DIR})
+target_link_libraries(ddmmetis PRIVATE metis ${Metis_LIBRARY} GKlib resources)
 
 add_subdirectory(lp)
+
+add_subdirectory(ddmmetis)
