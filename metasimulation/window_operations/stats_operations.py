@@ -3,8 +3,10 @@ from metasimulation.window_operations.abstract_operations import WindowOperation
 
 class StatsOperations(WindowOperations):
 
-    def __init__(self):
-        pass
+    def __init__(self, sim_state):
+        print(f"initialize Stats...", end='')
+        self.sim_state = sim_state
+        print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
                   communication, annoyance):
@@ -12,5 +14,5 @@ class StatsOperations(WindowOperations):
                                    communication, annoyance)
         return min_vt
 
-    def delayed_on_window(self, num_actors, current_assignment):
-        return current_assignment
+    def delayed_on_window(self):
+        return self.sim_state.get_assignment()
