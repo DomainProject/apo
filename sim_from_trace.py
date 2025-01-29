@@ -63,11 +63,9 @@ print(f"BEGIN SIMULATION LOOP")
 
 while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from = Simulator.dequeue_event()
-    #if wct_ts > 100: 
-        #sim_state.set_can_end(True)
-        #continue
     
     # Time Window Event
+    # just print/collect stats and trigger windows operations
     if evt_t == EVT.TIME_WINDOW:
         communication, annoyance = sim_state.get_state_matrix()
 
@@ -76,6 +74,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
 
             gvt = sim_state.get_gvt() 
             committed = sim_state.commit()
+            sim_state.serialize_stat(wct_ts)
             print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", committed / time_window_size)
 
             if not rebalance_in_progress and rebalance_completed:
@@ -94,7 +93,6 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                     rebalance_in_progress = True
                     rebalance_completed = False
 
-            sim_state.serialize_stat(wct_ts)
 
         Simulator.schedule_event(wct_ts + time_window_size, "", EVT.TIME_WINDOW)
 
@@ -106,30 +104,40 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     assert wct_ts >= cu_data['last_wct'], s
     cu_data['last_wct'] = wct_ts
 
-    # the device can start the processing of the highest priority actor
-    # schedules the EXE_END event
-    if evt_t == EVT.EXE_BGN:
-        #this might get empty due to migration  
-        if len(cu_data['queue']) > 0: 
-            begin_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
+    # the computing unit can start the processing of the highest priority actor
+    # if the cu has no actor bound (due to migration) do nothing 
+    # otherwise it execute the event and schedules the RCV and EXE_END events
+    if evt_t == EVT.EXE_BGN and len(cu_data['queue']) > 0:
+        begin_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
         
     # the device has received some task from some other device
-    # this do not schedule anything, it just updates task queue of the device
+    # this do not schedule anything, it just updates task queue of the computing unit and updates related stats
     if evt_t == EVT.RCV:        
+        # it might happen that a computing unit received a message for an actor no longer bound to it
+        # just forward
         if sim_state._assignment[a_id] != cur_cu:
-            print("ON A DIFFERENT DEVICE", cur_cu, sim_state._assignment[a_id])
+            print("ON A DIFFERENT CU", cur_cu, sim_state._assignment[a_id])
             Simulator.schedule_event(wct_ts+0.1, sim_state._assignment[a_id], EVT.RCV, (a_id, a_ts, actor_from))
         else:
             recv(sim_state, cu_data['queue'], a_id, a_ts, actor_from, cu_data['last_wct'])
 
+    # this computing unit has received the request of releasing some actor
+    # just set a flag its actual management will be managed during after EXE_END execution
+    if evt_t == EVT.REASSIGN: cu_data['bind'] = True
+
     # the device has completed its non-preemptable execution
     # now check received messages in the meantime
-    # if this event is out-of-order,  reschedule this type of event to manage the cost for solving inconstencies
-    # if it is in order, schedule EXE_BGN
-    if evt_t == EVT.EXE_END:   
-        ok = end_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
+    # if this event is out-of-order,  reschedule EXE_END event to manage the cost for solving inconstencies
+    # if it is in order
+    #   check if there is reassingment pending
+    #         if it is release all its actor and send it to the new computing unit
+    #   else 
+    #       schedule EXE_BGN
 
-        if ok  and 'bind' in cu_data and cu_data['bind']:
+    if evt_t == EVT.EXE_END:   
+        scheduled_exe_bgn = end_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
+
+        if scheduled_exe_bgn  and 'bind' in cu_data and cu_data['bind']:
             i = 0
             while i < len(cu_data['queue']):
                 a = cu_data['queue'][i]
@@ -141,8 +149,8 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                     i+=1
             cu_data['bind'] = False
         
-    if evt_t == EVT.REASSIGN: cu_data['bind'] = True
-
+    # the cu has received an actor so add it to its queue
+    # if it was previously empty reschedule a new EXE_BGN
     if evt_t == EVT.BIND:
         if len(cu_data['queue']) == 0:
             Simulator.schedule_event(wct_ts, cur_cu, EVT.EXE_BGN)
@@ -157,7 +165,8 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
             #    print(cu, sim_state.get_cunits_data()[cu], len(sim_state.get_cunits_data()[cu]['queue']))
             rebalance_completed = True
 
-    # Poll for a rebalancing solution
+    # Poll for a rebalancing solution.
+    # This is not associated to an event because it might wait a program running outside the metasimulator
     if rebalance_in_progress and not rebalance_completed:
         if check_and_install_new_binding(operations, wct_ts):
             rebalance_in_progress = False
