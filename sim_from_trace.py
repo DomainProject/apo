@@ -1,12 +1,20 @@
 import sys
 
+from metasimulation.SimulationModel.State import State as SimulationState
+from metasimulation.SimulationModel.event_handlers import *
+from metasimulation.SimulationParameters.global_constants import *
+from metasimulation.window_operations.ddm_operations import DdmOperations
+from metasimulation.window_operations.metis_operations import MetisOperations
+from metasimulation.window_operations.random_operations import RandomOperations
+from metasimulation.window_operations.stats_operations import StatsOperations
+
 
 def check_and_install_new_binding(operations, wct_ts):
     binding = operations.delayed_on_window()
     if binding is None: return False
-    
+
     print("got _assignment ")
-    
+
     if binding != sim_state.get_assignment() and sim_state._pending_assigment != binding:
         sim_state.put_pending_assignment(binding)
         print("new binding", binding)
@@ -21,21 +29,27 @@ def check_and_install_new_binding(operations, wct_ts):
     return True
 
 
+if len(sys.argv) < 3:
+    print("Usage: python3 sim_from_trace.py <operations> <trace_file>")
+    print("Valid values for <operations>: ddm, metis, random, stats")
+    sys.exit(1)
 
-from metasimulation.SimulationModel.State import State as SimulationState
-from metasimulation.window_operations.ddm_operations import DdmOperations
-
-import metasimulation.SimulationEngine.sim as Simulator
-from metasimulation.SimulationEngine.sim import *
-from metasimulation.SimulationModel.event_handlers import *
-from metasimulation.SimulationParameters.global_constants import *
-
-
-sim_state = SimulationState(sys.argv[1])
+sim_state = SimulationState(sys.argv[2])
 sim_state.init_simulator_queue()
 
-# TODO: use sys.argv[1] to change the instantiated object
-operations = DdmOperations(sim_state)
+match sys.argv[1]:
+    case "ddm":
+        operations = DdmOperations(sim_state)
+    case "metis":
+        operations = MetisOperations(sim_state)
+    case "random":
+        operations = RandomOperations(sim_state)
+    case "stats":
+        operations = StatsOperations(sim_state)
+    case _:
+        print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'stats'")
+        sys.exit(1)
+
 
 rebalance_in_progress = False
 rebalance_completed = True
@@ -46,18 +60,17 @@ print(f"BEGIN SIMULATION LOOP")
 
 while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     wct_ts, cur_cu, evt_t, a_id, a_ts, actor_from = Simulator.dequeue_event()
-    #if wct_ts > 100: 
+    # if wct_ts > 100:
         #sim_state.set_can_end(True)
         #continue
-    
+
     # Time Window Event
     if evt_t == EVT.TIME_WINDOW:
         communication, annoyance = sim_state.get_state_matrix()
 
         if wct_ts > 0:
 
-
-            gvt = sim_state.get_gvt() 
+            gvt = sim_state.get_gvt()
             committed = sim_state.commit()
             print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", committed / time_window_size)
 
@@ -65,13 +78,13 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                 rebalance_cnt += 1
                 if (rebalance_cnt % rebalance_period) == 0:
                     min_vt = operations.on_window(
-                        sim_state.get_cunits_data(), 
-                        wct_ts, 
-                        sim_state.get_can_end(), 
-                        gvt, 
+                        sim_state.get_cunits_data(),
+                        wct_ts,
+                        sim_state.get_can_end(),
+                        gvt,
                         committed,
-                        time_window_size, 
-                        communication, 
+                        time_window_size,
+                        communication,
                         annoyance
                     )
                     rebalance_in_progress = True
@@ -92,13 +105,13 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     # the device can start the processing of the highest priority actor
     # schedules the EXE_END event
     if evt_t == EVT.EXE_BGN:
-        #this might get empty due to migration  
-        if len(cu_data['queue']) > 0: 
+        # this might get empty due to migration
+        if len(cu_data['queue']) > 0:
             begin_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
-        
+
     # the device has received some task from some other device
     # this do not schedule anything, it just updates task queue of the device
-    if evt_t == EVT.RCV:        
+    if evt_t == EVT.RCV:
         if sim_state._assignment[a_id] != cur_cu:
             print("ON A DIFFERENT DEVICE", cur_cu, sim_state._assignment[a_id])
             Simulator.schedule_event(wct_ts+0.1, sim_state._assignment[a_id], EVT.RCV, (a_id, a_ts, actor_from))
@@ -109,7 +122,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
     # now check received messages in the meantime
     # if this event is out-of-order,  reschedule this type of event to manage the cost for solving inconstencies
     # if it is in order, schedule EXE_BGN
-    if evt_t == EVT.EXE_END:   
+    if evt_t == EVT.EXE_END:
         ok = end_exec(sim_state, cur_cu, cu_data['queue'], cu_data['last_wct'])
 
         if ok  and 'bind' in cu_data and cu_data['bind']:
@@ -123,7 +136,7 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
                 else:
                     i+=1
             cu_data['bind'] = False
-        
+
     if evt_t == EVT.REASSIGN: cu_data['bind'] = True
 
     if evt_t == EVT.BIND:
@@ -150,6 +163,3 @@ while Simulator.is_there_any_pending_evt() and not sim_state.get_can_end():
 # build application.py for throughput estimator
 
 print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ WT {wct_ts} @ GVT {sim_state.get_gvt()}")
-
-
-
