@@ -32,6 +32,7 @@ class DdmOperations(WindowOperations):
                 matrix_row.append((anno, comm))
             actor_matrix.append(matrix_row)
 
+        #print(actor_matrix)
         ddm_optimize(num_actors, ddm_prepare_actor_matrix(actor_matrix),
                      get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors), len(cu_units_data),
                      get_capacity_vector())
