@@ -2,27 +2,20 @@ import random
 import asyncio
 import math
 
-from metasimulation.Simulator.sim import get_events_count_vector_in_next_window
-from metasimulation.hardware import build_cunits, convert_metis_assignment_to_sim_assingment, get_capacity_vector
-from metasimulation.application import num_actors, comm_matrix, anno_matrix, task_unit_costs
+from metasimulation.SimulationModel.hardware import build_cunits
 from metasimulation.window_operations.abstract_operations import WindowOperations
 from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
 
 
 class MetisOperations(WindowOperations):
 
-    def __init__(self):
-        print(f"initialize METIS partitioning...", end='')
-        cus = len(build_cunits())
+    def __init__(self, sim_state):
+        print(f"initialize Metis...", end='')
+        self.sim_state = sim_state
         ddmmetis_init(num_actors, cus, comm_matrix, anno_matrix)
         print(f"done")
 
-    async def async_metis_partitioning(self, num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix):
-        # Run the metis partitioning asynchronously
-        return await asyncio.to_thread(metis_partitioning, num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix)
-
-
-    async def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
+    def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
                   communication, annoyance):
         if ending_simulation: return float('inf')
         min_vt = super().on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
@@ -48,11 +41,12 @@ class MetisOperations(WindowOperations):
         await self.async_metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix)
         return min_vt
 
-    async def delayed_on_window(self, num_actors, current_assignment):
+    def delayed_on_window(self):
+    async def delayed_on_window(self):
         #TODO call method to retrieve partitioning and try to install it
         # if no partitioning has been found return None
         cunits = build_cunits()
-        actors = num_actors
+        actors = self.sim_state.get_num_actors()
         part = await asyncio.to_thread(metis_get_partitioning)
         if not part:
             return None
