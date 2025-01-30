@@ -50,11 +50,13 @@ def filter_assignment(assignment):
                 order_appearence += [id]
                 used_id.add(id)
 
-        if len(order_appearence) == 1: continue
+        if len(order_appearence) == 1: 
+            if order_appearence[0] != 0:
+                return True
         else:
             for i in range(len(order_appearence)-1):
                 if order_appearence[i] > order_appearence[i+1]: 
-                    print(f"skipping {assignment}")
+                    #print(f"skipping {assignment}")
                     return True
     
     return False
@@ -112,11 +114,14 @@ else:
 results = {}
 
 who_am_i = 0
+childs = []
 if processes > 1:
     print("simulated cases /total cases - skipped by fiter actual expected ETA dd:hh:mm:ss")
     for i in range(processes-1):
-        if os.fork() > 0:
+        pid = os.fork() 
+        if pid > 0:
             who_am_i += 1
+            childs += [pid]
         else:
             break
 
@@ -129,6 +134,7 @@ sum_elapsed = 0
 all_tests_count = len(sim_state.get_cunits_data().keys())**sim_state.get_num_actors()
 estimated_filter_speedup = estimate_filter_reduction(sim_state.get_cunits_data().keys()) 
 estimated_filter_skipped = all_tests_count/estimated_filter_speedup 
+very_start_time = time.time()
 
 for current_assignment in to_be_evaluated_assignments:
 
@@ -299,6 +305,12 @@ for current_assignment in to_be_evaluated_assignments:
             eta_days    = math.floor(eta_hours/24)
             eta_hours   -= eta_days*24
 
-            print(f"\r{evaluated_tests}/{all_tests_count} - {skipped_fil/evaluated_tests} {estimated_filter_skipped/all_tests_count} ETA {eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s", end='')
+            print(f"\r{evaluated_tests}/{all_tests_count} - {skipped_fil * processes /evaluated_tests} "+
+                  f"{estimated_filter_skipped/all_tests_count} ETA {eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
+                  f"SINGLE TEST {sum_elapsed/(evaluated_tests-skipped)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
 
         #print(current_assignment, results[current_assignment]) 
+
+if who_am_i == (processes -1):
+    for pid in childs:
+        os.waitpid(pid, 0)
