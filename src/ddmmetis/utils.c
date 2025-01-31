@@ -108,7 +108,7 @@ Edge * createEdges(idx_t actors, real_t comm_cost_matrix[actors][actors],
     int k = 0;
     for (int i = 0; i < actors; i++) {
         for (int j = i+1; j < actors; j++) {
-            if ((*matrix)[i][j] > 0.0 && i != j) {  // Only consider valid edges
+            if ((*matrix)[i][j] >= 0.0 && i != j) {  // Only consider valid edges
                 //printf("Original value at [%d][%d] = %.6f\n", i, j, (*matrix)[i][j]);
                 edges[k].src = i;
                 edges[k].dest = j;

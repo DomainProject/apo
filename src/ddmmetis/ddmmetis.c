@@ -52,7 +52,7 @@ void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **ad
 	}
 
 	PRINTER() printf("sum_edge_wgt %d \t sum_vert_wgt %ld\n", sum_edge_wgt, sum_vert_wgt);
-	avg_edge_wgt = sum_edge_wgt / (*xadj)[act];
+	avg_edge_wgt = ((*xadj)[act] != 0) ? sum_edge_wgt / (*xadj)[act] : 0;
 	avg_vert_wgt = sum_vert_wgt / total_actors;
 
 
@@ -73,7 +73,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	idx_t *vwgt = malloc(sizeof(idx_t) * total_actors); // Vertex weights (used by metis to balance the partitions)
 
 	for(int i = 0; i < total_actors; i++) {
-		vwgt[i] = tasks_forecast[i];
+		vwgt[i] = (tasks_forecast[i] == 0) ? 1 : tasks_forecast[i]; //zero-weights is problematic
 	}
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
