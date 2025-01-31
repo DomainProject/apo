@@ -71,7 +71,7 @@ class State():
             for k in range(self._num_actors):
                 self._assignment += [cu_units[cnt]]
                 cnt = (cnt + 1) % len(cu_units)
-            self._assignment = ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
+            self._assignment = ['cpu_0'] * self._num_actors #, 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
             if self._verbose: print(self._assignment)
         else:
             self._assignment = assignment
