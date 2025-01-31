@@ -8,11 +8,11 @@
 
 
 mkdir -p simulation_1
-python3 trace_generator.py 8 50000 -1
+python3 trace_generator.py 8 500000 -1
 mv *.trace simulation_1
 
 mkdir -p simulation_2
-python3 trace_generator.py 8 50000 10
+python3 trace_generator.py 8 500000 10
 mv *.trace simulation_2
 
 

@@ -1,7 +1,12 @@
+#from metasimulation.SimulationParameters.global_constants import *
+#from metasimulation.SimulationParameters.hardware import *
+
+
+from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
+from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module as hardware_constants
+
 import metasimulation.SimulationModel.hardware as hardware
 from metasimulation.SimulationModel.actor import Actor as Actor
-from metasimulation.SimulationParameters.global_constants import *
-from metasimulation.SimulationParameters.hardware import *
 from metasimulation.SimulationEngine.sim import *
 from metasimulation.SimulationModel.event_handlers import EVT
 
@@ -179,9 +184,9 @@ class State():
 
         f = open('application.py', 'w')
         f.write(f"num_actors        = {self._num_actors}       \n")
-        f.write(f"task_unit_costs   = {task_unit_costs}  \n")
-        f.write(f"task_anno_costs   = {task_anno_costs}  \n")
-        f.write(f"comm_unitary_cost = {comm_unitary_cost}    \n")
+        f.write(f"task_unit_costs   = {global_constants.task_unit_costs}  \n")
+        f.write(f"task_anno_costs   = {global_constants.task_anno_costs}  \n")
+        f.write(f"comm_unitary_cost = {hardware_constants.comm_unitary_cost}    \n")
 
         f.write(f"comm_matrix = [\n")
         for i in range(self._num_actors):

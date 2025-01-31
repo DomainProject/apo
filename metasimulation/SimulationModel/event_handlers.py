@@ -1,5 +1,6 @@
+#from metasimulation.SimulationParameters import global_constants
+from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
 from enum import Enum
-from metasimulation.SimulationParameters import global_constants
 from metasimulation.SimulationModel import hardware as hardware_model
 from metasimulation.SimulationEngine import sim as Simulator
 from heapq import *
