@@ -5,6 +5,8 @@ import metasimulation.SimulationEngine.runtime_modules
 required_files = ["hardware.py", "global_constants.py"]
 
 
+rebalance_period = 5
+
 if len(sys.argv) < 3:
     print("Usage: python3 sim_from_trace.py <operations> <simulation folder> [parallel processes]")
     print("Valid values for <operations>: ddm, metis, random, stats")
