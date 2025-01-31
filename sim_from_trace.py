@@ -1,11 +1,13 @@
 import sys
 import os
 import metasimulation.SimulationEngine.runtime_modules
+from metasimulation.SimulationEngine.read_solutions import *
 
 required_files = ["hardware.py", "global_constants.py"]
 
 
 rebalance_period = 5
+cur_reb_period = rebalance_period
 
 if len(sys.argv) < 3:
     print("Usage: python3 sim_from_trace.py <operations> <simulation folder> [parallel processes]")
@@ -38,6 +40,12 @@ for f in simulation_folder_cnts:
         simulation_trace = os.path.join(simulation_folder, f)
         fsolutions = simulation_trace+".solutions"
 
+maximum_th = 0
+ground_truth = {}
+if os.path.isfile(fsolutions):
+    ground_truth = load_ground_truth(fsolutions)
+    for k in ground_truth:
+        maximum_th = max(maximum_th, float(ground_truth[k]))
 if cnt == 0:
     print(f"{simulation_folder} does not contain a '.trace' file")
     sys.exit(1)
@@ -78,23 +86,42 @@ from metasimulation.SimulationModel.hardware import get_dev_from_cu
 import time
 import math 
 
+
+def assignment_renaming(assignment):
+  new_assignment = []
+  translation = {}
+  used_labels = set([])
+  
+  for i in assignment:
+    if i not in translation:
+      dev = i.split('_')[0]
+      count = 0
+      while True:
+        new_label = f"{dev}_{count}"
+        if new_label not in used_labels:
+          used_labels.add(new_label)
+          translation[i] = new_label
+          break
+        count += 1
+    new_assignment += [translation[i]]
+  return new_assignment
+
 def check_and_install_new_binding(operations, wct_ts):
     binding = operations.delayed_on_window()
     if binding is None: return False
 
-    print("got assignment: ", end='')
-
+    old_bind = binding
+    binding = assignment_renaming(binding)
+    print(f"new binding: {old_bind} renamed below")
+    print(f"new binding: {binding} expected th {ground_truth[tuple(binding)]} vs max th {maximum_th}")
     if binding != sim_state.get_assignment() and sim_state._pending_assigment != binding:
         sim_state.put_pending_assignment(binding)
-        print("new binding: ", binding)
         to_updated = set([])
         for i in range(len(sim_state._assignment)):
             if sim_state._pending_assignment[i] != sim_state._assignment[i]:
                 to_updated.add(sim_state._assignment[i])
         for cu in to_updated:
             Simulator.schedule_event(wct_ts, cu, EVT.REASSIGN)
-    else:
-        print("same binding: ", binding)
     return True
 
 def filter_assignment(assignment):
@@ -163,6 +190,9 @@ to_be_evaluated_assignments = []
 if len(sys.argv) == 4:
     evaluate_all = True
     to_be_evaluated_assignments = itertools.product(sim_state.get_cunits_data().keys(), repeat=sim_state.get_num_actors())
+    if len(ground_truth) > 0:
+        print("There is a solutions file. Please remove it and then proceed")
+        exit(1)
     fsolutions = open(fsolutions, 'w')
     processes = int(sys.argv[3])
 else:
@@ -235,12 +265,18 @@ for current_assignment in to_be_evaluated_assignments:
                 committed = sim_state.commit()
                 if not evaluate_all: 
                     sim_state.serialize_stat(wct_ts)
-                    print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", committed / global_constants_parameter_module.time_window_size)
+                    truth_th = 0
+                    actualth = committed / global_constants_parameter_module.time_window_size
+                    if len(ground_truth) > 0:
+                        truth_th = float(ground_truth[tuple(sim_state.get_assignment())]) 
+                    print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", actualth, "MAX TH", maximum_th)
+                    if abs(actualth/truth_th) < 1.05: 
+                        cur_reb_period = rebalance_period
                 else:
                     results[tuple(sim_state.get_assignment())] += [committed / global_constants_parameter_module.time_window_size]
                 if not rebalance_in_progress and rebalance_completed:
                     rebalance_cnt += 1
-                    if (rebalance_cnt % global_constants_parameter_module.rebalance_period) == 0:
+                    if (rebalance_cnt % cur_reb_period) == 0:
                         operations.on_window(
                             sim_state.get_cunits_data(), 
                             wct_ts, 
@@ -253,6 +289,7 @@ for current_assignment in to_be_evaluated_assignments:
                         )
                         rebalance_in_progress = True
                         rebalance_completed = False
+                        cur_reb_period = 1000000
                         if evaluate_all == True: sim_state.set_can_end(True)
 
 
