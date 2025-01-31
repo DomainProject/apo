@@ -39,7 +39,7 @@ void print_csr_graph(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, i
 idx_t * remap_partitioning(idx_t nVertices, idx_t cus, idx_t *part);
 
 idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, idx_t **new_vwgt);
-idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt);
+idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt, idx_t msg_exch_cost[cus][cus]);
 
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,

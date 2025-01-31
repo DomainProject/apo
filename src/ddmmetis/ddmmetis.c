@@ -25,6 +25,7 @@ static idx_t *part_c = NULL;
 
 real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
 real_t anno_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
+idx_t msg_exch_cost[N_CUS][N_CUS] = {0};
 
 void ddmmetis_init(idx_t total_actors, idx_t total_cus)
 {
@@ -59,7 +60,7 @@ void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **ad
 }
 
 void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
-    real_t input_comm_cost_matrix[actors][actors], real_t input_anno_matrix[actors][actors])
+    real_t input_comm_cost_matrix[actors][actors], real_t input_anno_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -78,6 +79,9 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
 	if(input_anno_matrix != NULL)
 		memcpy(anno_matrix, input_anno_matrix, sizeof(anno_matrix));
+
+	if(input_msg_exch_cost != NULL)
+		memcpy(msg_exch_cost, input_comm_cost_matrix, sizeof(msg_exch_cost));
 
 
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, NULL, anno_matrix, 0);
@@ -130,7 +134,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 
 	PRINTER() printf("NVERTICES %ld \t MAXEDGES %ld\n", aug_v, maxEdges);
 
-	idx_t *new_adjncy = populate_newadjncy(aug_v / n_cus, n_cus, maxEdges, xadj, new_xadj, adjncy, adjwgt, &new_adjwgt);
+	idx_t *new_adjncy = populate_newadjncy(aug_v / n_cus, n_cus, maxEdges, xadj, new_xadj, adjncy, adjwgt, &new_adjwgt, msg_exch_cost);
 
 	PRINTER() print_csr_graph(aug_v, new_xadj, new_adjncy, new_vwgt, new_adjwgt);
 

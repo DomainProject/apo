@@ -48,6 +48,7 @@ def test_metis():
     comm_matrix = [[actor[1] for actor in row] for row in actors]
 
     metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix)
+    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix, msg_exch_cost)
 
     part = metis_get_partitioning()
 

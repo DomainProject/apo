@@ -33,18 +33,25 @@ real_t anno_matrix[NUM_ACTORS][NUM_ACTORS] = {
     {0.264986844007987f, 0.1602710775975910f, 0.4296543850808237f, 0.43045374207632f, 0.443643132502059f, 0.1542759001313469f, 0.434050848556069f, 0.2777765559359744f, 0.249799061093502f, 0.07633859307017427f}
 };
 
+idx_t msg_exch_cost = {
+        {1, 1, 5, 5},
+        {1, 1, 5, 5},
+        {3, 3, 7, 7}
+    };
+
 
 int main(void)
 {
 	idx_t total_actors = NUM_ACTORS;
 	idx_t total_cus = N_CU_TYPES;
 
+
 	ddmmetis_init(total_actors, total_cus);
 
 	idx_t tasks_forecast[NUM_ACTORS] = {50, 50, 50, 50, 20, 50, 50, 80, 10, 10};
     idx_t capacity[N_CU_TYPES] = {4, 4, 2};
 
-	metis_partitioning(total_actors, total_cus, tasks_forecast, capacity, comm_cost_matrix, anno_matrix);
+	metis_partitioning(total_actors, total_cus, tasks_forecast, capacity, comm_cost_matrix, anno_matrix, msg_exch_cost);
 	int *res = metis_get_partitioning();
 
 	for(int i = 0; i < total_actors; ++i) {
