@@ -40,12 +40,6 @@ for f in simulation_folder_cnts:
         simulation_trace = os.path.join(simulation_folder, f)
         fsolutions = simulation_trace+".solutions"
 
-maximum_th = 0
-ground_truth = {}
-if os.path.isfile(fsolutions):
-    ground_truth = load_ground_truth(fsolutions)
-    for k in ground_truth:
-        maximum_th = max(maximum_th, float(ground_truth[k]))
 if cnt == 0:
     print(f"{simulation_folder} does not contain a '.trace' file")
     sys.exit(1)
@@ -54,6 +48,13 @@ if cnt > 1:
     sys.exit(1)
 
 print(f"trace found ({simulation_trace})")
+
+maximum_th = 0
+ground_truth = {}
+if os.path.isfile(fsolutions):
+    ground_truth = load_ground_truth(fsolutions)
+    for k in ground_truth:
+        maximum_th = max(maximum_th, float(ground_truth[k]))
 
 
 import importlib.util
