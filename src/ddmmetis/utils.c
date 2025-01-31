@@ -312,7 +312,7 @@ real t ubvec, idx t *options, idx t *objval, idx t *part)
  * */
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
-    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t **partition, int remap)
+    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t *alpha, idx_t **partition, int remap)
 {
 
     idx_t ncon = 1;
@@ -339,13 +339,15 @@ void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
 
     if (status == METIS_OK) {
 
-        PRINTER() printf("EDGE CUT %ld \n", edgeCut);
+        *alpha = (edgeCut == 0) ? 1 : xadj[nVertices] / (edgeCut + 1);
+
+        PRINTER() printf("EDGE CUT %ld \t total edges %ld \t ratio %ld  n", edgeCut, xadj[nVertices], (idx_t) (xadj[nVertices]/edgeCut));
         if (!remap) {
-            PRINTER() print_partition(nVertices, *partition);
+            print_partition(nVertices, *partition);
         } else {
 
             *partition = remap_partitioning(nVertices, nParts, *partition);
-            PRINTER() print_partition(nVertices/nParts, *partition);
+             print_partition(nVertices/nParts, *partition);
         }
     } else {
         fprintf(stderr, "METIS partitioning failed.\n");

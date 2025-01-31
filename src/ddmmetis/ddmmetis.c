@@ -69,6 +69,8 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	idx_t ubfactor = 30; // default imbalance tolerance
 	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
 
+	idx_t alpha = 0;
+
 	idx_t *xadj, *adjncy, *adjwgt;
 	idx_t *vwgt = malloc(sizeof(idx_t) * total_actors); // Vertex weights (used by metis to balance the partitions)
 
@@ -86,6 +88,26 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, NULL, anno_matrix, 0);
 
+	if (part_o != NULL) {
+        for(int i = 0; i < total_actors; i++) {
+            PRINTER() printf("neighbors of vertex %ld :\t", i);
+            for(int j = xadj[i]; j < xadj[i + 1]; j++) {
+                PRINTER() printf("<%ld, %ld> ", adjncy[j], adjwgt[j]);
+                if(i != adjncy[j] && part_o[i] == part_o[adjncy[j]]) {
+                    PRINTER()
+                    printf(
+                        "vertex %ld and vertex %ld are on the same partition (%ld, %ld) ! Reward them -> (%ld, %ld)\n",
+                        i, adjncy[j], part_o[i], part_o[adjncy[j]], adjwgt[i], adjwgt[adjncy[j]]);
+                    adjwgt[i] = max(adjwgt[i] + alpha, adjwgt[i]);
+                    adjwgt[adjncy[j]] = max(adjwgt[adjncy[j]] + alpha, adjwgt[adjncy[j]]);
+                    vwgt[i] = max(vwgt[i] * avg_vert_wgt , vwgt[i] + 1);
+                    vwgt[adjncy[j]] = max(vwgt[adjncy[j]] * avg_vert_wgt , vwgt[adjncy[j]] + 1);
+                }
+            }
+            PRINTER() printf("\n");
+        }
+    }
+
 	PRINTER() printf("(first) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -95,8 +117,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 
 
 	PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE **** \n");
-	compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &part_a, 0);
-
+	compute_partition(total_actors, xadj, adjncy, NULL, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_a, 0);
 
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 1);
 
@@ -112,10 +133,10 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 				printf(
 				    "vertex %ld and vertex %ld are on the same partition (%ld, %ld) ! Reward them -> (%ld, %ld)\n",
 				    i, adjncy[j], part_a[i], part_a[adjncy[j]], adjwgt[i], adjwgt[adjncy[j]]);
-				adjwgt[i] = max(adjwgt[i] * avg_edge_wgt * 2, adjwgt[i]);
-				adjwgt[adjncy[j]] = max(adjwgt[adjncy[j]] * avg_edge_wgt * 2, adjwgt[adjncy[j]]);
-				vwgt[i] = max(vwgt[i] * avg_vert_wgt * 2, vwgt[i] + 1);
-				vwgt[adjncy[j]] = max(vwgt[adjncy[j]] * avg_vert_wgt * 2, vwgt[adjncy[j]] + 1);
+				adjwgt[i] = max(adjwgt[i] + alpha, adjwgt[i]);
+				adjwgt[adjncy[j]] = max(adjwgt[adjncy[j]] + alpha, adjwgt[adjncy[j]]);
+				vwgt[i] = max(vwgt[i] * avg_vert_wgt , vwgt[i] + 1);
+				vwgt[adjncy[j]] = max(vwgt[adjncy[j]] * avg_vert_wgt , vwgt[adjncy[j]] + 1);
 			}
 		}
 		PRINTER() printf("\n");
@@ -141,13 +162,12 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	ubfactor = 50;
 
     PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST **** \n");
-    compute_partition(aug_v, new_xadj, new_adjncy, new_vwgt, NULL, new_adjwgt, nParts, NULL, NULL, ubfactor, &part_c, 1);
+    compute_partition(aug_v, new_xadj, new_adjncy, new_vwgt, NULL, new_adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_c, 1);
 
 
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
 
-	PRINTER() printf("(third) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);
-
+	PRINTER() printf("(third) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);	
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
@@ -161,10 +181,10 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 				printf(
 				    "vertex %d and vertex %d are on the same partition (%d, %d) ! Reward them -> (%d, %d)\n",
 				    i, adjncy[j], part_c[i], part_c[adjncy[j]], adjwgt[i], adjwgt[adjncy[j]]);
-				adjwgt[i] = max(adjwgt[i] * avg_edge_wgt * 2, adjwgt[i]);
-				adjwgt[adjncy[j]] = max(adjwgt[adjncy[j]] * avg_edge_wgt * 2, adjwgt[adjncy[j]]);
-				vwgt[i] = max(vwgt[i] * avg_vert_wgt * 2, vwgt[i] + 1);
-				vwgt[adjncy[j]] = max(vwgt[adjncy[j]] * avg_vert_wgt * 2, vwgt[adjncy[j]] + 1);
+				adjwgt[i] = max(adjwgt[i] + alpha, adjwgt[i]);
+				adjwgt[adjncy[j]] = max(adjwgt[adjncy[j]] + alpha, adjwgt[adjncy[j]]);
+				vwgt[i] = max(vwgt[i] * avg_vert_wgt , vwgt[i] + 1);
+				vwgt[adjncy[j]] = max(vwgt[adjncy[j]] * avg_vert_wgt , vwgt[adjncy[j]] + 1);
 			}
 		}
 		PRINTER() printf("\n");
@@ -175,7 +195,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
     PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST AND OVERLOAD **** \n");
-    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &part_o, 0);
+    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_o, 0);
 
 
 	for(int k = 0; k < total_actors; k++) {

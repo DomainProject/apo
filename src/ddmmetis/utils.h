@@ -43,4 +43,4 @@ idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xad
 
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
-    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t **partition, int remap);
+    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t *alpha, idx_t **partition, int remap);
