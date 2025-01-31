@@ -1,10 +1,10 @@
 import sys
 import os
 
-from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
+from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
 from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
 
 
