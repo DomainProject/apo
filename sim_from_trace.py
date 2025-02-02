@@ -55,7 +55,7 @@ if os.path.isfile(fsolutions):
     ground_truth = load_ground_truth(fsolutions)
     for k in ground_truth:
         maximum_th = max(maximum_th, float(ground_truth[k]))
-
+if maximum_th != 0: print(f"Found optimal solution {maximum_th}")
 
 import importlib.util
 
@@ -270,7 +270,7 @@ for current_assignment in to_be_evaluated_assignments:
                 gvt = sim_state.get_gvt()
                 committed = sim_state.commit()
                 actualth = committed / global_constants_parameter_module.time_window_size
-                maximum_th = 0
+                
                 if not evaluate_all: 
                     sim_state.serialize_stat(wct_ts)
                     truth_th = 0

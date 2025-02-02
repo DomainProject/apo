@@ -14,10 +14,12 @@ def process_line(res, line):
 	res[line] = th
 
 def load_ground_truth(path):
+	print(f"loading ground truth {path}...", end='')
 	res = {}
 	f = open(path)
 	for line in f.readlines():
 		process_line(res, line)
 	f.close()
+	print('end')
 	return res
 
