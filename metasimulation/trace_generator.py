@@ -19,7 +19,7 @@ if fan_out_per < 0:
   print(f"|- 1 Outbound EVT Period: {float('inf')}")
 else:
   print(f"|- 1 Outbound EVT Period: {fan_out_per}")
-print("|- Last TS: {svt_end}")
+print(f"|- Last TS: {svt_end}")
 
 ofile=f"lp_{num_actors}-end_time_{svt_end}-fanout_{fan_out_per}.trace"
 
