@@ -36,12 +36,13 @@ _metisddm.metis_partitioning.argtypes = [
     ctypes.POINTER(idx_t),
     ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
-    ctypes.POINTER(real_t)
+    ctypes.POINTER(real_t),
+    ctypes.POINTER(idx_t)
 ]
 _metisddm.metis_partitioning.restype = None
 
 
-def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix):
+def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
@@ -71,11 +72,17 @@ def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix,
     for row in anno_matrix:
         flattened_anno_matrix.extend(row)
 
+    flattened_msg_exch_cost_matrix = []
+    for row in msg_exch_cost:
+        flattened_msg_exch_cost_matrix.extend(row)
+
     arr_comm = (ctypes.c_double * (total_actors * total_actors))(*flattened_comm_matrix)
     arr_anno = (ctypes.c_double * (total_actors * total_actors))(*flattened_anno_matrix)
+    arr_msg_exch = (ctypes.c_long * (cus * cus))(*flattened_msg_exch_cost_matrix)
 
+    
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_partitioning(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_anno)
+    _metisddm.metis_partitioning(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_anno, arr_msg_exch)
 
 
 _metisddm.metis_get_partitioning.argtypes = []

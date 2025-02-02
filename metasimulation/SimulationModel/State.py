@@ -1,7 +1,12 @@
+#from metasimulation.SimulationParameters.global_constants import *
+#from metasimulation.SimulationParameters.hardware import *
+
+
+from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
+from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module as hardware_constants
+
 import metasimulation.SimulationModel.hardware as hardware
 from metasimulation.SimulationModel.actor import Actor as Actor
-from metasimulation.SimulationParameters.global_constants import *
-from metasimulation.SimulationParameters.hardware import *
 from metasimulation.SimulationEngine.sim import *
 from metasimulation.SimulationModel.event_handlers import EVT
 
@@ -55,13 +60,8 @@ class State():
         cu_units = sorted(hardware.build_cunits())
         if self._verbose: print("Done")
 
-<<<<<<< HEAD
         if self._verbose: print(f"Building computing units...", end='')
         for k in cu_units:    
-=======
-        print(f"Building computing units...", end='')
-        for k in cu_units:
->>>>>>> metis-integration-2
             self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
         if self._verbose: print("Done")
 
@@ -71,7 +71,7 @@ class State():
             for k in range(self._num_actors):
                 self._assignment += [cu_units[cnt]]
                 cnt = (cnt + 1) % len(cu_units)
-            self._assignment = ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
+            self._assignment = ['cpu_0'] * self._num_actors #, 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
             if self._verbose: print(self._assignment)
         else:
             self._assignment = assignment
@@ -143,7 +143,7 @@ class State():
 
         min_cmt = min(cnt)
         max_cmt = max(cnt)
-        if min_cmt != max_cmt and False:
+        if min_cmt != max_cmt and False: 
             print(self._gvt)
             for cu in self._cu_units_data:
                 for a in self._cu_units_data[cu]['queue']:
@@ -160,33 +160,33 @@ class State():
         for i in range(len(self._round_aborts)):
             self._round_aborts[i] = 0
         #print("EVT ABORTED TOTAL", self._total_aborts)
-
-
+        
+        
 
         return sum(cnt)
 
 
-    def serialize_stat(self, wct_ts):
+    def serialize_stat(self, wct_ts): 
         comm = []
-        anno_matrix = []
-
+        anno = []      
+        
         for i in range(self._num_actors):
             comm += [[]]
-            anno_matrix += [[]]
+            anno += [[]]
             for j in range(self._num_actors):
                 comm[i] += [0]
-                anno_matrix[i] += [0]
+                anno[i] += [0]
 
         for i in range(self._num_actors):
             for j in range(self._num_actors):
                 comm[i][j] = self._communication_matrix[i][j]/wct_ts
-                anno_matrix[i][j] = self._annoyance_matrix[i][j]/wct_ts
+                anno[i][j] = self._annoyance_matrix[i][j]/wct_ts
 
         f = open('application.py', 'w')
         f.write(f"num_actors        = {self._num_actors}       \n")
-        f.write(f"task_unit_costs   = {task_unit_costs}  \n")
-        f.write(f"task_anno_costs   = {task_anno_costs}  \n")
-        f.write(f"comm_unitary_cost = {comm_unitary_cost}    \n")
+        f.write(f"task_unit_costs   = {global_constants.task_unit_costs}  \n")
+        f.write(f"task_anno_costs   = {global_constants.task_anno_costs}  \n")
+        f.write(f"comm_unitary_cost = {hardware_constants.comm_unitary_cost}    \n")
 
         f.write(f"comm_matrix = [\n")
         for i in range(self._num_actors):
@@ -197,7 +197,7 @@ class State():
 
         f.write(f"anno_matrix      = [\n")
         for i in range(self._num_actors):
-            f.write(f"{anno_matrix[i]}")
+            f.write(f"{anno[i]}")
             if i != self._num_actors - 1:        f.write(f",")
             f.write(f"\n")
         f.write(f"]\n")
@@ -214,7 +214,7 @@ def load_trace(path):
     traces = {}
     cnt=0
     for line in f.readlines():
-        if cnt == 0 and ',' in line:
+        if cnt == 0 and ',' in line: 
             cnt+=1
             continue
         if cnt != 0 and ',' in line:

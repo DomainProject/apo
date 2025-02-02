@@ -1,5 +1,8 @@
 import math
 
+from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
+from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module as hardware_constants
+
 from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_window
 from metasimulation.window_operations.abstract_operations import WindowOperations
 from src.ddm import ddm_init, ddm_optimize, ddm_prepare_actor_matrix, ddm_poll

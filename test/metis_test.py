@@ -1,10 +1,10 @@
 import sys
 import os
 
-from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
+from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
 from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
 
 
@@ -47,7 +47,29 @@ def test_metis():
     # second component of each actor is the communication cost
     comm_matrix = [[actor[1] for actor in row] for row in actors]
 
-    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix)
+    anno_matrix = [
+    [1, 2, 0, 3, 1], 
+    [2, 1, 4, 1, 2], 
+    [0, 4, 1, 5, 0], 
+    [3, 1, 5, 1, 2], 
+    [1, 2, 0, 2, 1]
+]
+
+    comm_matrix = [
+    [5, 6, 0, 7, 5], 
+    [6, 4, 8, 3, 6], 
+    [0, 8, 4, 9, 0], 
+    [7, 3, 9, 4, 7], 
+    [5, 6, 0, 7, 5]
+]
+
+    total_actors = 5
+    tasks_forecast = [30, 40, 50, 60, 20]
+
+    print("annoyance ", anno_matrix)
+    print("communication", comm_matrix)
+
+    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix, msg_exch_cost)
 
     part = metis_get_partitioning()
 
