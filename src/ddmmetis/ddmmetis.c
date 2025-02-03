@@ -31,9 +31,12 @@ static idx_t *part_o = NULL;
 static idx_t *part_a = NULL;
 static idx_t *part_c = NULL;
 
+static idx_t *final_part = NULL;
+
 real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
 real_t anno_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
 idx_t msg_exch_cost[N_CUS][N_CUS] = {0};
+idx_t speed[N_CUS] = {0};
 
 void ddmmetis_init(idx_t total_actors, idx_t total_cus)
 {
@@ -67,41 +70,72 @@ void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **ad
 	free(edges);
 }
 
-void update_weights(idx_t total_actors, idx_t *part, idx_t *xadj, idx_t *adjncy, idx_t **adjwgt, idx_t **vwgt, idx_t alpha) {
+void update_weights(idx_t total_actors, idx_t cus, idx_t *part, idx_t *xadj, idx_t *adjncy, idx_t **adjwgt, idx_t **vwgt, idx_t alpha, idx_t speed[cus]) {
+
+
+	idx_t max_speed = 0;
+    for (int i = 0; i < cus; i++) {
+        if (speed[i] > max_speed) {
+            max_speed = speed[i];
+        }
+    }
 
 	if (part != NULL) {
         for(int i = 0; i < total_actors; i++) {
             PRINTER() printf("neighbors of vertex %ld :\t", i);
             for(int j = xadj[i]; j < xadj[i + 1]; j++) {
-                PRINTER() printf("<%ld, %ld> ", adjncy[j], (*adjwgt)[j]);
-                if(i != adjncy[j] && part[i] == part[adjncy[j]]) {
-                    if ((*adjwgt)[i] == 0 && (*adjwgt)[j] == 0) { //no communication
-						PRINTER()
-						printf(
-						    "DISCONNECTED vertex %d and vertex %d are on the same partition (%d, %d) ! Reward them -> (%d, %d) [alpha %ld] \n",
-						    i, adjncy[j], part[i], part[adjncy[j]], (*adjwgt)[i], (*adjwgt)[j], alpha);
-						(*adjwgt)[i] = round(max((*adjwgt)[i] - alpha / (1 + (*adjwgt)[i]), (*adjwgt)[i]));
-						(*adjwgt)[j] = round(max((*adjwgt)[j] - alpha / (1 + (*adjwgt)[j]), (*adjwgt)[j]));
-						PRINTER()
-						printf("After update → adjwgt[i] %ld \t adjwgt[neighbor] %ld \t vwgt[i] %ld \t vwgt[neghbor] %ld \n",
-									(*adjwgt)[i], (*adjwgt)[j], (*vwgt)[i], (*vwgt)[adjncy[j]] );
-					}else {
-						PRINTER()
-						printf(
-						    "CHAIN vertex %d and vertex %d are on the same partition (%d, %d) ! Reward them -> (%d, %d) [alpha %ld] \n",
-						    i, adjncy[j], part[i], part[adjncy[j]], (*adjwgt)[i], (*adjwgt)[adjncy[j]], alpha);
-						(*adjwgt)[i] = round(max((*adjwgt)[i] + alpha, (*adjwgt)[i]));
-						(*adjwgt)[j] = round(max((*adjwgt)[j] + alpha, (*adjwgt)[j]));
-						PRINTER()
-						printf("After update → adjwgt[i] %ld \t adjwgt[neighbor] %ld \t vwgt[i] %ld \t vwgt[neghbor] %ld \n",
-									(*adjwgt)[i], (*adjwgt)[j], (*vwgt)[i], (*vwgt)[adjncy[j]] );
-					}
 
-					(*vwgt)[i] = min(round((*vwgt)[i] * 1.05) , (*vwgt)[i] + 1);
-					(*vwgt)[adjncy[j]] = min(round((*vwgt)[adjncy[j]] * 1.05)  , (*vwgt)[adjncy[j]] + 1);
-                }
+            	PRINTER()
+            	printf("DATA ABOUT SPEED %ld \t %ld \t %ld \t %ld\n", 
+                   speed[part[i]], 
+                   speed[part[adjncy[j]]], 
+                   (*vwgt)[i] + speed[part[i]], 
+                   (*vwgt)[i] + speed[part[adjncy[j]]]);
+
+            	if (speed != NULL) {	
+	            	if (speed[part[i]] > speed[part[adjncy[j]]]) {
+						(*vwgt)[i] = min(round((*vwgt)[i] + speed[part[i]]) , 1);
+						(*vwgt)[adjncy[j]] = max(round((*vwgt)[adjncy[j]] + speed[part[i]])  , 1);
+					} else {
+						(*vwgt)[i] = max(round((*vwgt)[i] + speed[part[adjncy[j]]]) , 1);
+						(*vwgt)[adjncy[j]] = min(round((*vwgt)[adjncy[j]] + speed[adjncy[j]])  , 1);
+					}
+				}
+                PRINTER() printf("<%ld, %ld> ", adjncy[j], (*adjwgt)[j]);
+                PRINTER() printf("speed part[i] %ld \t speed part[adjc[j]] %ld \n", speed[part[i]], speed[part[adjncy[j]]]);
+
+                if(i != adjncy[j] && part[i] == part[adjncy[j]]) {
+              
+					PRINTER()
+					printf(
+					    "vertex %d and vertex %d are on the same partition (%d, %d) ! Reward them -> (%d, %d) [alpha %ld] \n",
+					    i, adjncy[j], part[i], part[adjncy[j]], (*adjwgt)[i], (*adjwgt)[adjncy[j]], alpha);
+					(*adjwgt)[i] = round(max((*adjwgt)[i] + alpha, (*adjwgt)[i]));
+					(*adjwgt)[j] = round(max((*adjwgt)[j] + alpha, (*adjwgt)[j]));
+					PRINTER()
+					printf("After update → adjwgt[i] %ld \t adjwgt[neighbor] %ld \t vwgt[i] %ld \t vwgt[neghbor] %ld \n",
+								(*adjwgt)[i], (*adjwgt)[j], (*vwgt)[i], (*vwgt)[adjncy[j]] );
+				
+
+                } else {
+                	
+			        idx_t penalty = msg_exch_cost[part[i]][part[adjncy[j]]];  // Get the communication cost between partitions
+			        PRINTER()
+			        printf(
+			            "vertex %d and vertex %d are on different partitions (%d, %d) ! Penalize them -> (%d, %d) [penalty %ld] \n",
+			            i, adjncy[j], part[i], part[adjncy[j]], (*adjwgt)[i], (*adjwgt)[adjncy[j]], penalty);
+
+			        idx_t penalty_factor = 1 + penalty / ((*adjwgt)[i] + 1);  // Scaling factor based on current weight
+			        (*adjwgt)[i] = round((*adjwgt)[i] / penalty_factor);  // Apply scaled penalty
+			        (*adjwgt)[j] = round((*adjwgt)[j] / penalty_factor);  // Apply scaled penalty
+			    }
+                PRINTER()
+				printf("After update → adjwgt[i] %ld \t adjwgt[neighbor] %ld \t vwgt[i] %ld \t vwgt[neghbor] %ld \n",
+								(*adjwgt)[i], (*adjwgt)[j], (*vwgt)[i], (*vwgt)[adjncy[j]] );
+				
             }
             PRINTER() printf("\n");
+			
         }
     }
 
@@ -109,7 +143,7 @@ void update_weights(idx_t total_actors, idx_t *part, idx_t *xadj, idx_t *adjncy,
 }
 
 void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
-    real_t input_comm_cost_matrix[actors][actors], real_t input_anno_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+    real_t input_comm_cost_matrix[actors][actors], real_t input_anno_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus], idx_t input_speed[n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -134,11 +168,13 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	if(input_msg_exch_cost != NULL)
 		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
 
+	if (input_speed != NULL)
+		memcpy(speed, input_speed, sizeof(speed));
 
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, NULL, anno_matrix, 0);
 
 
-	update_weights(total_actors, part_o, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, n_cus, part_o, xadj, adjncy, &adjwgt, &vwgt, alpha, speed);
 	
 
 	PRINTER() printf("(first) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);
@@ -163,7 +199,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
 
-	update_weights(total_actors, part_a, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, n_cus, part_a, xadj, adjncy, &adjwgt, &vwgt, alpha, speed);
 
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -199,7 +235,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
 
-	update_weights(total_actors, part_c, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, n_cus, part_c, xadj, adjncy, &adjwgt, &vwgt, alpha, speed);
 
 
 	ubfactor = 100;
@@ -210,7 +246,7 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
     compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_o, 0);
 
 
-	for(int k = 0; k < total_actors; k++) {
+	/*for(int k = 0; k < total_actors; k++) {
 		if(capacity[part_o[k]] > 0) {
 			capacity[part_o[k]]--;
 		} else {
@@ -221,10 +257,12 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 				}
 			}
 		}
-	}
+	}*/
 
 
 	PRINTER() print_partition(total_actors, part_o);
+
+	final_part = part_o;
 
 
 	free(xadj);
@@ -238,8 +276,122 @@ void metis_partitioning(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, 
 	free(new_adjwgt);
 }
 
+void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
+    real_t input_comm_cost_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+{
+	idx_t nParts = n_cus; // Number of partitions (number of CUs)
+
+	idx_t ncon = 1; // number of weights associated to each vertex
+
+	idx_t ubfactor = 30; // default imbalance tolerance
+	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
+
+
+	idx_t *xadj, *adjncy, *adjwgt;
+	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
+	memcpy(vwgt, tasks_forecast, sizeof(idx_t) * total_actors);
+
+
+	if(input_comm_cost_matrix != NULL)
+		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
+	
+	if(input_msg_exch_cost != NULL)
+		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
+
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 1);
+
+
+	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
+
+	idx_t aug_v = total_actors * n_cus;
+	idx_t *new_adjwgt;
+	idx_t *new_vwgt;
+
+	idx_t *new_xadj = populate_newxadj(aug_v / n_cus, n_cus, xadj, vwgt, &new_vwgt);
+
+	idx_t maxEdges = new_xadj[aug_v];
+
+	PRINTER() printf("NVERTICES %ld \t MAXEDGES %ld\n", aug_v, maxEdges);
+
+	idx_t *new_adjncy = populate_newadjncy(aug_v / n_cus, n_cus, maxEdges, xadj, new_xadj, adjncy, adjwgt, &new_adjwgt, msg_exch_cost);
+
+	PRINTER() print_csr_graph(aug_v, new_xadj, new_adjncy, new_vwgt, new_adjwgt);
+
+	ubfactor = 30;
+
+    PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST **** \n");
+    compute_partition(aug_v, new_xadj, new_adjncy, new_vwgt, NULL, new_adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_c, 1);
+
+	PRINTER() print_partition(total_actors, part_c);
+
+	final_part = part_c;
+
+	free(xadj);
+	free(adjncy);
+	free(adjwgt);
+	free(vwgt);
+
+	free(new_xadj);
+	free(new_adjncy);
+	free(new_vwgt);
+	free(new_adjwgt);
+}
+
+void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
+    real_t input_comm_cost_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+{
+	idx_t nParts = n_cus; // Number of partitions (number of CUs)
+
+	idx_t ncon = 1; // number of weights associated to each vertex
+
+	idx_t ubfactor = 30; // default imbalance tolerance
+	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
+
+
+	idx_t *xadj, *adjncy, *adjwgt;
+	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
+	memcpy(vwgt, tasks_forecast, sizeof(idx_t) * total_actors);
+
+
+	if(input_comm_cost_matrix != NULL)
+		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
+	
+	if(input_msg_exch_cost != NULL)
+		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
+
+
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
+
+
+	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
+
+
+
+	ubfactor = 30;
+
+	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
+
+    PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST AND OVERLOAD **** \n");
+    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_o, 0);
+
+
+
+
+	PRINTER() print_partition(total_actors, part_o);
+
+	final_part = part_o;
+
+
+	free(xadj);
+	free(adjncy);
+	free(adjwgt);
+	free(vwgt);
+
+}
+
+
 idx_t *metis_get_partitioning(void)
 {
 	PRINTER() printf("*** PARTITION TO BE INSTALLED **** \n");
-	return part_o;
+	return final_part;
 }
