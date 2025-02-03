@@ -1,5 +1,6 @@
+#from metasimulation.SimulationParameters import global_constants
+from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
 from enum import Enum
-from metasimulation.SimulationParameters import global_constants
 from metasimulation.SimulationModel import hardware as hardware_model
 from metasimulation.SimulationEngine import sim as Simulator
 from heapq import *
@@ -17,8 +18,6 @@ class EVT(Enum):
             return self.value < other.value
         return NotImplemented
 
-last_actor_executed = {}
-
 def begin_exec(sim_state, cur_cu, queue, last_wct):
     initial = len(queue)
     cur_actor = queue[0]
@@ -26,8 +25,6 @@ def begin_exec(sim_state, cur_cu, queue, last_wct):
     next_ts = cur_actor.next_ts()
 
     actor_id = cur_actor.get_id()
-    last_actor_executed[cur_cu] = cur_actor
-
 
     end_exe_wct = last_wct
     end_exe_wct += float(global_constants.task_unit_costs)/hardware_model.get_relative_speed(cur_cu)  # simulate execution
@@ -133,7 +130,7 @@ def recv(sim_state, queue, a_id, a_ts, actor_from, last_wct):
     if queue[j].curr_ts() >= a_ts:
         #print(f"FUTURE ROLLBACK FROM {actor_from} FOR {a_id} @ {a_ts} {queue[j]} {queue[j]._executed}")
         if actor_from == a_id: 
-            print("AUTOROLLBACK FROM {actor_from} {a_id}")
+            print(f"AUTOROLLBACK FROM {actor_from} {a_id}")
             exit(1)
         sim_state.update_annoyance_counters(a_id, actor_from)
         if a_id != actor_from: queue[j].rcv(a_ts, last_wct, actor_from)

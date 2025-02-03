@@ -3,6 +3,11 @@ from heapq import *
 wall_clock_time_events = []
 verbose=False
 
+
+def init_simulation_engine():
+	global wall_clock_time_events
+	wall_clock_time_events = []
+
 def schedule_event(wct, dest_device, type, payload=None, debug=verbose):
 	a = -1
 	b = -1

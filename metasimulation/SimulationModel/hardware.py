@@ -1,11 +1,15 @@
-from metasimulation.SimulationParameters.hardware import *
+#from metasimulation.SimulationParameters.hardware import *
+# hardware_parameter_module is a dynamically loaded module containing cu_types and communication matrix
 # UTILITY FUNCTIONS
+
+
+from metasimulation.SimulationEngine.runtime_modules import *
 
 # creates an array of computing unit labels
 def build_cunits():
   res = []
-  for k in cu_types:
-      res += [f"{k}_{v}" for v in range(cu_types[k]['num_units'])]
+  for k in hardware_parameter_module.cu_types:
+      res += [f"{k}_{v}" for v in range(hardware_parameter_module.cu_types[k]['num_units'])]
   return res
 
 # get device type from computing unit
@@ -25,16 +29,17 @@ def on_same_unit(assignment,i,j):
 # get latency for communicating between two devices
 def get_communication_latency(cu_a, cu_b):
   if cu_a == cu_b: 
-    return comm_unitary_cost/2
-  return communication_costs[get_dev_from_cu(cu_a)][get_dev_from_cu(cu_b)]*comm_unitary_cost
+    return hardware_parameter_module.comm_unitary_cost/2
+  return hardware_parameter_module.communication_costs[get_dev_from_cu(cu_a)][get_dev_from_cu(cu_b)]*hardware_parameter_module.comm_unitary_cost
 
 def get_relative_speed(cu_a):
-  return cu_types[get_dev_from_cu(cu_a)]['relative_speed']
+  return hardware_parameter_module.cu_types[get_dev_from_cu(cu_a)]['relative_speed']
 
 def get_capacity_vector():
     res = []
-    for k in cu_types:
-        res += [cu_types[k]['capacity_cu']]*cu_types[k]['num_units']
+    for k in hardware_parameter_module.cu_types:
+        #res += [hardware_parameter_module.cu_types[k]['capacity_cu']]*hardware_parameter_module.cu_types[k]['num_units']
+        res += [3]*hardware_parameter_module.cu_types[k]['num_units']
     return res
 
 def convert_ddm_assignment_to_sim_assingment(ddm_assignment):
