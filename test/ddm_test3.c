@@ -12,7 +12,7 @@ int main(void)
 	int total_cus = NCUS;
 	int total_actors = NACT;
 	enum cu_type cus[NCUS] = {1, 1, 2, 4};
-	int msg_exch_cost[NCUS][NCUS] = {//        C  C  G  F
+	int msg_exch_cost[NCUS][NCUS] = {//       C  C  G  F
 	    /*CPU*/ {1, 1, 2, 2},
 	    /*CPU*/ {1, 1, 2, 2},
 	    /*GPU*/ {2, 2, 4, 4},
