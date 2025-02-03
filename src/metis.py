@@ -132,11 +132,10 @@ _metisddm.metis_overload.argtypes = [
     ctypes.POINTER(idx_t),
     ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
-    ctypes.POINTER(idx_t),
 ]
 _metisddm.metis_overload.restype = None
 
-def metis_overload(total_actors, cus, tasks_forecast, capacity, comm_matrix, msg_exch_cost):
+def metis_overload(total_actors, cus, tasks_forecast, capacity, comm_matrix):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
@@ -150,16 +149,11 @@ def metis_overload(total_actors, cus, tasks_forecast, capacity, comm_matrix, msg
         flattened_comm_matrix.extend(row)
 
  
-    flattened_msg_exch_cost_matrix = []
-    for row in msg_exch_cost:
-        flattened_msg_exch_cost_matrix.extend(row)
-
     arr_comm = (ctypes.c_double * (total_actors * total_actors))(*flattened_comm_matrix)
-    arr_msg_exch = (ctypes.c_long * (cus * cus))(*flattened_msg_exch_cost_matrix)
 
     
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_overload(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_msg_exch)
+    _metisddm.metis_overload(total_actors, cus, arr_tasks, arr_capacity, arr_comm)
 
 
 _metisddm.metis_get_partitioning.argtypes = []

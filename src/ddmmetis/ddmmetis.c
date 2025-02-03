@@ -338,7 +338,7 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 }
 
 void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
-    real_t input_comm_cost_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+    real_t input_comm_cost_matrix[actors][actors])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -356,10 +356,6 @@ void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
 	
-	if(input_msg_exch_cost != NULL)
-		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
-
-
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
 
 
