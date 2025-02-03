@@ -33,6 +33,10 @@ class MetisOperations(WindowOperations):
         comm_matrix = []
         anno_matrix = []
 
+        speed = []
+        #for c in cunits: speed.append(self.sim_state.get_speed(c))
+        print("speed : ", speed)
+
         for i in range(num_actors):
             comm_row = []
             anno_row = []
@@ -48,11 +52,12 @@ class MetisOperations(WindowOperations):
             anno_matrix = [[1] * len(anno_matrix[0]) for _ in range(len(anno_matrix))]
     
 
-        print(capacity)
+        print("capacity : ", capacity)
+        print(msg_exch_cost)
         print(task_forecast)
         print(anno_matrix)
         print(comm_matrix)
-        metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost)
+        metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
         return min_vt
 
     def delayed_on_window(self):
@@ -60,6 +65,7 @@ class MetisOperations(WindowOperations):
         # if no partitioning has been found return None
         cunits = self.sim_state.get_cunits()
         actors = self.sim_state.get_num_actors()
+        speed = []
         part = metis_get_partitioning()
         if not part:
             return None
