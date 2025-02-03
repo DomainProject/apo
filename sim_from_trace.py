@@ -40,16 +40,22 @@ for f in simulation_folder_cnts:
         simulation_trace = os.path.join(simulation_folder, f)
         fsolutions = simulation_trace+".solutions"
 
+if cnt == 0:
+    print(f"{simulation_folder} does not contain a '.trace' file")
+    sys.exit(1)
+if cnt > 1:
+    print(f"{simulation_folder} contains multiple '.trace' files")
+    sys.exit(1)
+
+print(f"trace found ({simulation_trace})")
+
 maximum_th = 0
 ground_truth = {}
 if os.path.isfile(fsolutions):
     ground_truth = load_ground_truth(fsolutions)
     for k in ground_truth:
         maximum_th = max(maximum_th, float(ground_truth[k]))
-
-
-print(f"trace found ({simulation_trace})")
-
+if maximum_th != 0: print(f"Found optimal solution {maximum_th}")
 
 import importlib.util
 
@@ -77,6 +83,8 @@ from metasimulation.window_operations.ddm_operations import DdmOperations
 from metasimulation.window_operations.metis_operations import MetisOperations
 from metasimulation.window_operations.random_operations import RandomOperations
 from metasimulation.window_operations.null_operations  import NullOperations
+from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
+from metasimulation.window_operations.metis_overload_operations  import MetisOverloadOperations
 from metasimulation.SimulationModel.hardware import get_dev_from_cu
 import time
 import math 
@@ -175,6 +183,10 @@ match wops_string:
         operations = RandomOperations(sim_state)
     case "null":
         operations = NullOperations(sim_state)
+    case "metis-communication":
+        operations = MetisCommunicationOperations(sim_state)
+    case "metis-overload":
+        operations = MetisOverloadOperations(sim_state)
     case _:
         print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'null'")
         sys.exit(1)
@@ -186,8 +198,13 @@ if len(sys.argv) == 4:
     evaluate_all = True
     to_be_evaluated_assignments = itertools.product(sim_state.get_cunits_data().keys(), repeat=sim_state.get_num_actors())
     if len(ground_truth) > 0:
-        print("There is a solutions file. Please remove it and then proceed")
-        exit(1)
+        text = input("There is a solutions file. Should overwrite it?[y/n]")
+        if text != "y":
+            print(f"supplied {text} != y. exiting")
+            exit(1)
+        else:
+            print(f"supplied {text} == y. overwriting")
+
     fsolutions = open(fsolutions, 'w')
     processes = int(sys.argv[3])
 else:
@@ -238,8 +255,8 @@ for current_assignment in to_be_evaluated_assignments:
             sim_state = SimulationState(sys.argv[2], assignment=list(current_assignment), verbose=False, traces=traces)
             sim_state.init_simulator_queue()
             operations = NullOperations(sim_state)
-            rebalance_period = 2
-        
+            rebalance_period = 4
+            cur_reb_period = rebalance_period
     else:
         print(f"BEGIN SIMULATION LOOP")
     
@@ -258,17 +275,18 @@ for current_assignment in to_be_evaluated_assignments:
 
                 gvt = sim_state.get_gvt()
                 committed = sim_state.commit()
+                actualth = committed / global_constants_parameter_module.time_window_size
+                
                 if not evaluate_all: 
                     sim_state.serialize_stat(wct_ts)
                     truth_th = 0
-                    actualth = committed / global_constants_parameter_module.time_window_size
                     if len(ground_truth) > 0:
                         truth_th = float(ground_truth[tuple(sim_state.get_assignment())]) 
                     print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", actualth, "MAX TH", maximum_th)
-                    if abs(actualth/truth_th) < 1.05: 
-                        cur_reb_period = rebalance_period
+                    if abs(actualth/truth_th) < 1.05: cur_reb_period = rebalance_period
                 else:
                     results[tuple(sim_state.get_assignment())] += [committed / global_constants_parameter_module.time_window_size]
+                
                 if not rebalance_in_progress and rebalance_completed:
                     rebalance_cnt += 1
                     if (rebalance_cnt % cur_reb_period) == 0:
@@ -282,10 +300,10 @@ for current_assignment in to_be_evaluated_assignments:
                             communication,
                             annoyance
                         )
+                        if evaluate_all == True: sim_state.set_can_end(True)
                         rebalance_in_progress = True
                         rebalance_completed = False
                         cur_reb_period = 1000000
-                        if evaluate_all == True: sim_state.set_can_end(True)
 
 
             Simulator.schedule_event(wct_ts + global_constants_parameter_module.time_window_size, "", EVT.TIME_WINDOW)
@@ -386,18 +404,21 @@ for current_assignment in to_be_evaluated_assignments:
 
         remaining = all_tests_count-evaluated_tests
         evaluated_tests += 1
+
         if skipped != evaluated_tests:
-            eta_seconds = remaining * (sum_elapsed/(evaluated_tests-skipped)) / (processes * estimated_filter_speedup)
-            eta_minutes = math.floor(eta_seconds/60)
+            curr_exec_time = sum_elapsed/(evaluated_tests-skipped)
+            eta_max_sec = remaining*curr_exec_time 
+            eta_seconds = remaining * (curr_exec_time) / (processes * estimated_filter_speedup)
+            eta_minutes = math.floor(eta_seconds/60.0)
             eta_seconds -= eta_minutes*60
             eta_hours   = math.floor(eta_minutes/60)
             eta_minutes -= eta_hours*60
             eta_days    = math.floor(eta_hours/24)
             eta_hours   -= eta_days*24
 
-            print(f"\r{evaluated_tests}/{all_tests_count} - {skipped_fil * processes /evaluated_tests} "+
-                  f"{estimated_filter_skipped/all_tests_count} ETA {eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
-                  f"SINGLE TEST {sum_elapsed/(evaluated_tests-skipped)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
+            print(f"\r{evaluated_tests}/{all_tests_count} - {'{:.2f}'.format(skipped_fil * processes /evaluated_tests)} "+
+                  f"{'{:.2f}'.format(estimated_filter_skipped/all_tests_count)} ETA {eta_days}d:{eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
+                  f"SINGLE TEST {'{:.2f}'.format(curr_exec_time)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
 
         #print(current_assignment, results[current_assignment]) 
 

@@ -53,10 +53,10 @@ class MetisOperations(WindowOperations):
     
 
         print("capacity : ", capacity)
-        print(msg_exch_cost)
-        print(task_forecast)
-        print(anno_matrix)
-        print(comm_matrix)
+        print("msg exchange cost: ", msg_exch_cost)
+        print("task forecast: ",task_forecast)
+        print("annoyance matrix: ", anno_matrix)
+        print("communication matrix: ",comm_matrix)
         metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
         return min_vt
 
