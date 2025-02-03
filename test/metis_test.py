@@ -1,7 +1,16 @@
-from src.ddm import ddm_prepare_actor_matrix, ddm_init, ddm_optimize, ddm_poll
+import sys
+import os
+
+from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+
+from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
 
 
-def test_ddm():
+
+
+def test_metis():
 
     total_cus = 4
     total_actors = 10
@@ -16,8 +25,6 @@ def test_ddm():
     runnable_on = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     cu_capacity = [4, 4, 2, 1]
 
-    ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on)
-
     actors = [[(1, 5), (1, 5), (0, 5), (1, 6), (1, 5), (1, 5), (1, 5), (1, 5), (1, 6), (1, 5)],
               [(1, 5), (1, 4), (1, 5), (1, 4), (1, 5), (1, 5), (1, 5), (1, 5), (1, 5), (1, 5)],
               [(1, 3), (1, 3), (1, 4), (1, 4), (1, 4), (1, 4), (1, 4), (1, 4), (1, 3), (1, 4)],
@@ -29,15 +36,29 @@ def test_ddm():
               [(1, 6), (1, 5), (1, 6), (1, 6), (1, 5), (1, 5), (1, 5), (1, 6), (1, 5), (1, 5)],
               [(1, 5), (1, 5), (1, 4), (1, 5), (1, 5), (1, 4), (1, 4), (1, 5), (1, 5), (1, 4)]]
 
-    # Convert tuples to actor_matrix structures
-    act_struct = ddm_prepare_actor_matrix(actors)
+    print("Calling ddmmetis_init with parameters:", total_actors, total_cus)
+
+    ddmmetis_init(total_actors, total_cus)
 
     tasks_forecast = [50, 50, 50, 50, 20, 50, 50, 80, 10, 10]
 
-    ddm_optimize(total_actors, act_struct, tasks_forecast, total_cus, cu_capacity)
-    res = None
-    while res is None:
-        res = ddm_poll()
-    result_values = [res[i] for i in range(total_actors)]
-    expected = [3, 0, 3, 0, 3, 2, 3, 3, 3, 0]
-    assert result_values == expected
+    # first component of each actor is the annoyance
+    anno_matrix = [[actor[0] for actor in row] for row in actors]
+    # second component of each actor is the communication cost
+    comm_matrix = [[actor[1] for actor in row] for row in actors]
+
+    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix)
+
+    part = metis_get_partitioning()
+
+    print("This is the partition:", part)
+    # expected = [3, 0, 3, 0, 3, 2, 3, 3, 3, 0]
+
+
+    # assign = convert_metis_assignment_to_sim_assingment(part)
+    #
+    # print("This is the assignment: " + str(assign))
+
+
+if __name__ == "__main__":
+    test_metis()

@@ -8,3 +8,8 @@ add_executable(ddm_test3 ddm_test3.c)
 target_link_libraries(ddm_test PRIVATE domainddm clingo)
 target_link_libraries(ddm_test2 PRIVATE domainddm clingo)
 target_link_libraries(ddm_test3 PRIVATE domainddm clingo)
+
+add_executable(metis_test metis_test.c)
+target_link_libraries(metis_test PRIVATE metis ddmmetis GKlib m)
+add_executable(metis_test2 metis_test2.c)
+target_link_libraries(metis_test2 PRIVATE metis ddmmetis GKlib m)
