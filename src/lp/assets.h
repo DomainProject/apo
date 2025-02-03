@@ -31,8 +31,8 @@
 #endif
 
 // Define resources variables
-EXTLD(ddm_v5_asp)
+EXTLD(ddm_v6_asp)
 
 // Use this code to access the resources
-//  size_t length = LDLEN(ddm_v5_asp);
-//  uint8_t *data = LDVAR(ddm_v5_asp);
+//  size_t length = LDLEN(ddm_v6_asp);
+//  uint8_t *data = LDVAR(ddm_v6_asp);
