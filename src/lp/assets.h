@@ -7,9 +7,9 @@
 #include <stdlib.h>
 
 #define EXTLD(NAME) extern const char NAME[]; \
-                    extern const size_t NAME_len;
+                    extern const size_t NAME ##_len;
 #define LDVAR(NAME) NAME
-#define LDLEN(NAME) NAME_len
+#define LDLEN(NAME) NAME ##_len
 
 // Define resources variables
 EXTLD(ddm_v6_asp)
