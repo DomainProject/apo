@@ -79,10 +79,17 @@ import gc
 import itertools
 from metasimulation.SimulationModel.State import State as SimulationState
 from metasimulation.SimulationModel.event_handlers import *
-from metasimulation.window_operations.ddm_operations import DdmOperations
-from metasimulation.window_operations.metis_operations import MetisOperations
-from metasimulation.window_operations.random_operations import RandomOperations
+
 from metasimulation.window_operations.null_operations  import NullOperations
+
+from metasimulation.window_operations.ddm_operations import DdmOperations
+
+from metasimulation.window_operations.metis_operations import MetisOperations
+from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
+from metasimulation.window_operations.metis_overload_operations  import MetisOverloadOperations
+
+from metasimulation.window_operations.random_operations import RandomOperations
+
 from metasimulation.SimulationModel.hardware import get_dev_from_cu
 import time
 import math 
@@ -181,6 +188,10 @@ match wops_string:
         operations = RandomOperations(sim_state)
     case "null":
         operations = NullOperations(sim_state)
+    case "metis-communication":
+        operations = MetisCommunicationOperations(sim_state)
+    case "metis-overload":
+        operations = MetisOverloadOperations(sim_state)
     case _:
         print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'null'")
         sys.exit(1)

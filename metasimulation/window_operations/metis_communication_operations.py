@@ -7,10 +7,10 @@ from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_
 from metasimulation.SimulationModel.hardware import build_cunits, get_capacity_vector, \
     convert_metis_assignment_to_sim_assingment,  get_communication_latency
 from metasimulation.window_operations.abstract_operations import WindowOperations
-from src.metis import ddmmetis_init, metis_get_partitioning, metis_partitioning
+from src.metis import ddmmetis_init, metis_get_partitioning, metis_communication
 
 
-class MetisOperations(WindowOperations):
+class MetisCommunicationOperations(WindowOperations):
 
     def __init__(self, sim_state):
         print(f"initialize Metis...", end='')
@@ -31,33 +31,20 @@ class MetisOperations(WindowOperations):
         task_forecast = get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors)
         msg_exch_cost = [ [ int(get_communication_latency(x,y)/hardware_constants.comm_unitary_cost) for y in cunits] for x in cunits]
         comm_matrix = []
-        anno_matrix = []
-
-        speed = []
-        #for c in cunits: speed.append(self.sim_state.get_speed(c))
-        print("speed : ", speed)
 
         for i in range(num_actors):
             comm_row = []
-            anno_row = []
             for j in range(num_actors):
                 comm_row.append(math.ceil(communication[j][i] / wct_ts))
-                anno_row.append(math.ceil(annoyance[j][i] / wct_ts))
             comm_matrix.append(comm_row)
-            anno_matrix.append(anno_row)
 
         task_forecast = [1] * len(task_forecast)
 
-        if all(all(cell == 0 for cell in row) for row in anno_matrix):  # Check if all elements are 0
-            anno_matrix = [[1] * len(anno_matrix[0]) for _ in range(len(anno_matrix))]
-    
-
         print("capacity : ", capacity)
-        print("msg exchange cost: ", msg_exch_cost)
-        print("task forecast: ",task_forecast)
-        print("annoyance matrix: ", anno_matrix)
+        print("msg exchange cost :", msg_exch_cost)
+        print("task forecast: ", task_forecast)
         print("communication matrix: ",comm_matrix)
-        metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
+        metis_communication(num_actors, cus, task_forecast, capacity, comm_matrix, msg_exch_cost)
         return min_vt
 
     def delayed_on_window(self):
@@ -65,7 +52,6 @@ class MetisOperations(WindowOperations):
         # if no partitioning has been found return None
         cunits = self.sim_state.get_cunits()
         actors = self.sim_state.get_num_actors()
-        speed = []
         part = metis_get_partitioning()
         if not part:
             return None
