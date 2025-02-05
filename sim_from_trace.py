@@ -86,8 +86,8 @@ from metasimulation.window_operations.ddm_operations import DdmOperations
 
 from metasimulation.window_operations.metis_operations import MetisOperations
 from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
-from metasimulation.window_operations.metis_capacity_operations  import MetisCapacityOperations
-from metasimulation.window_operations.metis_overload_operations  import MetisOverloadOperations
+from metasimulation.window_operations.metis_homogeneous_communication_operations  import MetisHomogeneousCommunicationOperations
+from metasimulation.window_operations.metis_homogeneous_nodes_operations  import MetisHomogeneousNodesOperations
 
 from metasimulation.window_operations.random_operations import RandomOperations
 
@@ -191,10 +191,10 @@ match wops_string:
         operations = NullOperations(sim_state)
     case "metis-communication":
         operations = MetisCommunicationOperations(sim_state)
-    case "metis-capacity":
-        operations = MetisCapacityOperations(sim_state)
-    case "metis-overload":
-        operations = MetisOverloadOperations(sim_state)
+    case "metis-homogeneous-comm":
+        operations = MetisHomogeneousCommunicationOperations(sim_state)
+    case "metis-homogeneous-nodes":
+        operations = MetisHomogeneousNodesOperations(sim_state)
     case _:
         print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'null'")
         sys.exit(1)

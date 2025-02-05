@@ -126,15 +126,15 @@ def metis_communication(total_actors, cus, tasks_forecast, capacity, comm_matrix
 
 
 
-_metisddm.metis_overload.argtypes = [
+_metisddm.metis_homogeneous_nodes.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
 ]
-_metisddm.metis_overload.restype = None
+_metisddm.metis_homogeneous_nodes.restype = None
 
-def metis_overload(total_actors, cus, tasks_forecast, comm_matrix):
+def metis_homogeneous_nodes(total_actors, cus, tasks_forecast, comm_matrix):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
@@ -151,38 +151,36 @@ def metis_overload(total_actors, cus, tasks_forecast, comm_matrix):
 
     
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_overload(total_actors, cus, arr_tasks, arr_comm)
+    _metisddm.metis_homogeneous_nodes(total_actors, cus, arr_tasks, arr_comm)
 
 
 
 
-_metisddm.metis_capacity.argtypes = [
+_metisddm.metis_homogeneous_communication.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(real_t),
     ctypes.POINTER(idx_t)
 ]
-_metisddm.metis_capacity.restype = None
+_metisddm.metis_homogeneous_communication.restype = None
 
-def metis_capacity(total_actors, cus, comm_matrix, forecast_capacity_metric):
+def metis_homogeneous_communication(total_actors, cus, comm_matrix, tasks_forecast):
     global last_ddm_total_actors_invocation
-    if len(forecast_capacity_metric) != (total_actors * cus):
-        raise ValueError(f"forecast_capacity_metric should have {total_actors} elements, but it has {len(forecast_capacity_metric)}")
+    if len(tasks_forecast) != total_actors:
+        raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
-    aug_vertex_number = total_actors*cus
-    arr_tasks = (idx_t * aug_vertex_number)(*forecast_capacity_metric)
+    arr_tasks = (idx_t * total_actors)(*tasks_forecast)
 
     flattened_comm_matrix = []
     for row in comm_matrix:
         flattened_comm_matrix.extend(row)
 
- 
+
     arr_comm = (ctypes.c_double * (total_actors * total_actors))(*flattened_comm_matrix)
 
 
-
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_capacity(total_actors, cus, arr_comm,  arr_tasks)
+    _metisddm.metis_homogeneous_communication(total_actors, cus, arr_comm,  arr_tasks)
 
 
 
