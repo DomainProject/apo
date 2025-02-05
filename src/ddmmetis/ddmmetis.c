@@ -3,21 +3,12 @@
 #include <string.h>
 
 #include <metis.h>
+#include <math.h>
 #include "utils.h"
 
-#define max(a,b)             \
-({                           \
-    __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a > _b ? _a : _b;       \
-})
 
-#define min(a,b)             \
-({                           \
-    __typeof__ (a) _a = (a); \
-    __typeof__ (b) _b = (b); \
-    _a <= _b ? _a : _b;       \
-})
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) <= (b) ? (a) : (b))
 
 static idx_t nEdges = 0;
 idx_t actors = 0;
@@ -38,13 +29,13 @@ real_t comm_cost_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
 real_t anno_matrix[NUM_ACTORS][NUM_ACTORS] = {0};
 idx_t msg_exch_cost[N_CUS][N_CUS] = {0};
 
-void ddmmetis_init(idx_t total_actors, idx_t total_cus)
+void ddmmetis_init(idx_t total_actors)
 {
 	actors = total_actors;
 }
 
 
-void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **adjwgt, idx_t **vwgt,
+void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **adjwgt,
     real_t communication_matrix[actors][actors], real_t annoyance_matrix[actors][actors], int aug)
 {
 	Edge *edges = createEdges(act, communication_matrix, annoyance_matrix, &nEdges);
@@ -52,25 +43,11 @@ void metis_init(idx_t act, idx_t n_cus, idx_t **xadj, idx_t **adjncy, idx_t **ad
 	idx_t total_actors = (aug) ? act * n_cus : act;
 	generateCSR(total_actors, nEdges, edges, xadj, adjncy, adjwgt);
 
-	idx_t sum_vert_wgt = 0;
-	for(int i = 0; i < act; i++) {
-		sum_vert_wgt += (*vwgt)[i];
-	}
-
-	idx_t sum_edge_wgt = 0;
-	for(int i = 0; i < (*xadj)[act]; i++) {
-		sum_edge_wgt += (*adjwgt)[i];
-	}
-
-	PRINTER() printf("sum_edge_wgt %d \t sum_vert_wgt %ld\n", sum_edge_wgt, sum_vert_wgt);
-	avg_edge_wgt = ((*xadj)[act] != 0) ? sum_edge_wgt / (*xadj)[act] : 0;
-	avg_vert_wgt = sum_vert_wgt / total_actors;
-
 
 	free(edges);
 }
 
-void update_weights(idx_t total_actors, idx_t cus, idx_t *part, idx_t *xadj, idx_t *adjncy, idx_t **adjwgt, idx_t **vwgt, idx_t alpha) {
+void update_weights(idx_t total_actors, idx_t *part, idx_t *xadj, idx_t *adjncy, idx_t **adjwgt, idx_t **vwgt, idx_t alpha) {
 
 
 
@@ -83,8 +60,6 @@ void update_weights(idx_t total_actors, idx_t cus, idx_t *part, idx_t *xadj, idx
 
     
     double lambda = (double)(sum_cost - alpha) / (sum_cost + 1.0);  // Avoid divide by zero
-
-	PRINTER() printf("sum_cost %ld -- alpha %ld --- LAMBDA %f -- MAX COST %ld \n", sum_cost, alpha, lambda, max_edge_cost);
 
 	if (part != NULL) {
         for(int i = 0; i < total_actors; i++) {
@@ -136,7 +111,7 @@ void compute_partition_weights(idx_t *part, idx_t total_actors, idx_t **vwgt, id
 }
 
 // Function to reassign vertices based on imbalance and minimize overload
-void rebalance_partition(idx_t *part, idx_t total_actors, idx_t *xadj, idx_t *adjncy, idx_t **vwgt, idx_t cus, idx_t *capacity) {
+void rebalance_partition(idx_t *part, idx_t total_actors, idx_t **vwgt, idx_t cus, idx_t *capacity) {
     idx_t partition_weights[cus];
     idx_t total_weight;
     double ideal_weight;
@@ -145,7 +120,6 @@ void rebalance_partition(idx_t *part, idx_t total_actors, idx_t *xadj, idx_t *ad
 
     ideal_weight = total_weight / cus;
 
-    PRINTER() printf("ideal weight %f\n", ideal_weight, total_weight);
 
     for (int i = 0; i < total_actors; i++) {
         idx_t p = part[i]; // Partition of vertex i
@@ -218,10 +192,10 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
 	if(input_msg_exch_cost != NULL)
 		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
 
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, NULL, anno_matrix, 0);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, NULL, anno_matrix, 0);
 
 
-	update_weights(total_actors, n_cus, part_o, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, part_o, xadj, adjncy, &adjwgt, &vwgt, alpha);
 	
 
 	PRINTER() printf("(first) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);
@@ -239,14 +213,14 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
 	free(adjncy);
 	free(adjwgt);
 
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 1);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 1);
 
 	PRINTER() printf("(second) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
 
-	update_weights(total_actors, n_cus, part_a, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, part_a, xadj, adjncy, &adjwgt, &vwgt, alpha);
 
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -275,14 +249,14 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
 	free(adjncy);
 	free(adjwgt);
 
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 0);
 
 	PRINTER() printf("(third) avg edges %ld \t avg vertexes %ld\n", avg_edge_wgt, avg_vert_wgt);	
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
 
-	update_weights(total_actors, n_cus, part_c, xadj, adjncy, &adjwgt, &vwgt, alpha);
+	update_weights(total_actors, part_c, xadj, adjncy, &adjwgt, &vwgt, alpha);
 
 
 	ubfactor = 100;
@@ -296,7 +270,7 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
     
 
 
-    rebalance_partition(part_o, total_actors, xadj, adjncy, &vwgt, n_cus, capacity);
+    rebalance_partition(part_o, total_actors, &vwgt, n_cus, capacity);
 
 	PRINTER() print_partition(total_actors, part_o);
 
@@ -328,12 +302,10 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
 
 
 
-void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
+void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
     real_t input_comm_cost_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
-
-	idx_t ncon = 1; // number of weights associated to each vertex
 
 	idx_t ubfactor = 30; // default imbalance tolerance
 	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
@@ -350,7 +322,7 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	if(input_msg_exch_cost != NULL)
 		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
 
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 1);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 1);
 
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -406,7 +378,7 @@ void metis_homogeneous_nodes(idx_t total_actors, idx_t n_cus, idx_t *tasks_forec
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
 	
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 0);
 
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
@@ -444,7 +416,7 @@ void metis_homogeneous_communication(idx_t total_actors, idx_t n_cus, real_t inp
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
 		
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 0);
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 0);
 
 
 	ubfactor = 30;

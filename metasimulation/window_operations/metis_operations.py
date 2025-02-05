@@ -16,7 +16,7 @@ class MetisHeterogeneousOperations(WindowOperations):
         print(f"initialize Metis...", end='')
         self.sim_state = sim_state
         # TODO: comm_matrix and anno_matrix must be taken in on_window
-        ddmmetis_init(sim_state.get_num_actors(), len(sim_state.get_cunits()))
+        ddmmetis_init(sim_state.get_num_actors())
         print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
@@ -49,11 +49,11 @@ class MetisHeterogeneousOperations(WindowOperations):
             anno_matrix = [[1] * len(anno_matrix[0]) for _ in range(len(anno_matrix))]
     
 
-        print("capacity : ", capacity)
-        print("msg exchange cost: ", msg_exch_cost)
-        print("task forecast: ",task_forecast)
-        print("annoyance matrix: ", anno_matrix)
-        print("communication matrix: ",comm_matrix)
+        #print("capacity : ", capacity)
+        #print("msg exchange cost: ", msg_exch_cost)
+        #print("task forecast: ",task_forecast)
+        #print("annoyance matrix: ", anno_matrix)
+        #print("communication matrix: ",comm_matrix)
         metis_heterogeneous_multilevel(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost)
         return min_vt
 

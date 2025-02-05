@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
-from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
+from src.metis import ddmmetis_init, metis_heterogeneous_multilevel, metis_get_partitioning
 
 
 
@@ -48,7 +48,7 @@ def test_metis():
 
     speed = [1, 1, 4, 2]
 
-    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
+    metis_heterogeneous_multilevel(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
 
     part = metis_get_partitioning()
 

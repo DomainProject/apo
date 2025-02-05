@@ -38,7 +38,7 @@ int main(void)
 	idx_t tasks_forecast[NUM_ACTORS] = {50, 50, 50, 50, 20, 50, 50, 80, 10, 10};
 	idx_t capacity[N_CUS] = {4, 4, 2, 1};
 
-	metis_partitioning(total_actors, total_cus, tasks_forecast, capacity, comm_cost, anno, msg_cost);
+	metis_heterogeneous_multilevel(total_actors, total_cus, tasks_forecast, capacity, comm_cost, anno, msg_cost);
 	int *res = metis_get_partitioning();
 
 	for(int i = 0; i < total_actors; ++i) {

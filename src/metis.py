@@ -12,9 +12,7 @@ last_ddm_total_actors_invocation = -1
 _metisddm = ctypes.CDLL('./cmake-build-debug/src/libddmmetis.so')  ##if launch metis_test.py must be ../cmake-build-debug
 
 _metisddm.ddmmetis_init.argtypes = [
-    idx_t,
     idx_t
-
 ]
 _metisddm.ddmmetis_init.restype = None
 
@@ -22,28 +20,27 @@ _metisddm.ddmmetis_init.restype = None
 import ctypes
 
 
-def ddmmetis_init(total_actors, cus):
+def ddmmetis_init(total_actors):
 
     # Call the C function (assuming _metisddm.ddmmetis_init is defined elsewhere)
-    _metisddm.ddmmetis_init(total_actors, cus)
+    _metisddm.ddmmetis_init(total_actors)
 
 
 
 
-_metisddm.metis_partitioning.argtypes = [
+_metisddm.metis_heterogeneous_multilevel.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
     ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
     ctypes.POINTER(real_t),
-    ctypes.POINTER(idx_t),
     ctypes.POINTER(idx_t)
 ]
-_metisddm.metis_partitioning.restype = None
+_metisddm.metis_heterogeneous_multilevel.restype = None
 
 
-def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost, speed):
+def metis_heterogeneous_multilevel(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
@@ -81,11 +78,9 @@ def metis_partitioning(total_actors, cus, tasks_forecast, capacity, comm_matrix,
     arr_anno = (ctypes.c_double * (total_actors * total_actors))(*flattened_anno_matrix)
     arr_msg_exch = (ctypes.c_long * (cus * cus))(*flattened_msg_exch_cost_matrix)
 
-    arr_speed = (ctypes.c_long * cus)(*speed)
-
     
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_partitioning(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_anno, arr_msg_exch, arr_speed)
+    _metisddm.metis_heterogeneous_multilevel(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_anno, arr_msg_exch)
 
 
 
@@ -93,19 +88,17 @@ _metisddm.metis_communication.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
-    ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
     ctypes.POINTER(idx_t),
 ]
 _metisddm.metis_communication.restype = None
 
-def metis_communication(total_actors, cus, tasks_forecast, capacity, comm_matrix, msg_exch_cost):
+def metis_communication(total_actors, cus, tasks_forecast, comm_matrix, msg_exch_cost):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
     arr_tasks = (idx_t * total_actors)(*tasks_forecast)
-    arr_capacity = (idx_t * cus)(*capacity)
 
     
     flattened_comm_matrix = []
@@ -122,7 +115,7 @@ def metis_communication(total_actors, cus, tasks_forecast, capacity, comm_matrix
 
     
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_communication(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_msg_exch)
+    _metisddm.metis_communication(total_actors, cus, arr_tasks, arr_comm, arr_msg_exch)
 
 
 

@@ -16,7 +16,7 @@ class MetisCommunicationOperations(WindowOperations):
         print(f"initialize Metis...", end='')
         self.sim_state = sim_state
         # TODO: comm_matrix and anno_matrix must be taken in on_window
-        ddmmetis_init(sim_state.get_num_actors(), len(sim_state.get_cunits()))
+        ddmmetis_init(sim_state.get_num_actors())
         print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
@@ -44,7 +44,7 @@ class MetisCommunicationOperations(WindowOperations):
        # print("msg exchange cost :", msg_exch_cost)
        # print("task forecast: ", task_forecast)
        # print("communication matrix: ",comm_matrix)
-        metis_communication(num_actors, cus, task_forecast, capacity, comm_matrix, msg_exch_cost)
+        metis_communication(num_actors, cus, task_forecast, comm_matrix, msg_exch_cost)
         return min_vt
 
     def delayed_on_window(self):
