@@ -75,6 +75,7 @@ global_constants_parameter_module = metasimulation.SimulationEngine.runtime_modu
 hardware_parameter_module = metasimulation.SimulationEngine.runtime_modules.hardware_parameter_module
 
 
+
 import gc
 import itertools
 from metasimulation.SimulationModel.State import State as SimulationState
@@ -86,14 +87,14 @@ from metasimulation.window_operations.ddm_operations import DdmOperations
 
 from metasimulation.window_operations.metis_operations import MetisHeterogeneousOperations
 from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
-from metasimulation.window_operations.metis_overload_operations  import MetisOverloadOperations
+from metasimulation.window_operations.metis_homogeneous_communication_operations  import MetisHomogeneousCommunicationOperations
+from metasimulation.window_operations.metis_homogeneous_nodes_operations  import MetisHomogeneousNodesOperations
 
 from metasimulation.window_operations.random_operations import RandomOperations
 
 from metasimulation.SimulationModel.hardware import get_dev_from_cu
 import time
 import math 
-
 
 def assignment_renaming(assignment):
   new_assignment = []
@@ -179,22 +180,26 @@ def estimate_filter_reduction(units):
 sim_state = SimulationState(simulation_trace, verbose=(len(sys.argv) != 4))
 sim_state.init_simulator_queue()
 
+
 match wops_string:
     case "ddm":
         operations = DdmOperations(sim_state)
-    case "metis":
+    case "metis-heterogeneous-multilevel":
         operations = MetisHeterogeneousOperations(sim_state)
     case "random":
         operations = RandomOperations(sim_state)
     case "null":
         operations = NullOperations(sim_state)
-    case "metis-communication":
+    case "metis-heterogeneous-communication":
         operations = MetisCommunicationOperations(sim_state)
-    case "metis-overload":
-        operations = MetisOverloadOperations(sim_state)
+    case "metis-homogeneous-comm":
+        operations = MetisHomogeneousCommunicationOperations(sim_state)
+    case "metis-homogeneous-nodes":
+        operations = MetisHomogeneousNodesOperations(sim_state)
     case _:
-        print("Invalid operations argument: please select one among 'ddm', 'metis', 'metis-communication', 'metis-overload', random', 'null'")
+        print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'null'")
         sys.exit(1)
+
 
 evaluate_all = False
 to_be_evaluated_assignments = []

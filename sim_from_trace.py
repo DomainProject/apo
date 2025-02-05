@@ -180,24 +180,22 @@ def estimate_filter_reduction(units):
 sim_state = SimulationState(simulation_trace, verbose=(len(sys.argv) != 4))
 sim_state.init_simulator_queue()
 
-match wops_string:
-    case "ddm":
-        operations = DdmOperations(sim_state)
-    case "metis-heterogeneous-multilevel":
-        operations = MetisHeterogeneousOperations(sim_state)
-    case "random":
-        operations = RandomOperations(sim_state)
-    case "null":
-        operations = NullOperations(sim_state)
-    case "metis-communication":
-        operations = MetisCommunicationOperations(sim_state)
-    case "metis-homogeneous-comm":
-        operations = MetisHomogeneousCommunicationOperations(sim_state)
-    case "metis-homogeneous-nodes":
-        operations = MetisHomogeneousNodesOperations(sim_state)
-    case _:
-        print("Invalid operations argument: please select one among 'ddm', 'metis', 'random', 'null'")
-        sys.exit(1)
+operations_map = {
+   "ddm":                               DdmOperations,
+   "metis-hete-asplike":                MetisHeterogeneousOperations,
+   "random":                            RandomOperations,
+   "null":                              NullOperations,
+   "metis-hete-comm": MetisCommunicationOperations,
+   "metis-homo-comm":            MetisHomogeneousCommunicationOperations,
+   "metis-homo-node":           MetisHomogeneousNodesOperations,
+    
+}
+
+if wops_string not in operations_map:
+    print(f"Invalid operations argument: please select one among {[k for k in operations_map.keys()]}")
+    sys.exit(1)
+
+operations = operations_map[wops_string](sim_state)
 
 evaluate_all = False
 to_be_evaluated_assignments = []
