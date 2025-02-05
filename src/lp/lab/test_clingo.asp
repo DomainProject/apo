@@ -12,17 +12,25 @@ oct_dev(5,cpu).                 oct_dev(5,fpga).
                 oct_dev(6,gpu). oct_dev(6,fpga).
 oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
-
 % T is the total workload of cu U
-cu_workload(U,T) :- cu(U), T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }. % sum W (1st component)
+cu_workload(U,T) :- cu(U), 
+    T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }.
 
-% cu_overload(U,O) iff O is the overload of U
-cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C), 
-                    W > C, O = W-C. 
+% T is the total system workload (all tasks to be processed)
+tasks(X) :- X = #sum{ W,A : tasks_forecast(A,W) }.
 
-% - optimization: workload 
-%#minimize{ O @ 1,U : cu_overload(U,O) }.
-#minimize{ O @ 1 : cu_overload(U,O) }.
+% O is the overload of U
+cu_overload(U,O) :- cu(U),
+  O = #max{ 0 ; W-C : cu_workload(U,W), cu_capacity(U,C) }.
+
+% max and min cu_overload
+max_cu_overload(M) :- M = #max{ 0 ; O : cu_overload(U,O) }.
+min_cu_overload(M) :- M = #min{ O : cu_overload(U,O) ; T : tasks(T) }.
+
+
+% - optimization: difference between max and min overload 
+#minimize{ Mo-Mi@1 : max_cu_overload(Mo), min_cu_overload(Mi) }.
+
 
 % -----
 % actor communication cost
@@ -37,6 +45,8 @@ cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
 
 % - optimization: communication cost
 #minimize{ C @ 2 : cc(C) }.
+
+#show min_cu_overload/1.
 
 % -----
 % annoyance(N) holds iff N is the global annoyance, that is, 
@@ -83,7 +93,7 @@ runnable_on(4,7).
 runnable_on(5,7).
 runnable_on(6,7).
 runnable_on(7,7).
-tasks_forecast(0,10).
+tasks_forecast(0,20).
 tasks_forecast(1,10).
 tasks_forecast(2,10).
 tasks_forecast(3,10).

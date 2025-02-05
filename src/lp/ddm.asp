@@ -14,22 +14,22 @@ oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 
 % T is the total workload of cu U
-cu_workload(U,T) :- cu(U), T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }. % sum W (1st component)
+cu_workload(U,T) :- cu(U), 
+    T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }.
 
-% cu_overload(U,O) iff O is the overload of U
-cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C), 
-                    W > C, O = W-C. 
+% T is the total system workload (all tasks to be processed)
+tasks(X) :- X = #sum{ W,A : tasks_forecast(A,W) }.
 
-% - optimization: workload 
-%#minimize{ O @ 1,U : cu_overload(U,O) }.
-#minimize{ O @ 0 : cu_overload(U,O) }.
+% O is the overload of U
+cu_overload(U,O) :- cu(U),
+  O = #max{ 0 ; W-C : cu_workload(U,W), cu_capacity(U,C) }.
 
-% -----
-% U is busy iff there exists an actor associated to U
-busy(U) :- run_on(_,U).
+% max and min cu_overload
+max_cu_overload(M) :- M = #max{ 0 ; O : cu_overload(U,O) }.
+min_cu_overload(M) :- M = #min{ O : cu_overload(U,O) ; T : tasks(T) }.
 
-% - optimization: maximize the number of active cus 
-#maximize{ 1@1,U : busy(U)}.
+% - optimization: difference between max and min overload 
+#minimize{ Mo-Mi@1 : max_cu_overload(Mo), min_cu_overload(Mi) }.
 
 % -----
 % actor communication cost
