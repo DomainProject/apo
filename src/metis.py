@@ -45,23 +45,10 @@ def metis_heterogeneous_multilevel(total_actors, cus, tasks_forecast, capacity, 
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
-    arr_tasks = (idx_t * total_actors)(*tasks_forecast)
+    arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
     arr_capacity = (idx_t * cus)(*capacity)
 
-    #print(tasks_forecast)
-
-    # mat_comm_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
-    # mat_anno_matrix = (ctypes.c_double * (total_actors * total_actors))  # Flat array version
-
-    # Convert each row to a ctypes array and flatten
-    # flattened_comm_matrix = [ctypes.c_double(val) for row in comm_matrix for val in row]
-    # flattened_anno_matrix = [ctypes.c_double(val) for row in anno_matrix for val in row]
-
-
-    # Now assign the flattened arrays to the matrix
-    # mat_comm_matrix = (ctypes.c_double * len(flattened_comm_matrix))(*flattened_comm_matrix)
-    # mat_anno_matrix = (ctypes.c_double * len(flattened_anno_matrix))(*flattened_anno_matrix)
-
+   
     flattened_comm_matrix = []
     for row in comm_matrix:
         flattened_comm_matrix.extend(row)
@@ -98,8 +85,7 @@ def metis_communication(total_actors, cus, tasks_forecast, comm_matrix, msg_exch
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
-    arr_tasks = (idx_t * total_actors)(*tasks_forecast)
-
+    arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
     
     flattened_comm_matrix = []
     for row in comm_matrix:
@@ -132,7 +118,7 @@ def metis_homogeneous_nodes(total_actors, cus, tasks_forecast, comm_matrix):
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
-    arr_tasks = (idx_t * total_actors)(*tasks_forecast)
+    arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
 
     
     flattened_comm_matrix = []
@@ -162,7 +148,7 @@ def metis_homogeneous_communication(total_actors, cus, comm_matrix, tasks_foreca
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
-    arr_tasks = (idx_t * total_actors)(*tasks_forecast)
+    arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
 
     flattened_comm_matrix = []
     for row in comm_matrix:
