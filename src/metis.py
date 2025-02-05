@@ -154,6 +154,38 @@ def metis_overload(total_actors, cus, tasks_forecast, comm_matrix):
     _metisddm.metis_overload(total_actors, cus, arr_tasks, arr_comm)
 
 
+
+
+_metisddm.metis_capacity.argtypes = [
+    idx_t,
+    idx_t,
+    ctypes.POINTER(real_t),
+    ctypes.POINTER(idx_t)
+]
+_metisddm.metis_capacity.restype = None
+
+def metis_capacity(total_actors, cus, comm_matrix, forecast_capacity_metric):
+    global last_ddm_total_actors_invocation
+    if len(forecast_capacity_metric) != (total_actors * cus):
+        raise ValueError(f"forecast_capacity_metric should have {total_actors} elements, but it has {len(forecast_capacity_metric)}")
+
+    aug_vertex_number = total_actors*cus
+    arr_tasks = (idx_t * aug_vertex_number)(*forecast_capacity_metric)
+
+    flattened_comm_matrix = []
+    for row in comm_matrix:
+        flattened_comm_matrix.extend(row)
+
+ 
+    arr_comm = (ctypes.c_double * (total_actors * total_actors))(*flattened_comm_matrix)
+
+
+
+    last_ddm_total_actors_invocation = total_actors
+    _metisddm.metis_capacity(total_actors, cus, arr_comm,  arr_tasks)
+
+
+
 _metisddm.metis_get_partitioning.argtypes = []
 _metisddm.metis_get_partitioning.restype = ctypes.POINTER(idx_t)
 

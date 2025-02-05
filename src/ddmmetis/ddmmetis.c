@@ -30,6 +30,7 @@ idx_t avg_vert_wgt = 0;
 static idx_t *part_o = NULL;
 static idx_t *part_a = NULL;
 static idx_t *part_c = NULL;
+static idx_t *part_cap = NULL;
 
 static idx_t *final_part = NULL;
 
@@ -382,6 +383,69 @@ void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	free(adjncy);
 	free(adjwgt);
 	free(vwgt);
+
+}
+
+
+void metis_capacity(idx_t total_actors, idx_t n_cus, real_t input_comm_cost_matrix[n_cus][n_cus], idx_t *input_forecast_capacity)
+{
+	idx_t nParts = n_cus; // Number of partitions (number of CUs)
+
+	idx_t ncon = 1; // number of weights associated to each vertex
+
+	idx_t ubfactor = 30; // default imbalance tolerance
+	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
+
+
+	idx_t *xadj, *adjncy, *adjwgt;
+	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
+	//memcpy(vwgt, tasks_forecast, sizeof(idx_t) * total_actors);
+
+
+	if(input_comm_cost_matrix != NULL)
+		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
+	
+	
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, &vwgt, comm_cost_matrix, NULL, 1);
+
+
+	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
+
+	idx_t aug_v = total_actors * n_cus;
+	idx_t *new_adjwgt;
+	idx_t *new_vwgt;
+
+	idx_t *new_xadj = populate_newxadj(aug_v / n_cus, n_cus, xadj, vwgt, &new_vwgt);
+
+	idx_t maxEdges = new_xadj[aug_v];
+
+	PRINTER() printf("NVERTICES %ld \t MAXEDGES %ld\n", aug_v, maxEdges);
+
+	idx_t *new_adjncy = populate_newadjncy(aug_v / n_cus, n_cus, maxEdges, xadj, new_xadj, adjncy, adjwgt, &new_adjwgt, msg_exch_cost);
+
+	if (input_forecast_capacity != NULL)
+		memcpy(new_vwgt, input_forecast_capacity, sizeof(idx_t)*aug_v);
+
+
+	PRINTER() print_csr_graph(aug_v, new_xadj, new_adjncy, new_vwgt, new_adjwgt);
+
+	ubfactor = 30;
+    PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST **** \n");
+    compute_partition(aug_v, new_xadj, new_adjncy, new_vwgt, NULL, NULL, nParts, NULL, NULL, ubfactor, &alpha, &part_cap, 1);
+
+	PRINTER() print_partition(total_actors, part_cap);
+
+	final_part = part_cap;
+
+	free(xadj);
+	free(adjncy);
+	free(adjwgt);
+	free(vwgt);
+
+	free(new_xadj);
+	free(new_adjncy);
+	free(new_vwgt);
+	free(new_adjwgt);
 
 }
 

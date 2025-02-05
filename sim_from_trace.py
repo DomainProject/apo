@@ -86,6 +86,7 @@ from metasimulation.window_operations.ddm_operations import DdmOperations
 
 from metasimulation.window_operations.metis_operations import MetisOperations
 from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
+from metasimulation.window_operations.metis_capacity_operations  import MetisCapacityOperations
 from metasimulation.window_operations.metis_overload_operations  import MetisOverloadOperations
 
 from metasimulation.window_operations.random_operations import RandomOperations
@@ -190,6 +191,8 @@ match wops_string:
         operations = NullOperations(sim_state)
     case "metis-communication":
         operations = MetisCommunicationOperations(sim_state)
+    case "metis-capacity":
+        operations = MetisCapacityOperations(sim_state)
     case "metis-overload":
         operations = MetisOverloadOperations(sim_state)
     case _:
