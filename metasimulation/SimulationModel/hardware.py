@@ -1,4 +1,4 @@
-from metasimulation.SimulationEngine.runtime_modules import *
+from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module
 
 # UTILITY FUNCTIONS
 
