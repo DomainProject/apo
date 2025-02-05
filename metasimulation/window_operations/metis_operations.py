@@ -7,10 +7,10 @@ from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_
 from metasimulation.SimulationModel.hardware import build_cunits, get_capacity_vector, \
     convert_metis_assignment_to_sim_assingment,  get_communication_latency
 from metasimulation.window_operations.abstract_operations import WindowOperations
-from src.metis import ddmmetis_init, metis_get_partitioning, metis_partitioning
+from src.metis import ddmmetis_init, metis_get_partitioning, metis_heterogeneous_multilevel
 
 
-class MetisOperations(WindowOperations):
+class MetisHeterogeneousOperations(WindowOperations):
 
     def __init__(self, sim_state):
         print(f"initialize Metis...", end='')
@@ -33,9 +33,6 @@ class MetisOperations(WindowOperations):
         comm_matrix = []
         anno_matrix = []
 
-        speed = []
-        #for c in cunits: speed.append(self.sim_state.get_speed(c))
-        print("speed : ", speed)
 
         for i in range(num_actors):
             comm_row = []
@@ -57,7 +54,7 @@ class MetisOperations(WindowOperations):
         print("task forecast: ",task_forecast)
         print("annoyance matrix: ", anno_matrix)
         print("communication matrix: ",comm_matrix)
-        metis_partitioning(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
+        metis_heterogeneous_multilevel(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost)
         return min_vt
 
     def delayed_on_window(self):
@@ -65,7 +62,6 @@ class MetisOperations(WindowOperations):
         # if no partitioning has been found return None
         cunits = self.sim_state.get_cunits()
         actors = self.sim_state.get_num_actors()
-        speed = []
         part = metis_get_partitioning()
         if not part:
             return None

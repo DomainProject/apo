@@ -84,7 +84,7 @@ from metasimulation.window_operations.null_operations  import NullOperations
 
 from metasimulation.window_operations.ddm_operations import DdmOperations
 
-from metasimulation.window_operations.metis_operations import MetisOperations
+from metasimulation.window_operations.metis_operations import MetisHeterogeneousOperations
 from metasimulation.window_operations.metis_communication_operations  import MetisCommunicationOperations
 from metasimulation.window_operations.metis_homogeneous_communication_operations  import MetisHomogeneousCommunicationOperations
 from metasimulation.window_operations.metis_homogeneous_nodes_operations  import MetisHomogeneousNodesOperations
@@ -183,8 +183,8 @@ sim_state.init_simulator_queue()
 match wops_string:
     case "ddm":
         operations = DdmOperations(sim_state)
-    case "metis":
-        operations = MetisOperations(sim_state)
+    case "metis-heterogeneous-multilevel":
+        operations = MetisHeterogeneousOperations(sim_state)
     case "random":
         operations = RandomOperations(sim_state)
     case "null":
