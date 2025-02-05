@@ -337,7 +337,7 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	free(new_adjwgt);
 }
 
-void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
+void metis_overload(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
     real_t input_comm_cost_matrix[actors][actors])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
