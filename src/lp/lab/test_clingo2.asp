@@ -23,15 +23,14 @@ cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C),
                     W > C, O = W-C.
 
 % - optimization: workload 
-%#minimize{ O @ 1,U : cu_overload(U,O) }.
-#minimize{ O @ 0 : cu_overload(_,O) }.
-%#minimize{ O @ 1,U : cu_workload(U,O) }.
-%#minimize{ O @ 1 : cu_workload(_,O) }.
+#minimize{ O@0 : cu_overload(U,O) }.
 
+% -----
 % U is busy iff there exists an actor associated to U
 busy(U) :- run_on(_,U).
 
-#maximize{ 1@ 1,U : busy(U)}.
+% - optimization: number of active computing unit
+#maximize{ 1@1,U : busy(U)}.
 
 % -----
 % actor communication cost
@@ -42,10 +41,11 @@ a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R),
                  C = C1*R.
 
 % total communication cost
-cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
+%cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
 
 % - optimization: communication cost
-#minimize{ C @ 2 : cc(C) }.
+%#minimize{ C @ 2 : cc(C) }.
+#minimize{ C @ 2,A1,A2 : a_cc(A1,A2,C) }.
 
 % -----
 % annoyance(N) holds iff N is the global annoyance, that is, 
@@ -57,7 +57,11 @@ annoyance(N) :- N = #sum{ C,A1,A2:
                 }.
 
 % - optimization: annoyance
-#minimize{ N @ 3 : annoyance(N) }.
+%#minimize{ N @ 3 : annoyance(N) }.
+#minimize{ C@3,A1,A2: 
+                mutual_annoyance(A1,A2,C), 
+                run_on(A1,U1), run_on(A2,U2),
+                U1 != U2  }.
 
 % utility directives
 %%% facts
