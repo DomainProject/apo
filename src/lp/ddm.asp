@@ -22,7 +22,14 @@ cu_overload(U,O) :- cu_workload(U,W), cu_capacity(U,C),
 
 % - optimization: workload 
 %#minimize{ O @ 1,U : cu_overload(U,O) }.
-#minimize{ O @ 1 : cu_overload(U,O) }.
+#minimize{ O @ 0 : cu_overload(_,O) }.
+%#minimize{ O @ 1,U : cu_workload(U,O) }.
+%#minimize{ O @ 1 : cu_workload(_,O) }.
+
+% U is busy iff there exists an actor associated to U
+busy(U) :- run_on(_,U).
+
+#maximize{ 1@ 1,U : busy(U)}.
 
 % -----
 % actor communication cost

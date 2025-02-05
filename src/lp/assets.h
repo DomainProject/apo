@@ -12,8 +12,8 @@
 #define LDLEN(NAME) NAME ##_len
 
 // Define resources variables
-EXTLD(ddm_v6_asp)
+EXTLD(ddm_asp)
 
 // Use this code to access the resources
-//  size_t length = LDLEN(ddm_v6_asp);
-//  uint8_t *data = LDVAR(ddm_v6_asp);
+//  size_t length = LDLEN(ddm_asp);
+//  uint8_t *data = LDVAR(ddm_asp);
