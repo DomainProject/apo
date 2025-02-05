@@ -17,19 +17,3 @@ add_custom_command(
         OUTPUT resources.c
         COMMAND embedfiles ${resources}
         DEPENDS copy_assets)
-
-
-
-#set_target_properties(resources PROPERTIES LINKER_LANGUAGE C)
-#target_include_directories(resources PRIVATE .)
-#
-#add_custom_command(TARGET resources PRE_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
-#        ${CMAKE_CURRENT_SOURCE_DIR} $<TARGET_FILE_DIR:resources>)
-#
-#
-#
-#add_custom_command(
-#        OUTPUT resources.o
-#        COMMAND ld -r -b binary -o resources.o ${resources}
-#        DEPENDS copy_assets)
