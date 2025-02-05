@@ -40,10 +40,10 @@ class MetisCommunicationOperations(WindowOperations):
 
         task_forecast = [1] * len(task_forecast)
 
-        print("capacity : ", capacity)
-        print("msg exchange cost :", msg_exch_cost)
-        print("task forecast: ", task_forecast)
-        print("communication matrix: ",comm_matrix)
+       # print("capacity : ", capacity)
+       # print("msg exchange cost :", msg_exch_cost)
+       # print("task forecast: ", task_forecast)
+       # print("communication matrix: ",comm_matrix)
         metis_communication(num_actors, cus, task_forecast, capacity, comm_matrix, msg_exch_cost)
         return min_vt
 
