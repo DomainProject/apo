@@ -47,12 +47,10 @@ def loop(sim_state, interrupt_early, maximum_th, ground_truth, rebalance_period,
                                 annoyance
                             )
                             if interrupt_early == True: sim_state.set_can_end(True)
-                            if rebalance_max_cnt != None and rebalance_cnt > rebalance_max_cnt: sim_state.set_can_end(True)
-                            else:
-                                print(rebalance_max_cnt, rebalance_cnt)
                             rebalance_in_progress = True
                             rebalance_completed = False
                             cur_reb_period = 1000000
+                    if rebalance_max_cnt != None and rebalance_cnt > rebalance_max_cnt: sim_state.set_can_end(True)
 
 
                 Simulator.schedule_event(wct_ts + global_constants_parameter_module.time_window_size, "", EVT.TIME_WINDOW)

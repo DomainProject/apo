@@ -60,7 +60,6 @@ def convert_metis_assignment_to_sim_assingment(partition):
 
     sorted_indices = sorted(count_dict.keys(), key=lambda x: count_dict[x], reverse=True)
 
-    print(cunits, sorted_indices)
     unit_mapping = {index: cunits[i] for i, index in enumerate(sorted_indices)}
     assign = [unit_mapping[i] for i in partition]
 

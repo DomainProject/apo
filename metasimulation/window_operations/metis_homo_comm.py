@@ -25,24 +25,18 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
                                    communication, annoyance)
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
-        cus = len(cunits)
-        capacity = [1] * cus
-        task_forecast = get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors)
-        comm_matrix = []
+        num_cus = len(cunits)
 
+        comm_matrix = []
         for i in range(num_actors):
             comm_row = []
             for j in range(num_actors):
                 comm_row.append(math.ceil(communication[j][i] / wct_ts))
             comm_matrix.append(comm_row)
 
-        for i in range(len(task_forecast)): task_forecast[i] += 1
-
+        task_forecast = [1]*num_actors
         
-       # print("capacity : ", capacity)
-       # print("comm matrix: ", comm_matrix)
-       # print("task forecast: ", task_forecast)
-        metis_homogeneous_communication(num_actors, cus, comm_matrix, task_forecast)
+        metis_homogeneous_communication(num_actors, num_cus, comm_matrix, task_forecast)
         return min_vt
 
     def delayed_on_window(self):

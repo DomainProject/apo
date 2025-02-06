@@ -43,7 +43,7 @@ class MetisHeterogeneousOperations(WindowOperations):
             comm_matrix.append(comm_row)
             anno_matrix.append(anno_row)
 
-        task_forecast = [1] * len(task_forecast)
+        task_forecast = [1] * num_actors
 
         if all(all(cell == 0 for cell in row) for row in anno_matrix):  # Check if all elements are 0
             anno_matrix = [[1] * len(anno_matrix[0]) for _ in range(len(anno_matrix))]
