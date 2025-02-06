@@ -127,8 +127,10 @@ def loop(sim_state, interrupt_early, maximum_th, ground_truth, rebalance_period,
             # Poll for a rebalancing solution.
             # This is not associated to an event because it might wait a program running outside the metasimulator
             if rebalance_in_progress and not rebalance_completed:
-                if check_and_install_new_binding(operations, wct_ts, maximum_th, ground_truth, sim_state):
+                rebalance_computed, newbid = check_and_install_new_binding(operations, wct_ts, maximum_th, ground_truth, sim_state)
+                if rebalance_computed:
                     rebalance_in_progress = False
+                    if not newbid: rebalance_completed = True
                     #print(f"REBALANCE STARTED @ {wct_ts}")
                     #print("PST", wct_ts, sim_state._assignment)
     return wct_ts

@@ -24,13 +24,15 @@ def assignment_renaming(assignment):
 
 def check_and_install_new_binding(operations, wct_ts, maximum_th, ground_truth, sim_state):
     binding = operations.delayed_on_window()
-    if binding is None: return False
+    if binding is None: return False, False
 
     old_bind = binding
     binding = assignment_renaming(binding)
     print(f"new binding: {old_bind} renamed below")
     print(f"new binding: {binding} expected th {ground_truth[tuple(binding)]} vs max th {maximum_th}")
+    new_bid=False
     if binding != sim_state.get_assignment() and sim_state._pending_assigment != binding:
+        new_bid=True
         sim_state.put_pending_assignment(binding)
         to_updated = set([])
         for i in range(len(sim_state._assignment)):
@@ -38,7 +40,7 @@ def check_and_install_new_binding(operations, wct_ts, maximum_th, ground_truth, 
                 to_updated.add(sim_state._assignment[i])
         for cu in to_updated:
             Simulator.schedule_event(wct_ts, cu, EVT.REASSIGN)
-    return True
+    return True, new_bid
 
 def filter_assignment(assignment):
     d = {}
