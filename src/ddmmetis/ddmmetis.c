@@ -21,7 +21,6 @@ idx_t avg_vert_wgt = 0;
 static idx_t *part_o = NULL;
 static idx_t *part_a = NULL;
 static idx_t *part_c = NULL;
-static idx_t *part_h_comm = NULL;
 
 static idx_t *final_part = NULL;
 
@@ -308,8 +307,6 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
 	idx_t ubfactor = 30; // default imbalance tolerance
-	// real_t tpwgts[cus] = {0.6, 0.3, 0.1};  // sum of elements must be 1
-
 
 	idx_t *xadj, *adjncy, *adjwgt;
 	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
@@ -322,8 +319,16 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	if(input_msg_exch_cost != NULL)
 		memcpy(msg_exch_cost, input_msg_exch_cost, sizeof(msg_exch_cost));
 
+	///FIRST ROUND OF PARTITIONING 
+	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 0);
+
+	compute_partition(total_actors, xadj, adjncy, vwgt, NULL, NULL, nParts, NULL, NULL, ubfactor, &alpha, &part_o, 0);
+
+
 	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 1);
 
+
+	update_weights(total_actors, part_o, xadj, adjncy, &adjwgt, &vwgt, alpha);
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
@@ -341,7 +346,7 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 
 	PRINTER() print_csr_graph(aug_v, new_xadj, new_adjncy, new_vwgt, new_adjwgt);
 
-	ubfactor = 30;
+	ubfactor = 50;
 
     PRINTER() printf("**** THIS IS THE PARTITION MINIMIZING ANNOYANCE AND COMMUNICATION COST **** \n");
     compute_partition(aug_v, new_xadj, new_adjncy, new_vwgt, NULL, new_adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_c, 1);
@@ -361,19 +366,23 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	free(new_adjwgt);
 }
 
-void metis_homogeneous_nodes(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
-    real_t input_comm_cost_matrix[actors][actors])
+void metis_baseline(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real_t input_comm_cost_matrix[actors][actors], real_t input_tpwgts[n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
 
 	idx_t ubfactor = 30; // default imbalance tolerance
 
-
 	idx_t *xadj, *adjncy, *adjwgt;
 	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
 	memcpy(vwgt, tasks_forecast, sizeof(idx_t) * total_actors);
 
+	real_t *tpwgts = calloc(n_cus, sizeof(real_t));
+	memcpy(tpwgts, input_tpwgts, sizeof(real_t)*n_cus);
+
+	real_t sum_tpwgts = 0.;
+	for (int i=0; i < n_cus; i++) sum_tpwgts += tpwgts[i];
+	if (sum_tpwgts != 1.0f) fprintf(stderr, "Sum of tpwgts is not 1! Impossible to use in METIS\n");
 
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
@@ -383,7 +392,7 @@ void metis_homogeneous_nodes(idx_t total_actors, idx_t n_cus, idx_t *tasks_forec
 
 	PRINTER() print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
 
-    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_o, 0);
+    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, tpwgts, NULL, ubfactor, &alpha, &part_o, 0);
 
 
 
@@ -401,41 +410,6 @@ void metis_homogeneous_nodes(idx_t total_actors, idx_t n_cus, idx_t *tasks_forec
 }
 
 
-void metis_homogeneous_communication(idx_t total_actors, idx_t n_cus, real_t input_comm_cost_matrix[n_cus][n_cus], idx_t *task_forecast)
-{
-	idx_t nParts = n_cus; // Number of partitions (number of CUs)
-
-
-	idx_t ubfactor = 30; // default imbalance tolerance
-
-
-	idx_t *xadj, *adjncy, *adjwgt;
-	idx_t *vwgt = calloc(total_actors, sizeof(idx_t)); // Vertex weights (used by metis to balance the partitions)
-	memcpy(vwgt, task_forecast, sizeof(idx_t) * total_actors);
-
-	if(input_comm_cost_matrix != NULL)
-		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
-		
-	metis_init(total_actors, n_cus, &xadj, &adjncy, &adjwgt, comm_cost_matrix, NULL, 0);
-
-
-	ubfactor = 30;
-	PRINTER()	 print_csr_graph(total_actors, xadj, adjncy, vwgt, adjwgt);
-
-    compute_partition(total_actors, xadj, adjncy, vwgt, NULL, adjwgt, nParts, NULL, NULL, ubfactor, &alpha, &part_h_comm, 0);
-
-
-	PRINTER() print_partition(total_actors, part_h_comm);
-
-	final_part = part_h_comm;
-
-	free(xadj);
-	free(adjncy);
-	free(adjwgt);
-	free(vwgt);
-
-
-}
 
 
 idx_t *metis_get_partitioning(void)

@@ -105,50 +105,22 @@ def metis_communication(total_actors, cus, tasks_forecast, comm_matrix, msg_exch
 
 
 
-_metisddm.metis_homogeneous_nodes.argtypes = [
+_metisddm.metis_baseline.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
     ctypes.POINTER(real_t),
+    ctypes.POINTER(real_t)
 ]
-_metisddm.metis_homogeneous_nodes.restype = None
+_metisddm.metis_baseline.restype = None
 
-def metis_homogeneous_nodes(total_actors, cus, tasks_forecast, comm_matrix):
+def metis_baseline(total_actors, cus, comm_matrix, tasks_forecast, capacity):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
     arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
-
-    
-    flattened_comm_matrix = []
-    for row in comm_matrix:
-        flattened_comm_matrix.extend(row)
-
- 
-    arr_comm = (ctypes.c_double * (total_actors * total_actors))(*flattened_comm_matrix)
-
-    
-    last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_homogeneous_nodes(total_actors, cus, arr_tasks, arr_comm)
-
-
-
-
-_metisddm.metis_homogeneous_communication.argtypes = [
-    idx_t,
-    idx_t,
-    ctypes.POINTER(real_t),
-    ctypes.POINTER(idx_t)
-]
-_metisddm.metis_homogeneous_communication.restype = None
-
-def metis_homogeneous_communication(total_actors, cus, comm_matrix, tasks_forecast):
-    global last_ddm_total_actors_invocation
-    if len(tasks_forecast) != total_actors:
-        raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
-
-    arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
+    arr_capacity = (ctypes.c_double * cus)(*capacity)
 
     flattened_comm_matrix = []
     for row in comm_matrix:
@@ -159,7 +131,7 @@ def metis_homogeneous_communication(total_actors, cus, comm_matrix, tasks_foreca
 
 
     last_ddm_total_actors_invocation = total_actors
-    _metisddm.metis_homogeneous_communication(total_actors, cus, arr_comm,  arr_tasks)
+    _metisddm.metis_baseline(total_actors, cus,  arr_tasks, arr_comm, arr_capacity)
 
 
 

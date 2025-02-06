@@ -7,7 +7,7 @@ from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_
 from metasimulation.SimulationModel.hardware import build_cunits, get_capacity_vector, \
     convert_metis_assignment_to_sim_assingment,  get_communication_latency
 from metasimulation.window_operations.abstract_operations import WindowOperations
-from src.metis import ddmmetis_init, metis_get_partitioning, metis_homogeneous_communication
+from src.metis import ddmmetis_init, metis_get_partitioning, metis_baseline
 
 
 class MetisHomogeneousCommunicationOperations(WindowOperations):
@@ -26,6 +26,7 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
         num_cus = len(cunits)
+        capacity = [1/num_cus] * num_cus
 
         comm_matrix = []
         for i in range(num_actors):
@@ -36,7 +37,7 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
 
         task_forecast = [1]*num_actors
         
-        metis_homogeneous_communication(num_actors, num_cus, comm_matrix, task_forecast)
+        metis_baseline(num_actors, num_cus, comm_matrix, task_forecast, capacity)
         return min_vt
 
     def delayed_on_window(self):
