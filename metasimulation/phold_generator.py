@@ -17,12 +17,7 @@ print(f"Generating trace with:")
 print(f"|- #Actors:{num_actors}")
 print(f"|- Last TS: {svt_end}")
 
-<<<<<<< HEAD
 ofile=f"phold_lp_{num_actors}-end_time_{svt_end}-send_prob_{send_prob}.trace"
-=======
-ofile=f"phold_lp_{num_actors}-end_time_{svt_end}_send_prob_{send_prob}.trace"
->>>>>>> origin/metis-debug
-
 print(f"Writing output file '{ofile}'")
 
 actors = []
