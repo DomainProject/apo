@@ -5,7 +5,7 @@ from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_m
 # creates an array of computing unit labels
 def build_cunits():
   res = []
-  for k in hardware_parameter_module.cu_types:
+  for k in sorted(hardware_parameter_module.cu_types.keys()):
       res += [f"{k}_{v}" for v in range(hardware_parameter_module.cu_types[k]['num_units'])]
   return res
 
@@ -34,9 +34,8 @@ def get_relative_speed(cu_a):
 
 def get_capacity_vector():
     res = []
-    for k in hardware_parameter_module.cu_types:
-        #res += [hardware_parameter_module.cu_types[k]['capacity_cu']]*hardware_parameter_module.cu_types[k]['num_units']
-        res += [3]*hardware_parameter_module.cu_types[k]['num_units']
+    for k in build_cunits():
+        res += [get_relative_speed(k)]
     return res
 
 
