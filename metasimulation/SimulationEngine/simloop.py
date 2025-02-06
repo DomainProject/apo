@@ -29,7 +29,8 @@ def loop(sim_state, interrupt_early, maximum_th, ground_truth, rebalance_period,
                         if len(ground_truth) > 0:
                             truth_th = float(ground_truth[tuple(sim_state.get_assignment())]) 
                         print("WT", wct_ts, "GVT", sim_state.get_gvt(), "COM", committed, "TH (com per msec)", actualth, "MAX TH", maximum_th)
-                        if abs(actualth/truth_th) < 1.05: cur_reb_period = rebalance_period
+                        if truth_th == 0 or (abs(actualth/truth_th) < 1.05 and abs(actualth/truth_th) > 0.95): 
+                            cur_reb_period = rebalance_period
                     else:
                         results[tuple(sim_state.get_assignment())] += [committed / global_constants_parameter_module.time_window_size]
                     
