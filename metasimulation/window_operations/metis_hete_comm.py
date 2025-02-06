@@ -1,11 +1,6 @@
 import math
 
-from metasimulation.SimulationEngine.runtime_modules import global_constants_parameter_module as global_constants
-from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module as hardware_constants
-
-from metasimulation.SimulationEngine.sim import get_events_count_vector_in_next_window
-from metasimulation.SimulationModel.hardware import build_cunits, get_capacity_vector, \
-    convert_metis_assignment_to_sim_assingment,  get_communication_latency
+from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment, get_relative_speed
 from metasimulation.window_operations.abstract_operations import WindowOperations
 from src.metis import ddmmetis_init, metis_get_partitioning, metis_baseline
 
@@ -34,9 +29,28 @@ class MetisCommunicationOperations(WindowOperations):
                 comm_row.append(math.ceil(communication[j][i] / wct_ts))
             comm_matrix.append(comm_row)
 
-        capacity = [1.0/num_cus] * num_cus
-        task_forecast = [1] * num_actors
-        
+        task_forecast = self.sim_state._executed_events_per_actor[:]
+        total_load    = sum(task_forecast)
+        for i in range(len(task_forecast)): task_forecast[i] = float(task_forecast[i])/total_load
+        for i in range(len(task_forecast)): task_forecast[i] = task_forecast[i]*100
+        for i in range(len(task_forecast)): task_forecast[i] = math.ceil(task_forecast[i])
+
+        capacity = []
+        non_zero_cap, non_zero_cu = float('inf'), None
+        for k in self.sim_state._cu_units_data:
+            if self.sim_state._cu_units_data[k]["executed"] != 0:
+                non_zero_cap = self.sim_state._cu_units_data[k]["executed"]
+                non_zero_cu  = k 
+            self.sim_state._cu_units_data[k]["executed"] = 0
+        baseline_capacity = non_zero_cap/get_relative_speed(non_zero_cu)
+        for k in self.sim_state._cu_units_data:
+            capacity += [baseline_capacity*get_relative_speed(k)]
+
+
+        total_capacity    = sum(capacity)
+        for i in range(len(capacity)): capacity[i] = float(capacity[i])/total_capacity
+        for i in range(len(capacity)): capacity[i] = capacity[i]
+
         metis_baseline(num_actors, num_cus, comm_matrix, task_forecast, capacity)
         return min_vt
 
