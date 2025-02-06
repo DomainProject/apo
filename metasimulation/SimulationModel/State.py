@@ -30,6 +30,7 @@ class State():
     _actors = []
     _pending_assigment = []
     _gvt = -1-0
+    _executed_events_per_actor = []
 
     def __init__(self, path, assignment=None, verbose=True, traces=None):
         self._verbose = verbose
@@ -50,6 +51,7 @@ class State():
             self._communication_matrix += [[]]
             self._total_aborts += [0]
             self._round_aborts += [0]
+            self._executed_events_per_actor += [0]
             for j in range(self._num_actors):
                 self._annoyance_matrix[i] += [0]
                 self._communication_matrix[i] += [0]
@@ -62,7 +64,7 @@ class State():
 
         if self._verbose: print(f"Building computing units...", end='')
         for k in cu_units:    
-            self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
+            self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0, "executed": 0}
         if self._verbose: print("Done")
 
         if self._verbose: print(f"Building assignment...", end='')
