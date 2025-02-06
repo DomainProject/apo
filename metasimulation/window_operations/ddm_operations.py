@@ -10,14 +10,14 @@ from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_m
 
 class DdmOperations(WindowOperations):
 
-    def __init__(self, sim_state):
+    def __init__(self, sim_state, ddm_conf=0):
         print(f"initialize DDM...", end='')
         self.sim_state = sim_state
         cunits = sim_state.get_cunits()
         cus = [{'cpu': 1, 'gpu': 2, 'fpga': 4}[x.split('_')[0]] for x in cunits]
         msg_exch_cost = [ [ int(get_communication_latency(x,y)/hardware_constants.comm_unitary_cost) for y in cunits] for x in cunits]
         runnable_on = [7] * sim_state.get_num_actors()
-        ddm_init(len(cus), sim_state.get_num_actors(), cus, msg_exch_cost, runnable_on)
+        ddm_init(len(cus), sim_state.get_num_actors(), cus, msg_exch_cost, runnable_on, conf=ddm_conf)
         print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, min_vt, committed, time_window_size,

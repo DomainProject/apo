@@ -39,7 +39,11 @@ sim_state = SimulationState(simulation_trace, verbose=(len(sys.argv) != 4))
 sim_state.init_simulator_queue()
 
 operations_map = {
-   "ddm":                  DdmOperations,
+   "ddm":                     DdmOperations,
+   "ddm_c1":                  DdmOperations,
+   "ddm_c2":                  DdmOperations,
+   "ddm_c3":                  DdmOperations,
+   "ddm_c4":                  DdmOperations,
    "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,
@@ -54,7 +58,10 @@ if wops_string not in operations_map:
     sys.exit(1)
 
 maximum_th, ground_truth = load_ground_truth(fsolutions)
-operations = operations_map[wops_string](sim_state)
+if "ddm" in wops_string and "c" in wops_string:
+    operations = operations_map[wops_string](sim_state, ddm_conf=int(wops_string[-1]))    
+else:
+    operations = operations_map[wops_string](sim_state)
 
 evaluate_all = False
 to_be_evaluated_assignments = []

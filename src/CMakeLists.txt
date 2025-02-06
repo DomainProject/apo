@@ -26,17 +26,30 @@ message(STATUS "Metis libraries: ${Metis_LIBRARY}")
 message(STATUS "GKLib libraries: ${GKlib_LIBRARY}")
 
 
-add_library(domainddm SHARED ddm.c dynstr.c clingo_solver.c)
 
 
-target_include_directories(domainddm PUBLIC ${Clingo_INCLUDE_DIRS})
-target_link_libraries(domainddm PRIVATE ${Clingo_LIBRARIES} resources)
+
+add_library(domainddm    SHARED ddm.c dynstr.c clingo_solver.c)
+add_library(domainddm_c1 SHARED ddm.c dynstr.c clingo_solver.c)
+add_library(domainddm_c2 SHARED ddm.c dynstr.c clingo_solver.c)
+add_library(domainddm_c3 SHARED ddm.c dynstr.c clingo_solver.c)
+add_library(domainddm_c4 SHARED ddm.c dynstr.c clingo_solver.c)
+
+target_include_directories(domainddm    PUBLIC ${Clingo_INCLUDE_DIRS})
+target_include_directories(domainddm_c1 PUBLIC ${Clingo_INCLUDE_DIRS})
+target_include_directories(domainddm_c2 PUBLIC ${Clingo_INCLUDE_DIRS})
+target_include_directories(domainddm_c3 PUBLIC ${Clingo_INCLUDE_DIRS})
+target_include_directories(domainddm_c4 PUBLIC ${Clingo_INCLUDE_DIRS})
+
+target_link_libraries(domainddm    PRIVATE ${Clingo_LIBRARIES} resources)
+target_link_libraries(domainddm_c1 PRIVATE ${Clingo_LIBRARIES} resources_c1)
+target_link_libraries(domainddm_c2 PRIVATE ${Clingo_LIBRARIES} resources_c2)
+target_link_libraries(domainddm_c3 PRIVATE ${Clingo_LIBRARIES} resources_c3)
+target_link_libraries(domainddm_c4 PRIVATE ${Clingo_LIBRARIES} resources_c4)
 
 
 add_library(ddmmetis SHARED ./ddmmetis/ddmmetis.c ./ddmmetis/utils.c)
 target_include_directories(ddmmetis PUBLIC ${Metis_INCLUDE_DIR})
-#target_link_libraries(ddmmetis PRIVATE ${Metis_LIBRARY})
 target_link_libraries(ddmmetis PRIVATE ${Metis_LIBRARY} ${GKlib_LIBRARY})
 
 add_subdirectory(lp)
-#add_subdirectory(ddmmetis)

@@ -3,7 +3,7 @@ from os import listdir
 from os.path import isfile, join
 
 
-sims = [1,2]
+sims = [1,2,3]
 p = "res_path"
 res = {}
 for i in sims:
@@ -28,7 +28,7 @@ for i in sims:
 
 for i in res:
   print(i)
-  for j in ["random", "metis-homo-node", "metis-homo-comm"]:
+  for j in ["random", "metis-homo-node", "metis-homo-comm", "ddm", "ddm_c1", "ddm_c2", "ddm_c3", "ddm_c4"]:
    avg = [ k[0]/k[1] for k in res[i][j] ]
    avg = sum(avg)/len(avg)
    print(f"|-{j}:{avg}")
