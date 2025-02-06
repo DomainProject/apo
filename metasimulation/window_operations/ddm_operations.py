@@ -31,31 +31,43 @@ class DdmOperations(WindowOperations):
         for i in range(num_actors):
             matrix_row = []
             for j in range(num_actors):
-                comm = math.ceil(communication[j][i] / wct_ts)
-                anno = math.ceil(annoyance[j][i] / wct_ts)
+                comm = math.ceil(communication[j][i])
+                anno = math.ceil(annoyance[j][i])
                 matrix_row.append((anno, comm))
             actor_matrix.append(matrix_row)
 
+        for i in range(num_actors):
+            print(str(actor_matrix[i]).replace('(','{').replace('[','{').replace(')','}').replace(']','}'))    
+
         task_forecast = self.sim_state._executed_events_per_actor[:]
+        self.sim_state._executed_events_per_actor = [0]*num_actors
+        print("task_forecast", task_forecast)
         total_load    = sum(task_forecast)
-        for i in range(len(task_forecast)): task_forecast[i] = float(task_forecast[i])/total_load
-        for i in range(len(task_forecast)): task_forecast[i] = task_forecast[i]*100
-        for i in range(len(task_forecast)): task_forecast[i] = math.ceil(task_forecast[i])
+
+
+
 
         capacity = []
-        non_zero_cap, non_zero_cu = float('inf'), None
+        #non_zero_cap, non_zero_cu = float('inf'), None
         for k in self.sim_state._cu_units_data:
             if self.sim_state._cu_units_data[k]["executed"] != 0:
                 non_zero_cap = self.sim_state._cu_units_data[k]["executed"]
-                non_zero_cu  = k 
+                non_zero_cu  = k
+                capacity += [int(self.sim_state._cu_units_data[k]["executed"]*1.01)] 
+            else:
+                capacity += [0]
             self.sim_state._cu_units_data[k]["executed"] = 0
         baseline_capacity = non_zero_cap/get_relative_speed(non_zero_cu)
-        for k in self.sim_state._cu_units_data:
-            capacity += [int(baseline_capacity*get_relative_speed(k))]
+        for i in range(num_cus):
+            if capacity[i] == 0:
+                capacity[i] = int(baseline_capacity*get_relative_speed(k))
 
 
-
-
+        total_capacity    = sum(capacity)
+        #for i in range(len(capacity)): capacity[i] = float(capacity[i])/total_capacity
+        #for i in range(len(capacity)): capacity[i] = capacity[i]
+        print("capacity", capacity)
+        print("task_forecast", task_forecast)
 
 
         ddm_optimize(num_actors, ddm_prepare_actor_matrix(actor_matrix), task_forecast, num_cus, capacity)

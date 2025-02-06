@@ -32,15 +32,16 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
             comm_row = []
             for j in range(num_actors):
                 comm_row.append(math.ceil(communication[j][i] / wct_ts))
+            print(comm_row)
             comm_matrix.append(comm_row)
 
 
 
         task_forecast = self.sim_state._executed_events_per_actor[:]
         total_load    = sum(task_forecast)
-        for i in range(len(task_forecast)): task_forecast[i] = float(task_forecast[i])/total_load
-        for i in range(len(task_forecast)): task_forecast[i] = task_forecast[i]*100
-        for i in range(len(task_forecast)): task_forecast[i] = math.ceil(task_forecast[i])
+        #for i in range(len(task_forecast)): task_forecast[i] = float(task_forecast[i])/total_load
+        #for i in range(len(task_forecast)): task_forecast[i] = task_forecast[i]*100
+        #for i in range(len(task_forecast)): task_forecast[i] = math.ceil(task_forecast[i])
 
         capacity = [1.0/num_cus] * num_cus
 
@@ -54,6 +55,9 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
 
 
 
+
+        print("capacity", capacity)
+        print("task_forecast", task_forecast)
 
 
 
