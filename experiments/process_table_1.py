@@ -28,7 +28,7 @@ for i in sims:
 
 for i in res:
   print(i)
-  for j in res[i]:
+  for j in ["random", "metis-homo-node", "metis-homo-comm"]:
    avg = [ k[0]/k[1] for k in res[i][j] ]
    avg = sum(avg)/len(avg)
    print(f"|-{j}:{avg}")
