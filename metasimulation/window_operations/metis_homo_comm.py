@@ -26,7 +26,6 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
         num_cus = len(cunits)
-        capacity = [1/num_cus] * num_cus
 
         comm_matrix = []
         for i in range(num_actors):
@@ -35,17 +34,13 @@ class MetisHomogeneousCommunicationOperations(WindowOperations):
                 comm_row.append(math.ceil(communication[j][i] / wct_ts))
             comm_matrix.append(comm_row)
 
-        task_forecast = [1]*num_actors
+        capacity = [1.0/num_cus] * num_cus
+        task_forecast = [1] * num_actors
         
         metis_baseline(num_actors, num_cus, comm_matrix, task_forecast, capacity)
         return min_vt
 
     def delayed_on_window(self):
-        # TODO call method to retrieve partitioning and try to install it
-        # if no partitioning has been found return None
-        cunits = self.sim_state.get_cunits()
-        actors = self.sim_state.get_num_actors()
-        speed = []
         part = metis_get_partitioning()
         if not part:
             return None

@@ -15,7 +15,6 @@ class MetisHomogeneousNodesOperations(WindowOperations):
     def __init__(self, sim_state):
         print(f"initialize Metis...", end='')
         self.sim_state = sim_state
-        # TODO: comm_matrix and anno_matrix must be taken in on_window
         ddmmetis_init(sim_state.get_num_actors())
         print(f"done")
 
@@ -26,29 +25,22 @@ class MetisHomogeneousNodesOperations(WindowOperations):
                                    communication, annoyance)
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
-        cus = len(cunits)
-        capacity = [1/cus] * cus
-        comm_matrix = []
+        num_cus = len(cunits)
 
+        comm_matrix = []
         for i in range(num_actors):
             comm_row = []
             for j in range(num_actors):
                 comm_row.append(0)
             comm_matrix.append(comm_row)
 
+        capacity = [1.0/num_cus] * num_cus
         task_forecast = [1] * num_actors
 
-       # print("task forecast: ", task_forecast)
-       # print("communication matrix: ",comm_matrix)
-        metis_baseline(num_actors, cus, comm_matrix, task_forecast, capacity)
+        metis_baseline(num_actors, num_cus, comm_matrix, task_forecast, capacity)
         return min_vt
 
     def delayed_on_window(self):
-        # TODO call method to retrieve partitioning and try to install it
-        # if no partitioning has been found return None
-        cunits = self.sim_state.get_cunits()
-        actors = self.sim_state.get_num_actors()
-        speed = []
         part = metis_get_partitioning()
         if not part:
             return None
