@@ -5,19 +5,24 @@ from metasimulation.window_operations.abstract_operations import WindowOperation
 from src.metis import ddmmetis_init, metis_get_partitioning, metis_baseline
 
 
+
+
+
 class MetisHomogeneousNodesOperations(WindowOperations):
 
     def __init__(self, sim_state):
         print(f"initialize Metis...", end='')
         self.sim_state = sim_state
         ddmmetis_init(sim_state.get_num_actors())
+
+
+
+
         print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
                   communication, annoyance):
-        if ending_simulation: return float('inf')
-        min_vt = super().on_window(cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,
-                                   communication, annoyance)
+
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
         num_cus = len(cunits)
@@ -28,6 +33,8 @@ class MetisHomogeneousNodesOperations(WindowOperations):
             for j in range(num_actors):
                 comm_row.append(0)
             comm_matrix.append(comm_row)
+
+
 
         task_forecast = self.sim_state._executed_events_per_actor[:]
         total_load    = sum(task_forecast)
@@ -52,7 +59,6 @@ class MetisHomogeneousNodesOperations(WindowOperations):
 
 
         metis_baseline(num_actors, num_cus, comm_matrix, task_forecast, capacity)
-        return min_vt
 
     def delayed_on_window(self):
         part = metis_get_partitioning()
