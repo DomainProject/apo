@@ -6,8 +6,8 @@ find_path(Metis_INCLUDE_DIR
 )
 
 find_library(Metis_LIBRARY
-  NAMES metis libmetis
-  PATHS /usr/lib /usr/local/lib
+        NAMES metis libmetis
+        PATHS /usr/lib /usr/local/lib
 )
 
 include(FindPackageHandleStandardArgs)

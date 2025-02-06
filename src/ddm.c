@@ -12,7 +12,7 @@
 #ifndef USE_ASSETS
 static unsigned char *base_program = NULL;
 #else
-static const char *base_program = LDVAR(ddm_v5_asp);
+static const char *base_program = LDVAR(ddm_asp);
 #endif
 
 static clingo_ctx *cctx;
@@ -85,7 +85,7 @@ void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_
 {
 	/*  ------------- BEGIN TEMPORARY CODE -----------  */
 #ifndef USE_ASSETS
-	int fd = open("lp/ddm_v5.asp", O_RDONLY);
+	int fd = open("lp/ddm.asp", O_RDONLY);
 	if(fd == -1) {
 		perror("open error");
 		exit(errno);
@@ -96,7 +96,7 @@ void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_
 
 	// the code above should be replaced by:
 #else
-	size_t len = LDLEN(ddm_v5_asp);
+	size_t len = LDLEN(ddm_asp);
 #endif
 	/*  ------------- END TEMPORARY CODE -------------  */
 
