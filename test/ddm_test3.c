@@ -14,10 +14,10 @@ int main(void)
 	enum cu_type cus[NCUS] = {1, 1, 2, 4};
 	int msg_exch_cost[NCUS][NCUS] = {
 	    //        C  C  G  F
-	    /*CPU*/  {1, 1, 2, 2},
-	    /*CPU*/  {1, 1, 2, 2},
-	    /*GPU*/  {2, 2, 4, 4},
-	    /*FPGA*/ {2, 2, 4, 4}
+	    /*CPU*/  {0.5, 1, 3, 3},
+	    /*CPU*/  {1, 0.5, 3, 3},
+	    /*GPU*/  {3, 3, 0.5, 5},
+	    /*FPGA*/ {3, 3, 5, 0.5}
 	};
 	short runnable_on[NACT] = {7, 7, 7, 7, 7, 7, 7, 7};
 	int cu_capacity[NCUS] = {1, 1, 1, 1};
