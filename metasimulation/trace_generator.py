@@ -37,7 +37,7 @@ for i in range(1,svt_end):
   for a in range(num_actors):
     f.write(f"{i},{a},{i+1},{a}\n")
     if (i % fan_out_per) == 0 and fan_out_per > 0:
-      if actor_wall > 0 and a != actor_wall:
+      if actor_wall < 0 or a != actor_wall:
         f.write(f"{i},{a},{i+0.1},{(a+1)%num_actors}\n")
 f.close()
 
