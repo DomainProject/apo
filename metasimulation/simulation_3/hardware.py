@@ -19,4 +19,5 @@ for k1 in cu_types:
     communication_costs[k1][k2] = 1                     # slowing factor for communication: xpu1->xpu1 fastest
     if k1 != 'cpu' and k2 == 'cpu': communication_costs[k1][k2] += 2    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
     if k2 != 'cpu' and k1 == 'cpu': communication_costs[k1][k2] += 2    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-    if k1 != 'cpu' and k2 != 'cpu': communication_costs[k1][k2] += 2    #                                   xpu1->xpu2  have communication cost multiplied by 4 when xpu1 and xpu2 are not cpus
+    if k1 != 'cpu' and k2 != 'cpu': communication_costs[k1][k2] += 4    #                                   xpu1->xpu2  have communication cost multiplied by 4 when xpu1 and xpu2 are not cpus
+    if k1 == k2: communication_costs[k1][k2] = 1

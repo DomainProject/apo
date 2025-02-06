@@ -16,7 +16,7 @@ python3 trace_generator.py 8 500000 10
 mv *.trace simulation_2
 
 mkdir -p simulation_3
-python3 trace_generator.py 8 500000 10 4
+python3 trace_generator.py 8 500000 2
 mv *.trace simulation_3
 
 
