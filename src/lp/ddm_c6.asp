@@ -21,15 +21,15 @@ cu_workload(U,T) :- cu(U),
 tasks(X) :- X = #sum{ W,A : tasks_forecast(A,W) }.
 
 % O is the overload of U
-cu_overload(U,O) :- cu(U),
-  O = #max{ 0 ; W-C : cu_workload(U,W), cu_capacity(U,C) }.
+%cu_overload(U,O) :- cu(U),
+%  O = #max{ 0 ; W-C : cu_workload(U,W), cu_capacity(U,C) }.
 
 % max and min cu_overload
-max_cu_overload(M) :- M = #max{ 0 ; O : cu_overload(U,O) }.
-min_cu_overload(M) :- M = #min{ O : cu_overload(U,O) ; T : tasks(T) }.
+%max_cu_overload(M) :- M = #max{ 0 ; O : cu_overload(U,O) }.
+%min_cu_overload(M) :- M = #min{ O : cu_overload(U,O) ; T : tasks(T) }.
 
 % - optimization: difference between max and min overload 
-#minimize{ Mo-Mi : max_cu_overload(Mo), min_cu_overload(Mi) }.
+% #minimize{ Mo-Mi : max_cu_overload(Mo), min_cu_overload(Mi) }.
 
 % -----
 % actor communication cost
@@ -39,13 +39,20 @@ a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R),
                  msg_exch_cost(U1,U2,C1), 
                  C = C1*R.
 
+max_a_cc(C) :- 
+    C = #max{ D : a_cc(A1,A2,D) }.
+
+%#minimize{ C@2 : max_a_cc(C) }.
+#minimize{ C@1 : a_cc(A1,A2,C) }.
+
+%#minimize{ C@1,A1,A2: a_cc(A1,A2,C) }.
+
 % total communication cost
 %cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
 
 % - optimization: communication cost
-%#minimize{ C @ 2 : cc(C) }.
+%#minimize{ C@2 : cc(C) }.
 
-%#minimize{ C@2,A1,A2 : a_cc(A1,A2,C) }.
 
 % -----
 % annoyance(N) holds iff N is the global annoyance, that is, 
@@ -74,12 +81,24 @@ num_tasks(K) :-
 num_cus(K) :-
     K = #sum{ 1,T : cu_type(T,L)}.
 
+max_num_unbalanced_cus(K):
+    K = T\C, num_cus(C), num_tasks(T).
 
-:- cu_workload(U,T), T > (K/C +1)*F, num_tasks(K), num_cus(C), max_task_forecast(F).
+unbalanced(U,0) :-
+   cu_workload(U,T), T <= (K/C)*F, num_tasks(K), num_cus(C), max_task_forecast(F).
 
+unbalanced(U,1) :-
+   cu_workload(U,T), T > (K/C)*F, num_tasks(K), num_cus(C), max_task_forecast(F).
+
+num_unbalanced_cus(K) :-
+    K = #sum{ 1,T : B=1,unbalanced(T,B) }.
+
+%:- cu_workload(U,T), T > (K/C)*F, num_tasks(K), num_cus(C), max_task_forecast(F).
+
+:- N > K, num_unbalanced_cus(N), max_num_unbalanced_cus(K).
 
 min_actor_with_cpu(A) :-
     A = #min{ B : actor(B), run_on(B,C), cu_type(C,cpu)}.
 
-
-:- C1 > C2, actor(A1), actor(A2), A1 < A2, run_on(A1,C1), run_on(A2,C2), cu_type(C1, cpu), cu_type(C2, cpu), min_actor_with_cpu(A1).
+% TODO handle the case of multiple units beloging to a device which is not a cpu 
+:- C1 > C2, A1 < A2, run_on(A1,C1), run_on(A2,C2), cu_type(C1, cpu), cu_type(C2, cpu), min_actor_with_cpu(A1).

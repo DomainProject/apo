@@ -63,3 +63,23 @@ a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R),
 
 % utility directives
 #show run_on/2.
+
+
+max_task_forecast(F) :- 
+    F = #max{ W : tasks_forecast(A,W) }.
+
+num_tasks(K) :-
+    K = #sum{ 1,T : tasks_forecast(T,L)}.
+
+num_cus(K) :-
+    K = #sum{ 1,T : cu_type(T,L)}.
+
+
+:- cu_workload(U,T), T > (K/C +1)*F, num_tasks(K), num_cus(C), max_task_forecast(F).
+
+
+min_actor_with_cpu(A) :-
+    A = #min{ B : actor(B), run_on(B,C), cu_type(C,cpu)}.
+
+
+:- C1 > C2, actor(A1), actor(A2), A1 < A2, run_on(A1,C1), run_on(A2,C2), cu_type(C1, cpu), cu_type(C2, cpu), min_actor_with_cpu(A1).

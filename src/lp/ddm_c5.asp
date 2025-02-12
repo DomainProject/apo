@@ -43,9 +43,9 @@ a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R),
 %cc(T) :- T = #sum{ C,A1,A2: a_cc(A1,A2,C) }. % sum C (1st component)
 
 % - optimization: communication cost
-%#minimize{ C @ 2 : cc(C) }.
+%#minimize{ C : cc(C) }.
 
-%#minimize{ C@2,A1,A2 : a_cc(A1,A2,C) }.
+#minimize{ C,A1,A2: a_cc(A1,A2,C) }.
 
 % -----
 % annoyance(N) holds iff N is the global annoyance, that is, 
