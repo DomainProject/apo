@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 		sanitize_symbol(argv[argi], symbol, sizeof(symbol));
 
 		FILE *in = open_or_exit(argv[argi], "rb");
-		fprintf(out, "const char %s[] = {\n", symbol);
+		fprintf(out, "const char %s[] = {\n\t", symbol);
 
 		unsigned char buf[256];
 		size_t nread;
@@ -55,9 +55,9 @@ int main(int argc, char **argv)
 		   We limit the number of bytes per line to enhance readability. */
 		while((nread = fread(buf, 1, sizeof(buf), in)) > 0) {
 			for(size_t i = 0; i < nread; i++) {
-				fprintf(out, "0x%02x, ", buf[i]);
-				if(++byte_count == 10) {
-					fprintf(out, "\n");
+				fprintf(out, "0x%02x,", buf[i]);
+				if(++byte_count == 20) {
+					fprintf(out, "\n\t");
 					byte_count = 0;
 				}
 			}

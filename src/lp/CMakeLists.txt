@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023-2025 Alessandro Pellegrini <a.pellegrini@ing.uniroma2.it>
 # SPDX-License-Identifier: GPL-3.0-only
 
-set(resources
+set(res_files
         ddm.asp
 )
 
@@ -15,5 +15,5 @@ add_custom_target(copy_assets
 
 add_custom_command(
         OUTPUT resources.c
-        COMMAND embedfiles ${resources}
-        DEPENDS copy_assets)
+        COMMAND embedfiles ${res_files}
+        DEPENDS copy_assets ${res_files} embedfiles)
