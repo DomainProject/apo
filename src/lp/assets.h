@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 
-#define EXTLD(NAME) extern const unsigned char NAME[]; \
+#define EXTLD(NAME) extern const unsigned char (NAME)[]; \
                     extern const size_t NAME ##_len;
 #define LDVAR(NAME) NAME
 #define LDLEN(NAME) NAME ##_len

@@ -13,7 +13,7 @@
 
 struct dynstr;
 
-extern void dynstr_strcat(struct dynstr *str, const unsigned char *src, size_t len);
+extern void dynstr_strcat(struct dynstr *str, const char *src, size_t len);
 extern void dynstr_strcpy(struct dynstr **dst, struct dynstr *src);
 extern void dynstr_printcat(struct dynstr *str, const char *fmt, ...);
 extern void dynstr_init(struct dynstr **str, size_t len);

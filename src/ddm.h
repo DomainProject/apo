@@ -3,7 +3,6 @@
 // cu
 enum cu_type { CPU = 1, GPU = 2, FPGA = 4 };
 
-extern int num_actors;
 struct actor_matrix {
 	int annoyance;
 	int msg_exchange_rate;

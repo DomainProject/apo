@@ -35,7 +35,7 @@ struct dynstr {
  * @param src The string to cat
  * @param len The length of the string to cat
  */
-void dynstr_strcat(struct dynstr *str, const unsigned char *src, size_t len)
+void dynstr_strcat(struct dynstr *str, const char *src, size_t len)
 {
 	while(str->used + len >= str->size) {
 		str->size *= 2;
