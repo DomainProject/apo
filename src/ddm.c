@@ -12,7 +12,7 @@
 #ifndef USE_ASSETS
 static unsigned char *base_program = NULL;
 #else
-static const char *base_program = LDVAR(ddm_asp);
+static const unsigned char *base_program = LDVAR(ddm_asp);
 #endif
 
 static clingo_ctx *cctx;
