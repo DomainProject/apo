@@ -26,32 +26,33 @@ add_library(resources_c5 STATIC resources5.c)
 add_library(resources_c6 STATIC resources6.c)
 
 
+
 add_custom_command(
         OUTPUT resources.c
         COMMAND embedfiles ${resources}
         COMMAND mv ${resources} resources.c.bck
-        DEPENDS copy_assets)
+        DEPENDS copy_assets ${resources} embedfiles)
 
 add_custom_command(
         OUTPUT resources1.c
         COMMAND embedfiles ${resources1}
         COMMAND mv resources.c resources1.c
         COMMAND sed -i 's/ddm_c1/ddm/g' resources1.c
-        DEPENDS copy_assets)
+        DEPENDS copy_assets ${resources1} embedfiles)
 
 add_custom_command(
         OUTPUT resources2.c
         COMMAND embedfiles ${resources2}
         COMMAND mv resources.c resources2.c
         COMMAND sed -i 's/ddm_c2/ddm/g' resources2.c
-        DEPENDS copy_assets)
+        DEPENDS copy_assets ${resources2} embedfiles)
 
 add_custom_command(
         OUTPUT resources3.c
         COMMAND embedfiles ${resources3}
         COMMAND mv resources.c resources3.c
         COMMAND sed -i 's/ddm_c3/ddm/g' resources3.c
-        DEPENDS copy_assets)
+        DEPENDS copy_assets ${resources3} embedfiles)
 
 
 add_custom_command(
@@ -59,7 +60,7 @@ add_custom_command(
         COMMAND embedfiles ${resources4}
         COMMAND mv resources.c resources4.c
         COMMAND sed -i 's/ddm_c4/ddm/g' resources4.c
-        DEPENDS copy_assets ddm_c4.asp)
+        DEPENDS copy_assets ${resources4} embedfiles)
 
 
 add_custom_command(
@@ -67,12 +68,11 @@ add_custom_command(
         COMMAND embedfiles ${resources5}
         COMMAND mv resources.c resources5.c
         COMMAND sed -i 's/ddm_c5/ddm/g' resources5.c
-        DEPENDS copy_assets ddm_c5.asp)
+        DEPENDS copy_assets ${resources5} embedfiles)
 
 add_custom_command(
         OUTPUT resources6.c
         COMMAND embedfiles ${resources6}
         COMMAND mv resources.c resources6.c
         COMMAND sed -i 's/ddm_c6/ddm/g' resources6.c
-        DEPENDS copy_assets ddm_c6.asp)
-
+        DEPENDS copy_assets ${resources6} embedfiles)

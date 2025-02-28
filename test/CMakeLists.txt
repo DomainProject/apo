@@ -6,10 +6,13 @@ add_executable(ddm_test ddm_test.c)
 add_executable(ddm_test2 ddm_test2.c)
 add_executable(ddm_test3 ddm_test3.c)
 add_executable(ddm_test4 ddm_test4.c)
+add_executable(ddm_stress_test ddm_stress_test.c)
+
 target_link_libraries(ddm_test PRIVATE domainddm)
 target_link_libraries(ddm_test2 PRIVATE domainddm)
 target_link_libraries(ddm_test3 PRIVATE domainddm)
 target_link_libraries(ddm_test4 PRIVATE domainddm)
+target_link_libraries(ddm_stress_test PRIVATE domainddm)
 
 #add_executable(metis_test metis_test.c)
 #target_link_libraries(metis_test PRIVATE metis ddmmetis GKlib m)

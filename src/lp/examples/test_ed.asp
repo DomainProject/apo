@@ -1,9 +1,9 @@
 % actor(s) and message(s)
 actor(1..8).
 
-runnable_on(A,cpu) :- actor(A).
-runnable_on(5..8,gpu).
-runnable_on(6..8,fpga).
+runnable_on(1..4,1). % cpu, 
+runnable_on(5..8,3). % cpu, gpu
+runnable_on(6..8,7). % cpu, gpu & fpga
 
 % msg_exch_rate(A1,A2,R) holds iff 
 % A1 and A2 exchange R messages per time window (msg/tw).

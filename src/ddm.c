@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 #include <time.h>
+#include <errno.h>
 #include "ddm.h"
 #include "dynstr.h"
 #include "lp/assets.h"
@@ -12,7 +12,7 @@
 #ifndef USE_ASSETS
 static unsigned char *base_program = NULL;
 #else
-static const char *base_program = LDVAR(ddm_asp);
+static const unsigned char *base_program = LDVAR(ddm_asp);
 #endif
 
 static clingo_ctx *cctx;
@@ -102,7 +102,7 @@ void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_
 
 	// Copy the ASP rules to solve the optimization problem to prog_buff
 	dynstr_init(&clingo_base_program_buffer, len);
-	dynstr_strcat(clingo_base_program_buffer, base_program, len);
+	dynstr_strcat(clingo_base_program_buffer, (const char *)base_program, len);
 
 	/* --- adding facts --- */
 	dynstr_printcat(clingo_base_program_buffer, "\n%%%%%% facts\n");
