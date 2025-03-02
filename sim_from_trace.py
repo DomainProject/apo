@@ -46,6 +46,7 @@ operations_map = {
    "ddm_c4":                  DdmOperations,
    "ddm_c5":                  DdmOperations,
    "ddm_c6":                  DdmOperations,
+   "ddm_c7":                  DdmOperations,
    "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,

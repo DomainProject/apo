@@ -36,6 +36,7 @@ add_library(domainddm_c3 SHARED ddm.c dynstr.c clingo_solver.c)
 add_library(domainddm_c4 SHARED ddm.c dynstr.c clingo_solver.c)
 add_library(domainddm_c5 SHARED ddm.c dynstr.c clingo_solver.c)
 add_library(domainddm_c6 SHARED ddm.c dynstr.c clingo_solver.c)
+add_library(domainddm_c7 SHARED ddm.c dynstr.c clingo_solver.c)
 
 target_include_directories(domainddm    PUBLIC ${Clingo_INCLUDE_DIRS})
 target_include_directories(domainddm_c1 PUBLIC ${Clingo_INCLUDE_DIRS})
@@ -44,6 +45,7 @@ target_include_directories(domainddm_c3 PUBLIC ${Clingo_INCLUDE_DIRS})
 target_include_directories(domainddm_c4 PUBLIC ${Clingo_INCLUDE_DIRS})
 target_include_directories(domainddm_c5 PUBLIC ${Clingo_INCLUDE_DIRS})
 target_include_directories(domainddm_c6 PUBLIC ${Clingo_INCLUDE_DIRS})
+target_include_directories(domainddm_c7 PUBLIC ${Clingo_INCLUDE_DIRS})
 
 target_link_libraries(domainddm    PRIVATE ${Clingo_LIBRARIES} resources)
 target_link_libraries(domainddm_c1 PRIVATE ${Clingo_LIBRARIES} resources_c1)
@@ -52,6 +54,7 @@ target_link_libraries(domainddm_c3 PRIVATE ${Clingo_LIBRARIES} resources_c3)
 target_link_libraries(domainddm_c4 PRIVATE ${Clingo_LIBRARIES} resources_c4)
 target_link_libraries(domainddm_c5 PRIVATE ${Clingo_LIBRARIES} resources_c5)
 target_link_libraries(domainddm_c6 PRIVATE ${Clingo_LIBRARIES} resources_c6)
+target_link_libraries(domainddm_c7 PRIVATE ${Clingo_LIBRARIES} resources_c7)
 
 
 add_library(ddmmetis SHARED ./ddmmetis/ddmmetis.c ./ddmmetis/utils.c)

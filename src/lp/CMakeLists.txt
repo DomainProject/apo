@@ -15,6 +15,7 @@ set(resources3 ddm_c3.asp)
 set(resources4 ddm_c4.asp)
 set(resources5 ddm_c5.asp)
 set(resources6 ddm_c6.asp)
+set(resources7 ddm_c7.asp)
 
 
 add_library(resources STATIC resources.c)
@@ -24,6 +25,7 @@ add_library(resources_c3 STATIC resources3.c)
 add_library(resources_c4 STATIC resources4.c)
 add_library(resources_c5 STATIC resources5.c)
 add_library(resources_c6 STATIC resources6.c)
+add_library(resources_c7 STATIC resources7.c)
 
 
 
@@ -76,3 +78,10 @@ add_custom_command(
         COMMAND mv resources.c resources6.c
         COMMAND sed -i 's/ddm_c6/ddm/g' resources6.c
         DEPENDS copy_assets ${resources6} embedfiles)
+
+add_custom_command(
+        OUTPUT resources7.c
+        COMMAND embedfiles ${resources7}
+        COMMAND mv resources.c resources7.c
+        COMMAND sed -i 's/ddm_c7/ddm/g' resources7.c
+        DEPENDS copy_assets ${resources7} embedfiles)
