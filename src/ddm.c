@@ -63,8 +63,13 @@ static int *get_pairs(clingo_model_t const *model)
 
 		char *atom = str + 7; // skip run_on(
 		char *snd, *end;
-		int idx = (int)strtol(atom, &snd, 10);
-		pairs[idx] = (int)strtol(++snd, &end, 10);
+
+		if(str[0] == 'r' && str[1] == 'u' && str[2] == 'n' ){
+			//printf("ATOM %s\n",str);
+			int idx = (int)strtol(atom, &snd, 10);
+			pairs[idx] = (int)strtol(++snd, &end, 10);
+			//printf("IDX:%u VAL:%u\n", idx, pairs[idx]);
+		}
 	}
 
 	// number of atoms in the model
