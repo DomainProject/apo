@@ -18,10 +18,10 @@ for i in sims:
     solver = '-'.join(f.split('-')[:-1])
     file=open(path+'/'+f)
     l1 = None
-    l2 = None
     for line in file.readlines():
-      l1 = l2
-      l2 = line.strip()
+      line = line.strip()
+      if "WT" not in line: continue
+      l1 = line.strip()
     file.close()
     if l1 == None: continue
     if l1 == '': continue
