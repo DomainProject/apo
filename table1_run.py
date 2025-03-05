@@ -46,7 +46,6 @@ operations_map = {
    "ddm_c4":                  DdmOperations,
    "ddm_c5":                  DdmOperations,
    "ddm_c6":                  DdmOperations,
-   "ddm_c7":                  DdmOperations,
    "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,
@@ -69,22 +68,8 @@ else:
 evaluate_all = False
 to_be_evaluated_assignments = []
 
-if len(sys.argv) == 4:
-    evaluate_all = True
-    to_be_evaluated_assignments = itertools.product(sim_state.get_cunits_data().keys(), repeat=sim_state.get_num_actors())
-    if len(ground_truth) > 0:
-        text = input("There is a solutions file. Should overwrite it?[y/n]")
-        if text != "y":
-            print(f"supplied {text} != y. exiting")
-            exit(1)
-        else:
-            print(f"supplied {text} == y. overwriting")
-
-    fsolutions = open(fsolutions, 'w')
-    processes = int(sys.argv[3])
-else:
-    to_be_evaluated_assignments = [None]
-    processes = 1
+to_be_evaluated_assignments = [None]
+processes = 1
 results = {}
 
 who_am_i = 0
@@ -129,18 +114,14 @@ for current_assignment in to_be_evaluated_assignments:
             sim_state.init_simulator_queue()
             operations = NullOperations(sim_state)
             rebalance_period = 4
-            cur_reb_period = rebalance_period
-    else:
-        print(f"BEGIN SIMULATION LOOP")
     
     skip = skip_filter or skip_parallel
     if not skip: 
         results[tuple(sim_state.get_assignment())] = []
-        wct_ts = metasimulation.SimulationEngine.simloop.loop(sim_state, evaluate_all, maximum_th, ground_truth, rebalance_period, operations, results)
+        wct_ts = metasimulation.SimulationEngine.simloop.loop(sim_state, evaluate_all, maximum_th, ground_truth, rebalance_period, operations, results, rebalance_max_cnt=7)
 
     # build application.py for throughput estimator
     if not evaluate_all:
-        print(f"END SIMULATION LOOP QUEUE EMPTY {not Simulator.is_there_any_pending_evt()} @ CAN_END {sim_state.get_can_end()} @ WT {wct_ts} @ GVT {sim_state.get_gvt()}")
         break
     else:
         if not skip:
@@ -172,8 +153,6 @@ for current_assignment in to_be_evaluated_assignments:
             print(f"\r{evaluated_tests}/{all_tests_count} - {'{:.2f}'.format(skipped_fil * processes /evaluated_tests)} "+
                   f"{'{:.2f}'.format(estimated_filter_skipped/all_tests_count)} ETA {eta_days}d:{eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
                   f"SINGLE TEST {'{:.2f}'.format(curr_exec_time)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
-
-        #print(current_assignment, results[current_assignment]) 
 
 if who_am_i == (processes -1):
     for pid in childs:

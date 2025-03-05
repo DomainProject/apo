@@ -2,10 +2,14 @@
 
 import sys
 
-if len(sys.argv) != 4:
+if len(sys.argv) < 4:
   print("Missing parameters",sys.argv)
-  print("CMD should be: cmd < num_actors>0 > < svt_end>0 > < fan_out_period!=0 (default <0=infty) >")
+  print("CMD should be: cmd < num_actors>0 > < svt_end>0 > < fan_out_period!=0 (default <0=infty) > [actor_id (0,num_actors-1)]")
   exit(1)
+
+actor_wall = -1
+if len(sys.argv) == 5:
+  actor_wall = int(sys.argv[4])
 
 num_actors = int(sys.argv[1])
 svt_end    = int(sys.argv[2])
@@ -21,7 +25,9 @@ else:
   print(f"|- 1 Outbound EVT Period: {fan_out_per}")
 print(f"|- Last TS: {svt_end}")
 
-ofile=f"lp_{num_actors}-end_time_{svt_end}-fanout_{fan_out_per}.trace"
+ofile=f"lp_{num_actors}-end_time_{svt_end}-fanout_{fan_out_per}"
+if actor_wall > 0: ofile+=f"_{actor_wall}"
+ofile+=".trace"
 
 print(f"Writing output file '{ofile}'")
 
@@ -31,7 +37,8 @@ for i in range(1,svt_end):
   for a in range(num_actors):
     f.write(f"{i},{a},{i+1},{a}\n")
     if (i % fan_out_per) == 0 and fan_out_per > 0:
-      f.write(f"{i},{a},{i+0.1},{(a+1)%num_actors}\n")
+      if actor_wall < 0 or a != actor_wall:
+        f.write(f"{i},{a},{i+0.1},{(a+1)%num_actors}\n")
 f.close()
 
 print("Done")  

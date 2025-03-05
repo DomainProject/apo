@@ -1,15 +1,13 @@
-from metasimulation.SimulationParameters.hardware import *
-
+from metasimulation.SimulationEngine.runtime_modules import hardware_parameter_module
 
 # UTILITY FUNCTIONS
 
 # creates an array of computing unit labels
 def build_cunits():
-    res = []
-    for k in cu_types:
-        res += [f"{k}_{v}" for v in range(cu_types[k]['num_units'])]
-    return res
-
+  res = []
+  for k in sorted(hardware_parameter_module.cu_types.keys()):
+      res += [f"{k}_{v}" for v in range(hardware_parameter_module.cu_types[k]['num_units'])]
+  return res
 
 # get device type from computing unit
 def get_dev_from_cu(cu_unit_label):
@@ -28,19 +26,16 @@ def on_same_unit(assignment, i, j):
 
 # get latency for communicating between two devices
 def get_communication_latency(cu_a, cu_b):
-    if cu_a == cu_b:
-        return comm_unitary_cost / 2
-    return communication_costs[get_dev_from_cu(cu_a)][get_dev_from_cu(cu_b)] * comm_unitary_cost
-
+  if cu_a == cu_b:  return hardware_parameter_module.comm_unitary_cost/2
+  return hardware_parameter_module.communication_costs[get_dev_from_cu(cu_a)][get_dev_from_cu(cu_b)]*hardware_parameter_module.comm_unitary_cost
 
 def get_relative_speed(cu_a):
-    return cu_types[get_dev_from_cu(cu_a)]['relative_speed']
-
+  return hardware_parameter_module.cu_types[get_dev_from_cu(cu_a)]['relative_speed']
 
 def get_capacity_vector():
     res = []
-    for k in cu_types:
-        res += [cu_types[k]['capacity_cu']] * cu_types[k]['num_units']
+    for k in build_cunits():
+        res += [get_relative_speed(k)]
     return res
 
 
@@ -65,9 +60,9 @@ def convert_metis_assignment_to_sim_assingment(partition):
     sorted_indices = sorted(count_dict.keys(), key=lambda x: count_dict[x], reverse=True)
 
     unit_mapping = {index: cunits[i] for i, index in enumerate(sorted_indices)}
-
     assign = [unit_mapping[i] for i in partition]
 
+    #print(partition)
     # round robin assignement
     # assign = [cunits[i] for i in partition]
     return assign

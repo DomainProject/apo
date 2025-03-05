@@ -18,7 +18,6 @@ print(f"|- #Actors:{num_actors}")
 print(f"|- Last TS: {svt_end}")
 
 ofile=f"phold_lp_{num_actors}-end_time_{svt_end}-send_prob_{send_prob}.trace"
-
 print(f"Writing output file '{ofile}'")
 
 actors = []

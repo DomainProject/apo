@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <math.h>
+#include <string.h>
 #include "utils.h"
 
 
@@ -103,21 +104,38 @@ Edge * createEdges(idx_t actors, real_t comm_cost_matrix[actors][actors],
     // Determine which matrix to use
     real_t (*matrix)[actors][actors] = (comm_cost_matrix == NULL) ? anno_matrix : comm_cost_matrix;
 
-
+    int only_self_edges = 1;
+    for (int i=0; i < actors; i++) {
+        for (int j = i+1; j < actors; j++) {
+            if ((*matrix)[i][j] > 0) {
+                only_self_edges = 0;
+                break;
+            }
+        }
+    }
 
     int k = 0;
     for (int i = 0; i < actors; i++) {
         for (int j = i+1; j < actors; j++) {
-            if ((*matrix)[i][j] > 0.0 && i != j) {  // Only consider valid edges
+            if ((*matrix)[i][j] > 0.0 && i != j) {  // Only consider valid edges but consider self-edges
                 //printf("Original value at [%d][%d] = %.6f\n", i, j, (*matrix)[i][j]);
                 edges[k].src = i;
                 edges[k].dest = j;
-                real_t avg = ((*matrix)[i][j] + (*matrix)[j][i]) / 2.0f;
+                real_t avg = fmax(((*matrix)[i][j] + (*matrix)[j][i] + 1.0f) / 2.0f, 0.0f);
+                //real_t avg = ((*matrix)[i][j] + (*matrix)[j][i] / 2.0f > 1) ? ((*matrix)[i][j] + (*matrix)[j][i]) / 2.0f : 1.0;
                 edges[k].weight = scale_weight(avg, SCALE);
 
                 PRINTER() printf("edges SRC %ld \t DEST %ld WEIGHT %ld (from comm_matrix[i][j] %.6f)\n", edges[k].src, edges[k].dest, edges[k].weight, (*matrix)[i][j]);
                 k++;
             }
+        }
+    }
+
+    if (only_self_edges) {
+        for (int i = 0; i < k; i++) {
+            edges[k].src = 0;
+            edges[k].dest = 0;
+            edges[i].weight = 0;
         }
     }
     *edge_count = k;  // Store the total number of edges
@@ -132,9 +150,9 @@ Edge * createEdges(idx_t actors, real_t comm_cost_matrix[actors][actors],
 /// Function to generate CSR representation
 void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t **adjncy, idx_t **adjwgt) {
     /// Allocate memory for CSR arrays
-    *xadj = malloc((nVertices + 1) * sizeof(idx_t));
-    *adjncy = malloc(2 * nEdges * sizeof(idx_t)); // 2*nEdges for undirected graphs
-    *adjwgt = malloc(2 * nEdges * sizeof(idx_t));
+    *xadj = calloc((nVertices + 1), sizeof(idx_t));
+    *adjncy = calloc(2 * nEdges, sizeof(idx_t)); // 2*nEdges for undirected graphs
+    *adjwgt = calloc(2 * nEdges , sizeof(idx_t));
 
     if (!*xadj || !*adjncy || !*adjwgt) {
         fprintf(stderr, "Memory allocation failed.\n");
@@ -170,7 +188,8 @@ void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t
 
     // Temporary array to track insertion position
     idx_t *temp = malloc(nVertices * sizeof(idx_t));
-    for (int i = 0; i < nVertices; i++) {
+    memcpy(temp, *xadj, (nVertices + 1) * sizeof(idx_t));
+    for (int i = 0; i <= nVertices; i++) {
         temp[i] = (*xadj)[i];
     }
 
@@ -187,6 +206,15 @@ void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t
         (*adjncy)[temp[src]++] = dest;
         (*adjncy)[temp[dest]++] = src; // For undirected graph
 
+        /*(*adjwgt)[temp[src]] = w;
+        (*adjncy)[temp[src]] = dest;
+        temp[src]++;
+
+        (*adjwgt)[temp[dest]] = w;
+        (*adjncy)[temp[dest]] = src;
+        temp[dest]++;*/
+
+        PRINTER() printf("src %ld : weight source %ld --- dest %ld : weight dest %ld\n", src, (*adjwgt)[(*xadj)[src]],dest, (*adjwgt)[(*xadj)[dest]]);
         PRINTER() printf("weight edges %d -- %d -- %d \n", w, temp[src], temp[dest]);
     }
 
@@ -197,13 +225,13 @@ void generateCSR(idx_t nVertices, idx_t nEdges, Edge *edges, idx_t **xadj, idx_t
 
 idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, idx_t **new_vwgt) {
 
-    idx_t *new_xadj = (idx_t *)malloc((nVertices*cus + 1) * sizeof(idx_t));
+    idx_t *new_xadj = (idx_t *)calloc((nVertices*cus + 1), sizeof(idx_t));
     if (!new_xadj) {
         fprintf(stderr, "Allocation error for new_xadj \n");
         exit(1);
     }
 
-    *new_vwgt = (idx_t *)malloc((nVertices*cus + 1) * sizeof(idx_t));
+    *new_vwgt = (idx_t *)calloc((nVertices*cus + 1), sizeof(idx_t));
     if (!*new_vwgt) {
         fprintf(stderr, "Allocation error for new_vwgt \n");
         exit(1);
@@ -216,7 +244,7 @@ idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, id
         for (int j = 0; j < cus; j++) {
             new_xadj[i*cus + j + 1] = (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j];
             (*new_vwgt)[i*cus + j + 1] = vwgt[i];
-            PRINTER() printf("[populate_newxadj] i %ld \t j %ld \t value %ld\n", i, j, (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j]);
+            PRINTER() printf("[populate_newxadj] i %d \t j %d \t value %ld\n", i, j, (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j]);
 
         }
     }
@@ -225,16 +253,16 @@ idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, id
 }
 
 
-idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt) {
+idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt, idx_t msg_exch_cost[cus][cus]) {
 
-    idx_t *new_adjncy = (idx_t *) malloc(maxEdges * sizeof(idx_t));
+    idx_t *new_adjncy = (idx_t *) calloc(maxEdges, sizeof(idx_t));
     if (!new_adjncy) {
         fprintf(stderr, "Allocation error for new_adjncy \n");
         exit(1);
     }
 
 
-    *new_adjwgt = (idx_t *)malloc(maxEdges * sizeof(idx_t));
+    *new_adjwgt = (idx_t *)calloc(maxEdges, sizeof(idx_t));
     if (!*new_adjwgt) {
         fprintf(stderr, "Allocation error for new_adjwgt \n");
         exit(1);
@@ -250,12 +278,12 @@ idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xad
 
                         index = new_xadj[i*cus+h] + (j-s)*cus + k;
                         if (index >= maxEdges || index < 0) {
-                            fprintf(stderr, "Error: Index %ld out of bounds (maxEdges = %d)\n", index, maxEdges);
+                            fprintf(stderr, "Error: Index %ld out of bounds (maxEdges = %ld)\n", index, maxEdges);
                             exit(EXIT_FAILURE);
                      }
                         new_adjncy[index] = adjncy[j]*cus+k;
-                        PRINTER() printf("[populate_newadjncy] i %ld \t j %ld \t (h,k) (%ld, %ld) \t new_xadj[i*cus+h] %ld \t (j-s)*cus + k %ld \t index %ld \t value %ld\n", i, j, h, k, new_xadj[i*cus+h], (j-s)*cus + k, index, adjncy[j]*cus+k);
-                        (*new_adjwgt)[index] = adjwgt[j];
+                        PRINTER() printf("[populate_newadjncy] i %d \t j %ld \t (h,k) (%d, %d) \t new_xadj[i*cus+h] %ld \t (j-s)*cus + k %ld \t index %ld \t value %ld \t adjwgt[j] * msg_exch_cost[h][k] %ld \n", i, j, h, k, new_xadj[i*cus+h], (j-s)*cus + k, index, adjncy[j]*cus+k, adjwgt[j] * msg_exch_cost[h][k]);
+                        (*new_adjwgt)[index] = adjwgt[j] * msg_exch_cost[h][k];
 
                 } ///end for k
                 for (int l = 0; l < h; l++) {
@@ -312,7 +340,7 @@ real t ubvec, idx t *options, idx t *objval, idx t *part)
  * */
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
-    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t **partition, int remap)
+    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t *alpha, idx_t **partition, int remap)
 {
 
     idx_t ncon = 1;
@@ -339,7 +367,9 @@ void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
 
     if (status == METIS_OK) {
 
-        PRINTER() printf("EDGE CUT %ld \n", edgeCut);
+        *alpha = (edgeCut == 0) ? 1 : xadj[nVertices] / (edgeCut + 1);
+
+        PRINTER() printf("EDGE CUT %ld \t total edges %ld \t ratio %ld  n", edgeCut, xadj[nVertices], (idx_t) (xadj[nVertices]/edgeCut));
         if (!remap) {
             PRINTER() print_partition(nVertices, *partition);
         } else {

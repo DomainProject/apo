@@ -1,3 +1,6 @@
+METIS/
+res_path/
+GKlib/
 __pycache__
 cmake-build-debug/
 *.trace

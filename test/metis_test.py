@@ -1,11 +1,11 @@
 import sys
 import os
 
-from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
-from src.metis import ddmmetis_init, metis_partitioning, metis_get_partitioning
+from metasimulation.SimulationModel.hardware import convert_metis_assignment_to_sim_assingment
+from src.metis import ddmmetis_init, metis_heterogeneous_multilevel, metis_get_partitioning
 
 
 
@@ -42,12 +42,13 @@ def test_metis():
 
     tasks_forecast = [50, 50, 50, 50, 20, 50, 50, 80, 10, 10]
 
-    # first component of each actor is the annoyance
-    anno_matrix = [[actor[0] for actor in row] for row in actors]
-    # second component of each actor is the communication cost
-    comm_matrix = [[actor[1] for actor in row] for row in actors]
+    
+    print("annoyance ", anno_matrix)
+    print("communication", comm_matrix)
 
-    metis_partitioning(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix)
+    speed = [1, 1, 4, 2]
+
+    metis_heterogeneous_multilevel(total_actors, total_cus, tasks_forecast, cu_capacity, comm_matrix, anno_matrix, msg_exch_cost, speed)
 
     part = metis_get_partitioning()
 

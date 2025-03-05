@@ -30,6 +30,7 @@ class State():
     _actors = []
     _pending_assigment = []
     _gvt = -1-0
+    _executed_events_per_actor = []
 
     def __init__(self, path, assignment=None, verbose=True, traces=None):
         self._verbose = verbose
@@ -50,6 +51,7 @@ class State():
             self._communication_matrix += [[]]
             self._total_aborts += [0]
             self._round_aborts += [0]
+            self._executed_events_per_actor += [0]
             for j in range(self._num_actors):
                 self._annoyance_matrix[i] += [0]
                 self._communication_matrix[i] += [0]
@@ -60,14 +62,9 @@ class State():
         cu_units = sorted(hardware.build_cunits())
         if self._verbose: print("Done")
 
-<<<<<<< HEAD
         if self._verbose: print(f"Building computing units...", end='')
         for k in cu_units:    
-=======
-        print(f"Building computing units...", end='')
-        for k in cu_units:
->>>>>>> metis-integration-2
-            self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0}
+            self._cu_units_data[k] = {'last_wct': 0, "queue": [], "len": 0, "executed": 0}
         if self._verbose: print("Done")
 
         if self._verbose: print(f"Building assignment...", end='')
@@ -76,7 +73,7 @@ class State():
             for k in range(self._num_actors):
                 self._assignment += [cu_units[cnt]]
                 cnt = (cnt + 1) % len(cu_units)
-            self._assignment = ['cpu_0'] * self._num_actors #, 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
+            #self._assignment = ['cpu_0'] * self._num_actors #, 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0']
             if self._verbose: print(self._assignment)
         else:
             self._assignment = assignment
@@ -148,7 +145,7 @@ class State():
 
         min_cmt = min(cnt)
         max_cmt = max(cnt)
-        if min_cmt != max_cmt and False:
+        if min_cmt != max_cmt and False: 
             print(self._gvt)
             for cu in self._cu_units_data:
                 for a in self._cu_units_data[cu]['queue']:
@@ -165,27 +162,27 @@ class State():
         for i in range(len(self._round_aborts)):
             self._round_aborts[i] = 0
         #print("EVT ABORTED TOTAL", self._total_aborts)
-
-
+        
+        
 
         return sum(cnt)
 
 
-    def serialize_stat(self, wct_ts):
+    def serialize_stat(self, wct_ts): 
         comm = []
-        anno_matrix = []
-
+        anno = []      
+        
         for i in range(self._num_actors):
             comm += [[]]
-            anno_matrix += [[]]
+            anno += [[]]
             for j in range(self._num_actors):
                 comm[i] += [0]
-                anno_matrix[i] += [0]
+                anno[i] += [0]
 
         for i in range(self._num_actors):
             for j in range(self._num_actors):
                 comm[i][j] = self._communication_matrix[i][j]/wct_ts
-                anno_matrix[i][j] = self._annoyance_matrix[i][j]/wct_ts
+                anno[i][j] = self._annoyance_matrix[i][j]/wct_ts
 
         f = open('application.py', 'w')
         f.write(f"num_actors        = {self._num_actors}       \n")
@@ -202,7 +199,7 @@ class State():
 
         f.write(f"anno_matrix      = [\n")
         for i in range(self._num_actors):
-            f.write(f"{anno_matrix[i]}")
+            f.write(f"{anno[i]}")
             if i != self._num_actors - 1:        f.write(f",")
             f.write(f"\n")
         f.write(f"]\n")
@@ -219,7 +216,7 @@ def load_trace(path):
     traces = {}
     cnt=0
     for line in f.readlines():
-        if cnt == 0 and ',' in line:
+        if cnt == 0 and ',' in line: 
             cnt+=1
             continue
         if cnt != 0 and ',' in line:

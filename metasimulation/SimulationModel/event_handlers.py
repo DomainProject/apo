@@ -28,7 +28,8 @@ def begin_exec(sim_state, cur_cu, queue, last_wct):
 
     end_exe_wct = last_wct
     end_exe_wct += float(global_constants.task_unit_costs)/hardware_model.get_relative_speed(cur_cu)  # simulate execution
-
+    sim_state._executed_events_per_actor[actor_id] += 1
+    sim_state._cu_units_data[cur_cu]["executed"] += 1
 
     # just for knowing if all actors have been initiated
     if vts == 0:

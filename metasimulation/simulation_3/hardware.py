@@ -5,8 +5,8 @@ cu_types = {
     #'capacity_cu':4,          # per computing unit capacity in terms of task units before being overloaded
     #'overload_penalty':10    # slowing factor for running as overloaded
     },
-'gpu' : {'num_units':1, 'relative_speed':4}, # , 'capacity_cu':2, 'overload_penalty': 30},
-'fpga': {'num_units':1, 'relative_speed':2} # , 'capacity_cu':2, 'overload_penalty': 60},
+'gpu' : {'num_units':1, 'relative_speed':1}, # , 'capacity_cu':2, 'overload_penalty': 30},
+'fpga': {'num_units':1, 'relative_speed':1}, # , 'capacity_cu':2, 'overload_penalty': 60},
 }
 
 comm_unitary_cost =  0.020   # MILLISECONDS to send a task with the faster communication channel
@@ -17,21 +17,7 @@ for k1 in cu_types:
   communication_costs[k1] = {}
   for k2 in cu_types:
     communication_costs[k1][k2] = 1                     # slowing factor for communication: xpu1->xpu1 fastest
-    if k1 == 'gpu'  and k2 == 'cpu': communication_costs[k1][k2] = 5    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-    if k2 == 'gpu'  and k1 == 'cpu': communication_costs[k1][k2] = 5    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-
-    if k1 == 'fpga' and k2 == 'cpu': communication_costs[k1][k2] = 10    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-    if k2 == 'fpga' and k1 == 'cpu': communication_costs[k1][k2] = 10    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-
-    if k1 == 'fpga' and k2 == 'gpu': communication_costs[k1][k2] = 20    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-    if k2 == 'fpga' and k1 == 'gpu': communication_costs[k1][k2] = 20    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
-
-    
-
-# 4 cpu 1 1
-# attori 100
-
-
-# percentuale hot spot 10%
-# ogni 10 invia evento foglia
-
+    if k1 != 'cpu' and k2 == 'cpu': communication_costs[k1][k2] += 2    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
+    if k2 != 'cpu' and k1 == 'cpu': communication_costs[k1][k2] += 2    #                                   cpu->xpu and xpu->cpu have communication cost multiplied by 2
+    if k1 != 'cpu' and k2 != 'cpu': communication_costs[k1][k2] += 4    #                                   xpu1->xpu2  have communication cost multiplied by 4 when xpu1 and xpu2 are not cpus
+    if k1 == k2: communication_costs[k1][k2] = 1

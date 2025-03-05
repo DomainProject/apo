@@ -8,9 +8,9 @@
 #define N_CUS 4
 #define NUM_ACTORS 10
 #define MAX_WEIGHT 10000L
-#define SCALE 100.0
+#define SCALE 1.0
 
-#define PRINTER() if (0)
+#define PRINTER() if (1)
 
 //extern idx_t actors;
 extern idx_t avg_edge_wgt;
@@ -39,8 +39,8 @@ void print_csr_graph(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, i
 idx_t * remap_partitioning(idx_t nVertices, idx_t cus, idx_t *part);
 
 idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, idx_t **new_vwgt);
-idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt);
+idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xadj, idx_t *new_xadj, idx_t *adjncy, idx_t *adjwgt, idx_t **new_adjwgt, idx_t msg_exch_cost[cus][cus]);
 
 
 void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt, idx_t *vsize, idx_t *adjwgt,
-    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t **partition, int remap);
+    idx_t nParts, real_t *tpwgts, real_t *ubvec, idx_t ubfactor, idx_t *alpha, idx_t **partition, int remap);
