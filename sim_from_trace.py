@@ -32,7 +32,7 @@ import metasimulation.SimulationEngine.simloop
 
 
 import time
-import math 
+import math
 
 
 sim_state = SimulationState(simulation_trace, verbose=(len(sys.argv) != 4))
@@ -40,20 +40,13 @@ sim_state.init_simulator_queue()
 
 operations_map = {
    "ddm":                     DdmOperations,
-   "ddm_c1":                  DdmOperations,
-   "ddm_c2":                  DdmOperations,
-   "ddm_c3":                  DdmOperations,
-   "ddm_c4":                  DdmOperations,
-   "ddm_c5":                  DdmOperations,
-   "ddm_c6":                  DdmOperations,
-   "ddm_c7":                  DdmOperations,
    "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,
    "metis-hete-comm":      MetisCommunicationOperations,
    "metis-homo-comm":      MetisHomogeneousCommunicationOperations,
    "metis-homo-node":      MetisHomogeneousNodesOperations,
-    
+
 }
 
 if wops_string not in operations_map:
@@ -62,7 +55,7 @@ if wops_string not in operations_map:
 
 maximum_th, ground_truth = load_ground_truth(fsolutions)
 if "ddm" in wops_string and "c" in wops_string:
-    operations = operations_map[wops_string](sim_state, ddm_conf=int(wops_string[-1]))    
+    operations = operations_map[wops_string](sim_state, ddm_conf=int(wops_string[-1]))
 else:
     operations = operations_map[wops_string](sim_state)
 
@@ -92,7 +85,7 @@ childs = []
 if processes > 1:
     print("simulated cases /total cases - skipped by fiter actual expected ETA dd:hh:mm:ss")
     for i in range(processes-1):
-        pid = os.fork() 
+        pid = os.fork()
         if pid > 0:
             who_am_i += 1
             childs += [pid]
@@ -107,8 +100,8 @@ skipped_fil = 0
 start_time = 0
 sum_elapsed = 0
 all_tests_count = len(sim_state.get_cunits_data().keys())**sim_state.get_num_actors()
-estimated_filter_speedup = estimate_filter_reduction(sim_state.get_cunits_data().keys()) 
-estimated_filter_skipped = all_tests_count/estimated_filter_speedup 
+estimated_filter_speedup = estimate_filter_reduction(sim_state.get_cunits_data().keys())
+estimated_filter_skipped = all_tests_count/estimated_filter_speedup
 very_start_time = time.time()
 
 for current_assignment in to_be_evaluated_assignments:
@@ -132,9 +125,9 @@ for current_assignment in to_be_evaluated_assignments:
             cur_reb_period = rebalance_period
     else:
         print(f"BEGIN SIMULATION LOOP")
-    
+
     skip = skip_filter or skip_parallel
-    if not skip: 
+    if not skip:
         results[tuple(sim_state.get_assignment())] = []
         wct_ts = metasimulation.SimulationEngine.simloop.loop(sim_state, evaluate_all, maximum_th, ground_truth, rebalance_period, operations, results)
 
@@ -160,7 +153,7 @@ for current_assignment in to_be_evaluated_assignments:
 
         if skipped != evaluated_tests:
             curr_exec_time = sum_elapsed/(evaluated_tests-skipped)
-            eta_max_sec = remaining*curr_exec_time 
+            eta_max_sec = remaining*curr_exec_time
             eta_seconds = remaining * (curr_exec_time) / (processes * estimated_filter_speedup)
             eta_minutes = math.floor(eta_seconds/60.0)
             eta_seconds -= eta_minutes*60
@@ -173,7 +166,7 @@ for current_assignment in to_be_evaluated_assignments:
                   f"{'{:.2f}'.format(estimated_filter_skipped/all_tests_count)} ETA {eta_days}d:{eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
                   f"SINGLE TEST {'{:.2f}'.format(curr_exec_time)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
 
-        #print(current_assignment, results[current_assignment]) 
+        #print(current_assignment, results[current_assignment])
 
 if who_am_i == (processes -1):
     for pid in childs:

@@ -14,9 +14,9 @@ num_classifiers = int(sys.argv[4])
 
 # These represent base durations for each type of task.
 # We will add random variability around these base durations.
-TILE_BASE_DURATION         = 0.01
-CLASSIFICATION_BASE_DURATION= 0.03
-BOUNDING_BASE_DURATION     = 0.05
+TILE_BASE_DURATION         = 1.01
+CLASSIFICATION_BASE_DURATION= 3.03
+BOUNDING_BASE_DURATION     = 5.05
 
 # We can also define a small variation range (fraction of base duration)
 # to apply as uniform noise around the base.
