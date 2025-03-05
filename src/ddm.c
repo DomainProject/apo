@@ -6,7 +6,7 @@
 #include "dynstr.h"
 #include "lp/assets.h"
 
-#define TIMEOUT 10
+#define TIMEOUT 15
 #define USE_ASSETS
 
 #ifndef USE_ASSETS
@@ -181,7 +181,7 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 		}
 	}
 
-//#ifndef USE_ASSETS
+#ifndef USE_ASSETS
 	FILE *file = fopen("ddm_tmp.asp", "w");
 	if(file == NULL) {
 		perror("Error opening file");
@@ -189,13 +189,13 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 	}
 	fprintf(file, "%s\n", dynstr_getbuff(clingo_program_buffer));
 	fclose(file);
-//#endif
+#endif
 
 	// initialize clingo w/program in prog_buff
 	const char *argv[] = {"--opt-mode", "opt"};
 	const int argc = 2;
-	//init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_async | clingo_solve_mode_yield, &cctx);
-	init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_yield, &cctx);
+	init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_async | clingo_solve_mode_yield, &cctx);
+//	init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_yield, &cctx);
 
 	// get the first model
 	if(!clingo_solve_handle_resume(cctx->handle)) {
@@ -209,23 +209,22 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 	// 1. invoke clingo & get the optimal as
 	static clingo_model_t const *model = NULL;
 	clingo_model_t const *tmp_model = NULL;
-	//bool result;
-
-	// bool proven;
-	// size_t costs_size = 3;
-	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
+	bool result;
+//
+//	 bool proven;
+//	 size_t costs_size = 3;
+//	 int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
 
 	// poll clingo to check if a result is ready
-	//clingo_solve_handle_wait(cctx->handle, 0, &result);
+	clingo_solve_handle_wait(cctx->handle, 0, &result);
 
-	while (true) {
-    	if (!clingo_solve_handle_resume(cctx->handle)) { goto error; }
-    	if (!clingo_solve_handle_model(cctx->handle, &tmp_model)) { goto error; }
-	    if (!tmp_model) { break; }
-	    else model = tmp_model;
-  	}
+//	while (true) {
+//    	if (!clingo_solve_handle_resume(cctx->handle)) { goto error; }
+//    	if (!clingo_solve_handle_model(cctx->handle, &tmp_model)) { goto error; }
+//	    if (!tmp_model) { break; }
+//	    else model = tmp_model;
+//  	}
 
-	/*
 	// check whether the search has finished
 	if(result) {
 		if(!clingo_solve_handle_model(cctx->handle, &tmp_model)) {
@@ -254,19 +253,19 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 		// the optimal model
 		// 2. extract pairs <actor,cu> from the as (run_on/2 facts)
 		return get_pairs(model);
-	}*/
+	}
 
-	return get_pairs(model);
+//	return get_pairs(model);
 
 	// no result (yet)
-	//return NULL;
+	return NULL;
 error:
 	perror(clingo_error_message());
 	exit(clingo_error_code());
 	return NULL;
 }
 
-/*
+
 int *ddm_poll(void)
 {
 	static time_t last_call = 0;
@@ -295,12 +294,12 @@ int *ddm_poll(void)
 	}
 	return ret;
 }
-*/
 
-int *ddm_poll(void){
-  int *ret = ddm_poll_internal(true);
-  // free the solve handle
-  free_clingo(cctx);
-  dynstr_fini(&clingo_program_buffer);
-  return ret;
-}
+//
+//int *ddm_poll(void){
+//  int *ret = ddm_poll_internal(true);
+//  // free the solve handle
+//  free_clingo(cctx);
+//  dynstr_fini(&clingo_program_buffer);
+//  return ret;
+//}

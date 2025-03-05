@@ -1,0 +1,62 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_4/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_4/global_constants.py into module global_constants
+trace found (metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace)
+Loading trace metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace...Done
+Building annoyance_matrix and communication_matrix for 8 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+loading ground truth metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace.solutions...end
+Found optimal solution 38.6525
+initialize Random...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 1810.2072918840927 COM 17439 TH (com per msec) 34.878 MAX TH 38.6525
+WT 1000 GVT 3597.766530795887 COM 16622 TH (com per msec) 33.244 MAX TH 38.6525
+WT 1500 GVT 5414.391290960996 COM 17004 TH (com per msec) 34.008 MAX TH 38.6525
+WT 2000 GVT 7199.574852591571 COM 16925 TH (com per msec) 33.85 MAX TH 38.6525
+WT 2500 GVT 9028.96427186235 COM 17333 TH (com per msec) 34.666 MAX TH 38.6525
+new binding: ['fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_1', 'cpu_1'] renamed below
+new binding: ['fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_1', 'cpu_1'] expected th 25.4865 vs max th 38.6525
+WT 3000 GVT 10392.88415440799 COM 13094 TH (com per msec) 26.188 MAX TH 38.6525
+WT 3500 GVT 11724.710364340888 COM 12556 TH (com per msec) 25.112 MAX TH 38.6525
+WT 4000 GVT 13063.737739586526 COM 12658 TH (com per msec) 25.316 MAX TH 38.6525
+WT 4500 GVT 14417.464760814495 COM 12671 TH (com per msec) 25.342 MAX TH 38.6525
+WT 5000 GVT 15752.935948434031 COM 12536 TH (com per msec) 25.072 MAX TH 38.6525
+new binding: ['gpu_0', 'fpga_0', 'gpu_0', 'cpu_1', 'fpga_0', 'fpga_0', 'fpga_0', 'cpu_1'] renamed below
+new binding: ['gpu_0', 'fpga_0', 'gpu_0', 'cpu_0', 'fpga_0', 'fpga_0', 'fpga_0', 'cpu_0'] expected th 27.37 vs max th 38.6525
+WT 5500 GVT 17209.01687429149 COM 13556 TH (com per msec) 27.112 MAX TH 38.6525
+WT 6000 GVT 18600.647784144257 COM 13394 TH (com per msec) 26.788 MAX TH 38.6525
+WT 6500 GVT 20046.395087984896 COM 13597 TH (com per msec) 27.194 MAX TH 38.6525
+WT 7000 GVT 21490.52179642912 COM 13365 TH (com per msec) 26.73 MAX TH 38.6525
+WT 7500 GVT 22919.309329000527 COM 13541 TH (com per msec) 27.082 MAX TH 38.6525
+new binding: ['gpu_0', 'gpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'gpu_0', 'cpu_1'] renamed below
+new binding: ['gpu_0', 'gpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'gpu_0', 'cpu_1'] expected th 26.834999999999997 vs max th 38.6525
+WT 8000 GVT 24356.687176652846 COM 13408 TH (com per msec) 26.816 MAX TH 38.6525
+WT 8500 GVT 25793.951015729202 COM 13595 TH (com per msec) 27.19 MAX TH 38.6525
+WT 9000 GVT 27263.72901248344 COM 13690 TH (com per msec) 27.38 MAX TH 38.6525
+WT 9500 GVT 28691.74562695132 COM 13372 TH (com per msec) 26.744 MAX TH 38.6525
+WT 10000 GVT 30072.38541000494 COM 13164 TH (com per msec) 26.328 MAX TH 38.6525
+new binding: ['fpga_0', 'cpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'gpu_0', 'fpga_0'] renamed below
+new binding: ['fpga_0', 'cpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'gpu_0', 'fpga_0'] expected th 32.147 vs max th 38.6525
+WT 10500 GVT 31770.466351265713 COM 16080 TH (com per msec) 32.16 MAX TH 38.6525
+WT 11000 GVT 33486.88398476582 COM 16096 TH (com per msec) 32.192 MAX TH 38.6525
+WT 11500 GVT 35212.52790173937 COM 16228 TH (com per msec) 32.456 MAX TH 38.6525
+WT 12000 GVT 36930.91530981743 COM 16128 TH (com per msec) 32.256 MAX TH 38.6525
+WT 12500 GVT 38676.355945899864 COM 16436 TH (com per msec) 32.872 MAX TH 38.6525
+new binding: ['fpga_0', 'fpga_0', 'cpu_1', 'cpu_0', 'cpu_1', 'fpga_0', 'cpu_0', 'fpga_0'] renamed below
+new binding: ['fpga_0', 'fpga_0', 'cpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'cpu_1', 'fpga_0'] expected th 29.161499999999997 vs max th 38.6525
+WT 13000 GVT 40253.36542460653 COM 14571 TH (com per msec) 29.142 MAX TH 38.6525
+WT 13500 GVT 41817.126129173776 COM 14502 TH (com per msec) 29.004 MAX TH 38.6525
+WT 14000 GVT 43373.83754231111 COM 14576 TH (com per msec) 29.152 MAX TH 38.6525
+WT 14500 GVT 44925.19722129925 COM 14531 TH (com per msec) 29.062 MAX TH 38.6525
+WT 15000 GVT 46483.313575333894 COM 14638 TH (com per msec) 29.276 MAX TH 38.6525
+new binding: ['gpu_0', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'cpu_1', 'gpu_0'] renamed below
+new binding: ['gpu_0', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'cpu_1', 'gpu_0'] expected th 35.3785 vs max th 38.6525
+WT 15500 GVT 48398.70956340662 COM 17907 TH (com per msec) 35.814 MAX TH 38.6525
+ENDED TRACE FOR Actor(id:0,lvt:49998.81838189442,next:inf)
+END SIMULATION LOOP QUEUE EMPTY False @ CAN_END True @ WT 15935.710000005913 @ GVT 49988.33128266028

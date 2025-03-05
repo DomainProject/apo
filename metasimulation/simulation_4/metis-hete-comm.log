@@ -1,0 +1,91 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_4/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_4/global_constants.py into module global_constants
+trace found (metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace)
+Loading trace metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace...Done
+Building annoyance_matrix and communication_matrix for 8 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+loading ground truth metasimulation/simulation_4/phold_lp_8-end_time_50000_send_prob_0.125.trace.solutions...end
+Found optimal solution 38.6525
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 1810.2072918840927 COM 17439 TH (com per msec) 34.878 MAX TH 38.6525
+WT 1000 GVT 3597.766530795887 COM 16622 TH (com per msec) 33.244 MAX TH 38.6525
+WT 1500 GVT 5414.391290960996 COM 17004 TH (com per msec) 34.008 MAX TH 38.6525
+WT 2000 GVT 7199.574852591571 COM 16925 TH (com per msec) 33.85 MAX TH 38.6525
+WT 2500 GVT 9028.96427186235 COM 17333 TH (com per msec) 34.666 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0'] expected th 16.572499999999998 vs max th 38.6525
+WT 3000 GVT 9905.17946019086 COM 8286 TH (com per msec) 16.572 MAX TH 38.6525
+WT 3500 GVT 10790.878261539565 COM 8297 TH (com per msec) 16.594 MAX TH 38.6525
+WT 4000 GVT 11692.322246544309 COM 8255 TH (com per msec) 16.51 MAX TH 38.6525
+WT 4500 GVT 12604.937419865095 COM 8468 TH (com per msec) 16.936 MAX TH 38.6525
+WT 5000 GVT 13496.482032285665 COM 8251 TH (com per msec) 16.502 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0'] expected th 13.89 vs max th 38.6525
+WT 5500 GVT 14274.572104117977 COM 7072 TH (com per msec) 14.144 MAX TH 38.6525
+WT 6000 GVT 15016.709249130987 COM 6881 TH (com per msec) 13.762 MAX TH 38.6525
+WT 6500 GVT 15775.461061829024 COM 6904 TH (com per msec) 13.808 MAX TH 38.6525
+WT 7000 GVT 16536.506924034933 COM 6934 TH (com per msec) 13.868 MAX TH 38.6525
+WT 7500 GVT 17285.911472596832 COM 6818 TH (com per msec) 13.636 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_1'] expected th 16.5395 vs max th 38.6525
+WT 8000 GVT 18170.301883260658 COM 8389 TH (com per msec) 16.778 MAX TH 38.6525
+WT 8500 GVT 19052.709557696104 COM 8294 TH (com per msec) 16.588 MAX TH 38.6525
+WT 9000 GVT 19935.71275915732 COM 8282 TH (com per msec) 16.564 MAX TH 38.6525
+WT 9500 GVT 20836.10989677589 COM 8298 TH (com per msec) 16.596 MAX TH 38.6525
+WT 10000 GVT 21749.669164388688 COM 8361 TH (com per msec) 16.722 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_0'] expected th 16.572499999999998 vs max th 38.6525
+WT 10500 GVT 22628.957061499364 COM 8291 TH (com per msec) 16.582 MAX TH 38.6525
+WT 11000 GVT 23509.78545175093 COM 8197 TH (com per msec) 16.394 MAX TH 38.6525
+WT 11500 GVT 24405.693779687514 COM 8265 TH (com per msec) 16.53 MAX TH 38.6525
+WT 12000 GVT 25306.88850071199 COM 8254 TH (com per msec) 16.508 MAX TH 38.6525
+WT 12500 GVT 26204.61766737944 COM 8431 TH (com per msec) 16.862 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] expected th 16.52 vs max th 38.6525
+WT 13000 GVT 27122.315412193002 COM 8308 TH (com per msec) 16.616 MAX TH 38.6525
+WT 13500 GVT 28013.74032668698 COM 8291 TH (com per msec) 16.582 MAX TH 38.6525
+WT 14000 GVT 28912.60165065628 COM 8206 TH (com per msec) 16.412 MAX TH 38.6525
+WT 14500 GVT 29801.932033746656 COM 8342 TH (com per msec) 16.684 MAX TH 38.6525
+WT 15000 GVT 30699.161623040844 COM 8272 TH (com per msec) 16.544 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1'] expected th 13.912 vs max th 38.6525
+WT 15500 GVT 31442.382004698688 COM 6964 TH (com per msec) 13.928 MAX TH 38.6525
+WT 16000 GVT 32189.480060446418 COM 6859 TH (com per msec) 13.718 MAX TH 38.6525
+WT 16500 GVT 32940.556789366994 COM 6920 TH (com per msec) 13.84 MAX TH 38.6525
+WT 17000 GVT 33692.11262554517 COM 6841 TH (com per msec) 13.682 MAX TH 38.6525
+WT 17500 GVT 34432.60291886389 COM 6798 TH (com per msec) 13.596 MAX TH 38.6525
+new binding: ['cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] expected th 16.639499999999998 vs max th 38.6525
+WT 18000 GVT 35314.280396047965 COM 8203 TH (com per msec) 16.406 MAX TH 38.6525
+WT 18500 GVT 36211.7590604692 COM 8350 TH (com per msec) 16.7 MAX TH 38.6525
+WT 19000 GVT 37130.04873358683 COM 8452 TH (com per msec) 16.904 MAX TH 38.6525
+WT 19500 GVT 38023.64362106556 COM 8177 TH (com per msec) 16.354 MAX TH 38.6525
+WT 20000 GVT 38922.03889693414 COM 8356 TH (com per msec) 16.712 MAX TH 38.6525
+new binding: ['cpu_1', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] expected th 16.639499999999998 vs max th 38.6525
+WT 20500 GVT 39809.911635445744 COM 8171 TH (com per msec) 16.342 MAX TH 38.6525
+WT 21000 GVT 40702.070423408535 COM 8243 TH (com per msec) 16.486 MAX TH 38.6525
+WT 21500 GVT 41591.41220741684 COM 8293 TH (com per msec) 16.586 MAX TH 38.6525
+WT 22000 GVT 42503.61028149198 COM 8513 TH (com per msec) 17.026 MAX TH 38.6525
+WT 22500 GVT 43413.96640829224 COM 8410 TH (com per msec) 16.82 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'cpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] expected th 16.683 vs max th 38.6525
+WT 23000 GVT 44307.051442952834 COM 8287 TH (com per msec) 16.574 MAX TH 38.6525
+WT 23500 GVT 45199.23047408439 COM 8338 TH (com per msec) 16.676 MAX TH 38.6525
+WT 24000 GVT 46084.91593818277 COM 8236 TH (com per msec) 16.472 MAX TH 38.6525
+WT 24500 GVT 46961.31810858692 COM 8248 TH (com per msec) 16.496 MAX TH 38.6525
+WT 25000 GVT 47862.688593164494 COM 8212 TH (com per msec) 16.424 MAX TH 38.6525
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0', 'cpu_1', 'cpu_0'] expected th 16.545 vs max th 38.6525
+WT 25500 GVT 48768.23117244635 COM 8337 TH (com per msec) 16.674 MAX TH 38.6525
+WT 26000 GVT 49655.43573483375 COM 8270 TH (com per msec) 16.54 MAX TH 38.6525
+ENDED TRACE FOR Actor(id:6,lvt:49998.92209152665,next:inf)
+END SIMULATION LOOP QUEUE EMPTY False @ CAN_END True @ WT 26188.68999980093 @ GVT 49985.27819243471
