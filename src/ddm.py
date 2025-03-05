@@ -12,12 +12,9 @@ last_ddm_total_actors_invocation = -1
 
 _domainddm = None
 
-def ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on, conf=0):
-    global _domainddm    
-    if conf != 0:
-        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm_c{conf}.so')
-    else:
-        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
+def ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on):
+    global _domainddm
+    _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
 
 
     arr_cus = (ctypes.c_int * total_cus)(*cus)

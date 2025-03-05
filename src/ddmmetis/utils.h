@@ -10,7 +10,7 @@
 #define MAX_WEIGHT 10000L
 #define SCALE 1.0
 
-#define PRINTER() if (0)
+#define PRINTER() if (1)
 
 //extern idx_t actors;
 extern idx_t avg_edge_wgt;

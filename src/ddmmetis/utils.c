@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <math.h>
+#include <string.h>
 #include "utils.h"
 
 
@@ -103,7 +104,7 @@ Edge * createEdges(idx_t actors, real_t comm_cost_matrix[actors][actors],
     // Determine which matrix to use
     real_t (*matrix)[actors][actors] = (comm_cost_matrix == NULL) ? anno_matrix : comm_cost_matrix;
 
-    int only_self_edges = 1; 
+    int only_self_edges = 1;
     for (int i=0; i < actors; i++) {
         for (int j = i+1; j < actors; j++) {
             if ((*matrix)[i][j] > 0) {
@@ -243,7 +244,7 @@ idx_t *populate_newxadj(idx_t nVertices, idx_t cus, idx_t *xadj, idx_t *vwgt, id
         for (int j = 0; j < cus; j++) {
             new_xadj[i*cus + j + 1] = (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j];
             (*new_vwgt)[i*cus + j + 1] = vwgt[i];
-            PRINTER() printf("[populate_newxadj] i %ld \t j %ld \t value %ld\n", i, j, (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j]);
+            PRINTER() printf("[populate_newxadj] i %d \t j %d \t value %ld\n", i, j, (xadj[i+1] - xadj[i])*cus+(cus-1) + new_xadj[i*cus + j]);
 
         }
     }
@@ -277,11 +278,11 @@ idx_t *populate_newadjncy(idx_t nVertices, idx_t cus, idx_t maxEdges, idx_t *xad
 
                         index = new_xadj[i*cus+h] + (j-s)*cus + k;
                         if (index >= maxEdges || index < 0) {
-                            fprintf(stderr, "Error: Index %ld out of bounds (maxEdges = %d)\n", index, maxEdges);
+                            fprintf(stderr, "Error: Index %ld out of bounds (maxEdges = %ld)\n", index, maxEdges);
                             exit(EXIT_FAILURE);
                      }
                         new_adjncy[index] = adjncy[j]*cus+k;
-                        PRINTER() printf("[populate_newadjncy] i %ld \t j %ld \t (h,k) (%ld, %ld) \t new_xadj[i*cus+h] %ld \t (j-s)*cus + k %ld \t index %ld \t value %ld \t adjwgt[j] * msg_exch_cost[h][k] %ld \n", i, j, h, k, new_xadj[i*cus+h], (j-s)*cus + k, index, adjncy[j]*cus+k, adjwgt[j] * msg_exch_cost[h][k]);
+                        PRINTER() printf("[populate_newadjncy] i %d \t j %ld \t (h,k) (%d, %d) \t new_xadj[i*cus+h] %ld \t (j-s)*cus + k %ld \t index %ld \t value %ld \t adjwgt[j] * msg_exch_cost[h][k] %ld \n", i, j, h, k, new_xadj[i*cus+h], (j-s)*cus + k, index, adjncy[j]*cus+k, adjwgt[j] * msg_exch_cost[h][k]);
                         (*new_adjwgt)[index] = adjwgt[j] * msg_exch_cost[h][k];
 
                 } ///end for k

@@ -210,7 +210,7 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 	static clingo_model_t const *model = NULL;
 	clingo_model_t const *tmp_model = NULL;
 	//bool result;
-	
+
 	// bool proven;
 	// size_t costs_size = 3;
 	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
@@ -257,7 +257,7 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 	}*/
 
 	return get_pairs(model);
-	
+
 	// no result (yet)
 	//return NULL;
 error:
