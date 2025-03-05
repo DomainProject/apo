@@ -17,7 +17,7 @@ def extract_data(file_path):
         for line in f:
             # Utilizzo di una regex per trovare le parti interessanti:
             # WT <valore> ... TH (com per msec) <valore> ... MAX TH <valore>
-            m = re.search(r'WT\s+(\d+).*?TH\s+\(com per msec\)\s+([0-9.]+).*?MAX TH\s+([0-9.]+)', line)
+            m = re.search(r'GVT\s+(\d+).*?TH\s+\(com per msec\)\s+([0-9.]+).*?MAX TH\s+([0-9.]+)', line)
             if m:
                 wt_val = m.group(1)
                 th_val = m.group(2)
@@ -53,13 +53,14 @@ def main():
                 out.write(f"{wt} {th}\n")
 
     # Generazione del file di script per gnuplot
-    plt_filename = "metasimulation/simulation_4/plot.plt"
+    plt_filename = "plot.plt"
     with open(plt_filename, "w") as plt_file:
         plt_file.write("set terminal pdfcairo enhanced color size 5in,2.5in font \"Linux Libertine, 12\"\n")
         plt_file.write("set output 'output.pdf'\n")
-        plt_file.write("set title 'Plot'\n")
-        plt_file.write("set xlabel 'WT'\n")
-        plt_file.write("set ylabel 'TH (com per msec)'\n")
+        plt_file.write("set xlabel 'Simulation Time'\n")
+        plt_file.write("set ylabel 'Throughput (task/msec)'\n")
+        plt_file.write("set grid y\n")
+        plt_file.write("set key center below\n")
         # Se è stato trovato un valore di riferimento diverso da 0, aggiunge una linea orizzontale
         if overall_ref is not None:
             plt_file.write(f"set arrow from graph 0, first {overall_ref} to graph 1, first {overall_ref} nohead\n")

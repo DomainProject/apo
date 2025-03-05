@@ -1,0 +1,548 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_3/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_3/global_constants.py into module global_constants
+trace found (metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace)
+Loading trace metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace...Done
+Building annoyance_matrix and communication_matrix for 8 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+loading ground truth metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace.solutions...end
+Found optimal solution 88.884
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 1684.0 COM 22102 TH (com per msec) 44.204 MAX TH 88.884
+WT 1000 GVT 3360.0 COM 21994 TH (com per msec) 43.988 MAX TH 88.884
+WT 1500 GVT 5032.0 COM 21948 TH (com per msec) 43.896 MAX TH 88.884
+WT 2000 GVT 6708.0 COM 21997 TH (com per msec) 43.994 MAX TH 88.884
+WT 2500 GVT 8381.0 COM 21955 TH (com per msec) 43.91 MAX TH 88.884
+[6, 4, 0, 0, 0, 0, 0, 0]
+[0, 5, 3, 0, 0, 0, 0, 0]
+[0, 0, 5, 3, 0, 0, 0, 0]
+[0, 0, 0, 5, 3, 0, 0, 0]
+[0, 0, 0, 0, 6, 4, 0, 0]
+[0, 0, 0, 0, 0, 5, 3, 0]
+[0, 0, 0, 0, 0, 0, 5, 3]
+[3, 0, 0, 0, 0, 0, 0, 5]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [16668, 13916, 11706, 13840, 17136, 13884, 11636, 13776]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 3000 GVT 11586.0 COM 39854 TH (com per msec) 79.708 MAX TH 88.884
+WT 3500 GVT 14812.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 4000 GVT 18038.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 4500 GVT 21264.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 5000 GVT 24490.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[7, 4, 0, 0, 0, 0, 0, 0]
+[0, 6, 3, 0, 0, 0, 0, 0]
+[0, 0, 6, 3, 0, 0, 0, 0]
+[0, 0, 0, 6, 3, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 6, 3, 0]
+[0, 0, 0, 0, 0, 0, 6, 3]
+[3, 0, 0, 0, 0, 0, 0, 6]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [39587, 30043, 31239, 29957, 33276, 29996, 31168, 29888]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 5500 GVT 27716.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 6000 GVT 30941.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 6500 GVT 34167.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 7000 GVT 37393.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 7500 GVT 40618.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 6, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 3, 0, 0, 0, 0]
+[0, 0, 0, 6, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 6, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 3]
+[3, 0, 0, 0, 0, 0, 0, 6]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [62505, 46173, 50763, 46086, 49406, 46125, 50693, 46016]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 8000 GVT 43844.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 8500 GVT 47070.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 9000 GVT 50296.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 9500 GVT 53522.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 10000 GVT 56747.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 3, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 3]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [85427, 62302, 70289, 62214, 65534, 62254, 70217, 62146]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 10500 GVT 59973.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 11000 GVT 63199.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 11500 GVT 66425.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 12000 GVT 69650.1 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 12500 GVT 72876.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [108347, 78431, 89811, 78344, 81664, 78383, 89741, 78276]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 13000 GVT 76103.0 COM 40087 TH (com per msec) 80.174 MAX TH 88.884
+WT 13500 GVT 79328.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 14000 GVT 82554.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 14500 GVT 85779.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 15000 GVT 89005.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [131267, 94559, 109337, 94474, 97792, 94512, 109266, 94404]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 15500 GVT 92231.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 16000 GVT 95457.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 16500 GVT 98683.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 17000 GVT 101908.1 COM 40069 TH (com per msec) 80.138 MAX TH 88.884
+WT 17500 GVT 105135.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [154187, 110689, 128862, 110602, 113922, 110641, 128791, 110533]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 18000 GVT 108360.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 18500 GVT 111586.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 19000 GVT 114812.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 19500 GVT 118038.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 20000 GVT 121263.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [177107, 126819, 148387, 126731, 130050, 126770, 148315, 126662]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 20500 GVT 124490.0 COM 40078 TH (com per msec) 80.156 MAX TH 88.884
+WT 21000 GVT 127715.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 21500 GVT 130941.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 22000 GVT 134167.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 22500 GVT 137392.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [200028, 142947, 167911, 142860, 146180, 142899, 167841, 142790]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 23000 GVT 140618.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 23500 GVT 143844.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 24000 GVT 147070.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 24500 GVT 150296.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 25000 GVT 153522.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [222948, 159075, 187435, 158990, 162309, 159028, 187365, 158920]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 25500 GVT 156747.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 26000 GVT 159974.0 COM 40078 TH (com per msec) 80.156 MAX TH 88.884
+WT 26500 GVT 163199.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+WT 27000 GVT 166425.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 27500 GVT 169650.0 COM 40053 TH (com per msec) 80.106 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [245868, 175205, 206961, 175118, 178438, 175157, 206889, 175050]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 28000 GVT 172876.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 28500 GVT 176102.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 29000 GVT 179328.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 29500 GVT 182554.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 30000 GVT 185780.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [268788, 191335, 226485, 191248, 194567, 191286, 226414, 191178]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 30500 GVT 189006.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 31000 GVT 192232.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 31500 GVT 195457.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 32000 GVT 198683.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 32500 GVT 201909.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [291708, 207465, 246010, 207376, 210696, 207415, 245939, 207307]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 33000 GVT 205135.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 33500 GVT 208360.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 34000 GVT 211586.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 34500 GVT 214812.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 35000 GVT 218038.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [314628, 223594, 265535, 223504, 226825, 223544, 265463, 223436]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 35500 GVT 221264.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 36000 GVT 224489.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 36500 GVT 227715.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 37000 GVT 230941.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 37500 GVT 234167.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [337548, 239722, 285059, 239635, 242954, 239673, 284987, 239566]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 38000 GVT 237392.1 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 38500 GVT 240618.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 39000 GVT 243845.0 COM 40087 TH (com per msec) 80.174 MAX TH 88.884
+WT 39500 GVT 247070.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 40000 GVT 250296.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [360468, 255851, 304584, 255762, 259083, 255802, 304513, 255694]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 40500 GVT 253521.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 41000 GVT 256747.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 41500 GVT 259973.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 42000 GVT 263199.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 42500 GVT 266425.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [383388, 271981, 324108, 271892, 275212, 271931, 324037, 271824]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 43000 GVT 269650.1 COM 40069 TH (com per msec) 80.138 MAX TH 88.884
+WT 43500 GVT 272877.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 44000 GVT 276102.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 44500 GVT 279328.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 45000 GVT 282554.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [406308, 288111, 343633, 288021, 291341, 288060, 343562, 287952]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 45500 GVT 285780.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 46000 GVT 289005.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+WT 46500 GVT 292232.0 COM 40078 TH (com per msec) 80.156 MAX TH 88.884
+WT 47000 GVT 295457.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 47500 GVT 298683.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [429229, 304239, 363157, 304150, 307470, 304189, 363086, 304082]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 48000 GVT 301909.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 48500 GVT 305134.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 49000 GVT 308360.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 49500 GVT 311586.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 50000 GVT 314812.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [452149, 320367, 382681, 320280, 323600, 320318, 382611, 320211]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 50500 GVT 318038.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 51000 GVT 321264.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 51500 GVT 324489.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 52000 GVT 327716.0 COM 40078 TH (com per msec) 80.156 MAX TH 88.884
+WT 52500 GVT 330941.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [475069, 336497, 402207, 336408, 339728, 336447, 402135, 336340]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 53000 GVT 334167.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 53500 GVT 337392.0 COM 40053 TH (com per msec) 80.106 MAX TH 88.884
+WT 54000 GVT 340618.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 54500 GVT 343844.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 55000 GVT 347070.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 7, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [497988, 352627, 421731, 352538, 355858, 352576, 421661, 352468]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 55500 GVT 350296.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 56000 GVT 353522.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 56500 GVT 356748.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 57000 GVT 359974.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 57500 GVT 363199.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 7, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [520910, 368755, 441256, 368666, 371986, 368705, 441185, 368598]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 58000 GVT 366425.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 58500 GVT 369650.0 COM 40053 TH (com per msec) 80.106 MAX TH 88.884
+WT 59000 GVT 372876.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 59500 GVT 376102.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 60000 GVT 379328.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [543830, 384884, 460779, 384796, 388116, 384834, 460709, 384728]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 60500 GVT 382554.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 61000 GVT 385780.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 61500 GVT 389006.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 62000 GVT 392231.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 62500 GVT 395457.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [566750, 401013, 480305, 400924, 404244, 400963, 480234, 400856]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 63000 GVT 398682.1 COM 40069 TH (com per msec) 80.138 MAX TH 88.884
+WT 63500 GVT 401908.1 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 64000 GVT 405134.1 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 64500 GVT 408360.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 65000 GVT 411587.0 COM 40087 TH (com per msec) 80.174 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [589670, 417143, 499829, 417054, 420374, 417092, 499759, 416985]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 65500 GVT 414812.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 66000 GVT 418038.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 66500 GVT 421263.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 67000 GVT 424489.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 67500 GVT 427715.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [612590, 433271, 519355, 433182, 436502, 433221, 519283, 433114]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 68000 GVT 430941.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 68500 GVT 434167.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 69000 GVT 437392.0 COM 40053 TH (com per msec) 80.106 MAX TH 88.884
+WT 69500 GVT 440619.0 COM 40087 TH (com per msec) 80.174 MAX TH 88.884
+WT 70000 GVT 443844.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [635510, 449401, 538879, 449312, 452632, 449350, 538808, 449242]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 70500 GVT 447070.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 71000 GVT 450296.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 71500 GVT 453522.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 72000 GVT 456747.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+WT 72500 GVT 459974.0 COM 40078 TH (com per msec) 80.156 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [658431, 465529, 558404, 465440, 468760, 465479, 558333, 465372]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 73000 GVT 463199.0 COM 40062 TH (com per msec) 80.124 MAX TH 88.884
+WT 73500 GVT 466425.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 74000 GVT 469651.0 COM 40069 TH (com per msec) 80.138 MAX TH 88.884
+WT 74500 GVT 472876.0 COM 40054 TH (com per msec) 80.108 MAX TH 88.884
+WT 75000 GVT 476102.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [681352, 481657, 577929, 481569, 484890, 481609, 577857, 481502]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 75500 GVT 479328.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 76000 GVT 482554.0 COM 40071 TH (com per msec) 80.142 MAX TH 88.884
+WT 76500 GVT 485780.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 77000 GVT 489006.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+WT 77500 GVT 492232.0 COM 40070 TH (com per msec) 80.14 MAX TH 88.884
+[8, 4, 0, 0, 0, 0, 0, 0]
+[0, 7, 4, 0, 0, 0, 0, 0]
+[0, 0, 8, 4, 0, 0, 0, 0]
+[0, 0, 0, 7, 4, 0, 0, 0]
+[0, 0, 0, 0, 7, 4, 0, 0]
+[0, 0, 0, 0, 0, 7, 4, 0]
+[0, 0, 0, 0, 0, 0, 8, 4]
+[4, 0, 0, 0, 0, 0, 0, 7]
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [704272, 497787, 597453, 497698, 501018, 497738, 597382, 497630]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_1', 'fpga_0', 'fpga_0', 'gpu_0', 'gpu_0'] expected th 80.1215 vs max th 88.884
+WT 78000 GVT 495457.0 COM 40063 TH (com per msec) 80.126 MAX TH 88.884
+WT 78500 GVT 498683.0 COM 40069 TH (com per msec) 80.138 MAX TH 88.884
+ENDED TRACE FOR Actor(id:6,lvt:499999.0,next:inf)
+END SIMULATION LOOP QUEUE EMPTY False @ CAN_END True @ WT 78703.69999880288 @ GVT 499998.0

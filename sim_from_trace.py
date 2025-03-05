@@ -1,16 +1,14 @@
-import sys
-import os
+#!/usr/bin/env python3
 
 import metasimulation.SimulationEngine.runtime_modules
-from metasimulation.SimulationEngine.read_solutions import *
 from metasimulation.SimulationEngine.commandline import *
+from metasimulation.SimulationEngine.read_solutions import *
 
 simulation_folder, simulation_trace, fsolutions, wops_string = validate_command_line(sys.argv)
 
 global_constants_parameter_module = metasimulation.SimulationEngine.runtime_modules.global_constants_parameter_module
 hardware_parameter_module = metasimulation.SimulationEngine.runtime_modules.hardware_parameter_module
 
-import gc
 import itertools
 
 from metasimulation.SimulationEngine.assignment import *
@@ -100,8 +98,8 @@ skipped_fil = 0
 start_time = 0
 sum_elapsed = 0
 all_tests_count = len(sim_state.get_cunits_data().keys())**sim_state.get_num_actors()
-estimated_filter_speedup = estimate_filter_reduction(sim_state.get_cunits_data().keys())
-estimated_filter_skipped = all_tests_count/estimated_filter_speedup
+# estimated_filter_speedup = estimate_filter_reduction(sim_state.get_cunits_data().keys())
+# estimated_filter_skipped = all_tests_count/estimated_filter_speedup
 very_start_time = time.time()
 
 for current_assignment in to_be_evaluated_assignments:

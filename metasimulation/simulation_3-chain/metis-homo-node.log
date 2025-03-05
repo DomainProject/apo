@@ -1,0 +1,45 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_3/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_3/global_constants.py into module global_constants
+trace found (metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace)
+Loading trace metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace...Done
+Building annoyance_matrix and communication_matrix for 8 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_0', 'cpu_1', 'fpga_0', 'gpu_0']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+loading ground truth metasimulation/simulation_3/lp_8-end_time_500000-fanout_2.trace.solutions...end
+Found optimal solution 88.884
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 1684.0 COM 22102 TH (com per msec) 44.204 MAX TH 88.884
+WT 1000 GVT 3360.0 COM 21994 TH (com per msec) 43.988 MAX TH 88.884
+WT 1500 GVT 5032.0 COM 21948 TH (com per msec) 43.896 MAX TH 88.884
+WT 2000 GVT 6708.0 COM 21997 TH (com per msec) 43.994 MAX TH 88.884
+WT 2500 GVT 8381.0 COM 21955 TH (com per msec) 43.91 MAX TH 88.884
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [16668, 13916, 11706, 13840, 17136, 13884, 11636, 13776]
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0', 'fpga_0', 'gpu_0', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0', 'fpga_0', 'gpu_0', 'cpu_1'] expected th 53.551 vs max th 88.884
+WT 3000 GVT 10391.0 COM 26930 TH (com per msec) 53.86 MAX TH 88.884
+WT 3500 GVT 12404.0 COM 26947 TH (com per msec) 53.894 MAX TH 88.884
+WT 4000 GVT 14406.0 COM 26843 TH (com per msec) 53.686 MAX TH 88.884
+WT 4500 GVT 16402.0 COM 26769 TH (com per msec) 53.538 MAX TH 88.884
+WT 5000 GVT 18395.0 COM 26743 TH (com per msec) 53.486 MAX TH 88.884
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [18525, 13891, 13355, 11168, 13906, 12984, 12424, 20594]
+new binding: ['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'fpga_0', 'gpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0'] expected th 56.6235 vs max th 88.884
+WT 5500 GVT 20548.1 COM 28311 TH (com per msec) 56.622 MAX TH 88.884
+WT 6000 GVT 22720.0 COM 28494 TH (com per msec) 56.988 MAX TH 88.884
+WT 6500 GVT 24894.0 COM 28536 TH (com per msec) 57.072 MAX TH 88.884
+WT 7000 GVT 27064.0 COM 28493 TH (com per msec) 56.986 MAX TH 88.884
+WT 7500 GVT 29236.0 COM 28510 TH (com per msec) 57.02 MAX TH 88.884
+capacity [0.25, 0.25, 0.25, 0.25]
+task_forecast [17343, 14719, 12442, 14571, 17264, 14691, 12422, 14313]
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0', 'fpga_0', 'gpu_0', 'cpu_1'] renamed below
+new binding: ['cpu_0', 'cpu_1', 'cpu_0', 'fpga_0', 'gpu_0', 'fpga_0', 'gpu_0', 'cpu_1'] expected th 53.551 vs max th 88.884
+OUT OF ORDER EVENT 29238.1 29241.0 29238.1 [29236.0, 29236.0, 29237.0, 29238.0, 29238.0, 29239.0, 29240.0, 29240.0] Actor(id:1,lvt:29240.0,next:29238.1)
