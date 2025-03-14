@@ -27,11 +27,11 @@ class MetisHeterogeneousOperations(WindowOperations):
         num_actors = self.sim_state.get_num_actors()
         cunits = self.sim_state.get_cunits()
         cus = len(cunits)
-        capacity = get_capacity_vector()
         task_forecast = get_events_count_vector_in_next_window(wct_ts + time_window_size, num_actors)
         msg_exch_cost = [ [ int(get_communication_latency(x,y)/hardware_constants.comm_unitary_cost) for y in cunits] for x in cunits]
         comm_matrix = []
         anno_matrix = []
+        capacity = [20.0, 50.0, 35.0, 60.0]
 
 
         for i in range(num_actors):
@@ -54,6 +54,7 @@ class MetisHeterogeneousOperations(WindowOperations):
         #print("task forecast: ",task_forecast)
         #print("annoyance matrix: ", anno_matrix)
         #print("communication matrix: ",comm_matrix)
+
         metis_heterogeneous_multilevel(num_actors, cus, task_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost)
         return min_vt
 

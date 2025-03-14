@@ -32,21 +32,41 @@ _metisddm.metis_heterogeneous_multilevel.argtypes = [
     idx_t,
     idx_t,
     ctypes.POINTER(idx_t),
-    ctypes.POINTER(idx_t),
+    ctypes.POINTER(real_t),
     ctypes.POINTER(real_t),
     ctypes.POINTER(real_t),
     ctypes.POINTER(idx_t)
 ]
 _metisddm.metis_heterogeneous_multilevel.restype = None
 
+#ddm -> annoyance, communication cost, overload order: 0
+#ddm_c1 -> overload, communication cost, annoyance order: 1
+#ddm_c2 -> communication cost, overload,annoyance order: 2
+#ddm_c3 -> overload+comm.cost, annoyance order: 3
+#ddm_c4 -> overload (da ignorare) order: 4
 
+
+#todo,: add parameter "flag" to choose among different metis implementations
 def metis_heterogeneous_multilevel(total_actors, cus, tasks_forecast, capacity, comm_matrix, anno_matrix, msg_exch_cost):
     global last_ddm_total_actors_invocation
     if len(tasks_forecast) != total_actors:
         raise ValueError(f"tasks_forecast should have {total_actors} elements, but it has {len(tasks_forecast)}")
 
     arr_tasks = (idx_t * total_actors)(*map(lambda x: max(1, int(round(x))), tasks_forecast))
-    arr_capacity = (idx_t * cus)(*capacity)
+    
+
+    min_capacity = min(capacity)
+    max_capacity = max(capacity)
+    if max_capacity != min_capacity:
+        for i in range(cus):
+            capacity[i] = (capacity[i] - min_capacity) / (max_capacity - min_capacity)
+    else:
+        for i in range(cus):
+            capacity[i] = 1.0  # If all values are the same, set them to 1.0
+
+
+    print(capacity)
+    arr_capacity = (real_t * cus)(*capacity)
 
    
     flattened_comm_matrix = []
@@ -67,6 +87,7 @@ def metis_heterogeneous_multilevel(total_actors, cus, tasks_forecast, capacity, 
 
     
     last_ddm_total_actors_invocation = total_actors
+
     _metisddm.metis_heterogeneous_multilevel(total_actors, cus, arr_tasks, arr_capacity, arr_comm, arr_anno, arr_msg_exch)
 
 
