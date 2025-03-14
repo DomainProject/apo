@@ -31,7 +31,20 @@ class MetisHeterogeneousOperations(WindowOperations):
         msg_exch_cost = [ [ int(get_communication_latency(x,y)/hardware_constants.comm_unitary_cost) for y in cunits] for x in cunits]
         comm_matrix = []
         anno_matrix = []
-        capacity = [20.0, 50.0, 35.0, 60.0]
+        capacity = []
+        non_zero_cap, non_zero_cu = float('inf'), None
+        for k in self.sim_state._cu_units_data:
+            if self.sim_state._cu_units_data[k]["executed"] != 0:
+                non_zero_cap = self.sim_state._cu_units_data[k]["executed"]
+                non_zero_cu  = k 
+            self.sim_state._cu_units_data[k]["executed"] = 0
+        baseline_capacity = non_zero_cap/get_relative_speed(non_zero_cu)
+        for k in self.sim_state._cu_units_data:
+            capacity += [baseline_capacity*get_relative_speed(k)]
+
+        total_capacity    = sum(capacity)
+        for i in range(len(capacity)): capacity[i] = float(capacity[i])/total_capacity
+        for i in range(len(capacity)): capacity[i] = capacity[i]
 
 
         for i in range(num_actors):
