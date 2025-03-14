@@ -181,7 +181,7 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 		}
 	}
 
-//#ifndef USE_ASSETS
+#ifndef USE_ASSETS
 	printf("Writing program to temp file\n");
 	FILE *file = fopen("ddm_tmp.asp", "w");
 	if(file == NULL) {
@@ -193,7 +193,7 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
     printf("File written\n");
     fclose(file);
 //    exit(0);
-//#endif
+#endif
 
 	// initialize clingo w/program in prog_buff
 	const char *argv[] = {"--opt-mode", "opt"};

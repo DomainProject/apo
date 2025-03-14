@@ -1,14 +1,14 @@
 #!/bin/bash
 
-./sim_from_trace.py ddm metasimulation/$1 | tee ddm.log
-#./sim_from_trace.py metis-hete-asplike metasimulation/$1 | tee metis-hete-asplike.log
+#./sim_from_trace.py ddm metasimulation/$1 | tee ddm.log
+./sim_from_trace.py metis-hete-asplike metasimulation/$1 | tee metis-hete-asplike.log
 #./sim_from_trace.py metis-hete-comm metasimulation/$1 | tee metis-hete-comm.log
 #./sim_from_trace.py metis-homo-comm metasimulation/$1 | tee metis-homo-comm.log
 #./sim_from_trace.py metis-homo-node metasimulation/$1 | tee metis-homo-node.log
 #./sim_from_trace.py random metasimulation/$1 | tee random.log
 
-mv ddm.log metasimulation/$1
-#mv metis-hete-asplike.log metasimulation/$1
+#mv ddm.log metasimulation/$1
+mv metis-hete-asplike.log metasimulation/$1
 #mv metis-hete-comm.log metasimulation/$1
 #mv metis-homo-comm.log metasimulation/$1
 #mv metis-homo-node.log metasimulation/$1

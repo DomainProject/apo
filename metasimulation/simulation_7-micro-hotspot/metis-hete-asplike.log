@@ -1,0 +1,20 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_7-micro-hotspot/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_7-micro-hotspot/global_constants.py into module global_constants
+trace found (metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace)
+Loading trace metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace...Done
+Building annoyance_matrix and communication_matrix for 16 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'gpu_0', 'gpu_1', 'cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 2.3 COM 804 TH (com per msec) 1.608 MAX TH 0
+WT 1000 GVT 1.5585 COM 52 TH (com per msec) 0.104 MAX TH 0
+WT 1500 GVT 12.2249 COM 3842 TH (com per msec) 7.684 MAX TH 0
+WT 2000 GVT 11.3115 COM 198 TH (com per msec) 0.396 MAX TH 0
+WT 2500 GVT 12.0941 COM 439 TH (com per msec) 0.878 MAX TH 0

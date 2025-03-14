@@ -1,0 +1,64 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_7-micro-hotspot/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_7-micro-hotspot/global_constants.py into module global_constants
+trace found (metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace)
+Loading trace metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace...Done
+Building annoyance_matrix and communication_matrix for 16 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'gpu_0', 'gpu_1', 'cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 2.3 COM 804 TH (com per msec) 1.608 MAX TH 0
+WT 1000 GVT 1.5585 COM 52 TH (com per msec) 0.104 MAX TH 0
+WT 1500 GVT 12.2249 COM 3842 TH (com per msec) 7.684 MAX TH 0
+WT 2000 GVT 11.3115 COM 198 TH (com per msec) 0.396 MAX TH 0
+WT 2500 GVT 12.0941 COM 439 TH (com per msec) 0.878 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [8457, 7602, 7367, 6846, 9976, 17407, 17540, 16111, 7856, 15437, 15702, 9810, 7931, 9039, 9949, 7386]
+new binding: ['cpu_1', 'cpu_1', 'cpu_2', 'cpu_2', 'cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'cpu_3', 'fpga_0', 'gpu_0', 'cpu_3', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+WT 3000 GVT 18.4173 COM 2312 TH (com per msec) 4.624 MAX TH 0
+WT 3500 GVT 20.232 COM 778 TH (com per msec) 1.556 MAX TH 0
+WT 4000 GVT 25.9394 COM 2122 TH (com per msec) 4.244 MAX TH 0
+WT 4500 GVT 27.8774 COM 789 TH (com per msec) 1.578 MAX TH 0
+WT 5000 GVT 27.7327 COM 26 TH (com per msec) 0.052 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [7864, 9766, 8952, 8540, 15859, 15521, 16187, 15486, 9215, 8654, 14695, 6998, 14163, 4715, 7447, 5334]
+new binding: ['cpu_1', 'cpu_4', 'cpu_2', 'cpu_3', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'cpu_2', 'cpu_1', 'gpu_0', 'cpu_3', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+WT 5500 GVT 28.203 COM 269 TH (com per msec) 0.538 MAX TH 0
+WT 6000 GVT 31.062 COM 1095 TH (com per msec) 2.19 MAX TH 0
+WT 6500 GVT 31.4626 COM 322 TH (com per msec) 0.644 MAX TH 0
+WT 7000 GVT 31.2805 COM 131 TH (com per msec) 0.262 MAX TH 0
+WT 7500 GVT 31.35 COM 169 TH (com per msec) 0.338 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [13676, 16824, 9177, 11733, 16333, 18109, 16632, 6579, 9296, 5748, 10953, 7843, 16681, 4870, 6528, 2993]
+new binding: ['cpu_4', 'cpu_5', 'cpu_1', 'cpu_6', 'cpu_7', 'fpga_0', 'gpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_3', 'cpu_2', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+WT 8000 GVT 41.6074 COM 3662 TH (com per msec) 7.324 MAX TH 0
+WT 8500 GVT 41.6778 COM 183 TH (com per msec) 0.366 MAX TH 0
+WT 9000 GVT 41.5881 COM 134 TH (com per msec) 0.268 MAX TH 0
+WT 9500 GVT 44.3332 COM 1041 TH (com per msec) 2.082 MAX TH 0
+WT 10000 GVT 44.3271 COM 371 TH (com per msec) 0.742 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [16548, 16100, 10240, 14634, 15365, 8805, 12774, 7204, 8480, 8709, 8888, 8303, 16857, 4942, 6112, 6452]
+new binding: ['cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'cpu_1', 'gpu_0', 'cpu_1', 'cpu_2', 'cpu_2', 'cpu_3', 'cpu_3', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+WT 10500 GVT 45.664 COM 891 TH (com per msec) 1.782 MAX TH 0
+WT 11000 GVT 49.3872 COM 1528 TH (com per msec) 3.056 MAX TH 0
+WT 11500 GVT 49.3639 COM 58 TH (com per msec) 0.116 MAX TH 0
+WT 12000 GVT 50.0522 COM 516 TH (com per msec) 1.032 MAX TH 0
+WT 12500 GVT 52.7188 COM 1096 TH (com per msec) 2.192 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [17111, 16190, 17544, 15497, 7407, 8780, 15534, 8018, 6449, 9589, 5496, 13249, 14858, 5044, 4593, 7556]
+new binding: ['cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'cpu_1', 'cpu_1', 'fpga_0', 'cpu_2', 'cpu_2', 'cpu_3', 'cpu_3', 'gpu_0', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+WT 13000 GVT 55.931 COM 1134 TH (com per msec) 2.268 MAX TH 0
+WT 13500 GVT 56.2775 COM 274 TH (com per msec) 0.548 MAX TH 0
+WT 14000 GVT 57.6891 COM 864 TH (com per msec) 1.728 MAX TH 0
+WT 14500 GVT 59.0817 COM 549 TH (com per msec) 1.098 MAX TH 0
+WT 15000 GVT 59.9539 COM 410 TH (com per msec) 0.82 MAX TH 0
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [16217, 15555, 16610, 15014, 8298, 9781, 8191, 8132, 8226, 8667, 9077, 15451, 14638, 5072, 6673, 4547]
+new binding: ['cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'cpu_1', 'fpga_0', 'cpu_1', 'cpu_2', 'cpu_2', 'cpu_3', 'cpu_3', 'gpu_0', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_0'] renamed below
+OUT OF ORDER EVENT 60.1113 60.1589 60.1113 [59.9549, 59.9549, 59.9549, 59.9549, 59.9876, 60.07, 60.07, 60.07, 60.07, 60.1365] Actor(id:5,lvt:60.1365,next:60.1113)

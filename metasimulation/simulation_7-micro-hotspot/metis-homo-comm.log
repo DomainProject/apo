@@ -1,0 +1,64 @@
+hardware.py found
+loading hardware.py from metasimulation/simulation_7-micro-hotspot/hardware.py into module hardware
+global_constants.py found
+loading global_constants.py from metasimulation/simulation_7-micro-hotspot/global_constants.py into module global_constants
+trace found (metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace)
+Loading trace metasimulation/simulation_7-micro-hotspot/trace_1000.0s_200.0b_200.0i_16actors_10.0imb_12.0rate.trace...Done
+Building annoyance_matrix and communication_matrix for 16 actors...Done
+Loading hardware configuration...Done
+Building computing units...Done
+Building assignment...['cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'gpu_0', 'gpu_1', 'cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_4']
+done
+Populate device queue with new actors...done
+Populate simulator queue...done
+initialize Metis...done
+BEGIN SIMULATION LOOP
+WT 500 GVT 2.3 COM 804 TH (com per msec) 1.608 MAX TH 0
+WT 1000 GVT 1.5585 COM 52 TH (com per msec) 0.104 MAX TH 0
+WT 1500 GVT 12.2249 COM 3842 TH (com per msec) 7.684 MAX TH 0
+WT 2000 GVT 11.3115 COM 198 TH (com per msec) 0.396 MAX TH 0
+WT 2500 GVT 12.0941 COM 439 TH (com per msec) 0.878 MAX TH 0
+[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 2, 1, 1, 2, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 2, 0, 2, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 0, 1, 2, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1]
+[2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [8457, 7602, 7367, 6846, 9976, 17407, 17540, 16111, 7856, 15437, 15702, 9810, 7931, 9039, 9949, 7386]
+new binding: ['cpu_0', 'cpu_0', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_5', 'cpu_6', 'cpu_7', 'cpu_1', 'fpga_0', 'gpu_0', 'gpu_1', 'cpu_3', 'cpu_4', 'cpu_2', 'cpu_4'] renamed below
+WT 3000 GVT 11.9192 COM 9 TH (com per msec) 0.018 MAX TH 0
+WT 3500 GVT 14.5899 COM 996 TH (com per msec) 1.992 MAX TH 0
+WT 4000 GVT 14.5371 COM 66 TH (com per msec) 0.132 MAX TH 0
+WT 4500 GVT 16.5376 COM 769 TH (com per msec) 1.538 MAX TH 0
+WT 5000 GVT 16.6867 COM 194 TH (com per msec) 0.388 MAX TH 0
+[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[1, 2, 1, 1, 1, 1, 1, 0, 2, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1]
+[1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 1, 1]
+[1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]
+capacity [0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091, 0.09090909090909091]
+task_forecast [17268, 15825, 16598, 14387, 19408, 33340, 32810, 33254, 15397, 23240, 32036, 25270, 15292, 16844, 19675, 17265]
+new binding: ['cpu_0', 'cpu_1', 'cpu_1', 'cpu_2', 'cpu_3', 'cpu_5', 'cpu_6', 'cpu_7', 'fpga_0', 'cpu_3', 'gpu_0', 'gpu_1', 'cpu_2', 'cpu_0', 'cpu_4', 'cpu_4'] renamed below
+OUT OF ORDER EVENT 16.7646 16.8111 16.7646 [16.7117, 16.7181, 16.7637, 16.7646, 16.7646, 16.7646, 16.7775] Actor(id:2,lvt:16.7775,next:16.7646)
