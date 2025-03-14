@@ -39,8 +39,13 @@ class Actor():
         m = min(a,b)
         
         if len(self._executed) > 0 and m < self._executed[-1]:
-            print("OUT OF ORDER EVENT", m, a, b, self._executed, self)
-            exit(1)
+            if a < b: 
+                self._last_from_trace+=1
+            else: 
+                heappop(self._pending)
+            return False
+            #print("OUT OF ORDER EVENT", m, a, b, self._executed, self)
+            #raise Exception("Sorry, no numbers below zero") 
         self._last_wct = wct
         self._executed +=[m]
         self._last_lvt = m
