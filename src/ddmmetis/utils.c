@@ -378,6 +378,6 @@ void compute_partition(idx_t nVertices, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
             PRINTER() print_partition(nVertices/nParts, *partition);
         }
     } else {
-        fprintf(stderr, "METIS partitioning failed.\n");
+        fprintf(stderr, "METIS partitioning failed with error %u.\n", status);
     }
 }
