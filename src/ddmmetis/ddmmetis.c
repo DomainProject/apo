@@ -383,7 +383,10 @@ void metis_baseline(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real
 
 	real_t sum_tpwgts = 0.;
 	for (int i=0; i < n_cus; i++) sum_tpwgts += tpwgts[i];
-	if (sum_tpwgts != 1.0f) fprintf(stderr, "Sum of tpwgts is not 1! Impossible to use in METIS\n");
+	if (sum_tpwgts != 1.0f) {
+		tpwgts = NULL; /// just to make sure that it is not actually used
+		fprintf(stderr, "Sum of tpwgts is not 1! Cannot be used in METIS, setting it to NULL\n");
+	}
 
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));
