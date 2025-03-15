@@ -18,17 +18,100 @@ WT 1000 GVT 1.5585 COM 52 TH (com per msec) 0.104 MAX TH 0
 WT 1500 GVT 12.2249 COM 3842 TH (com per msec) 7.684 MAX TH 0
 WT 2000 GVT 11.3115 COM 198 TH (com per msec) 0.396 MAX TH 0
 WT 2500 GVT 12.0941 COM 439 TH (com per msec) 0.878 MAX TH 0
-new binding: ['cpu_3', 'gpu_1', 'fpga_0', 'cpu_7', 'cpu_4', 'cpu_6', 'cpu_6', 'fpga_0', 'gpu_0', 'cpu_4', 'gpu_1', 'cpu_0', 'cpu_3', 'cpu_5', 'fpga_0', 'cpu_6'] renamed below
-WT 3000 GVT 12.0941 COM 144 TH (com per msec) 0.288 MAX TH 0
-WT 3500 GVT 12.0941 COM 392 TH (com per msec) 0.784 MAX TH 0
-WT 4000 GVT 12.1296 COM 272 TH (com per msec) 0.544 MAX TH 0
-WT 4500 GVT 16.4575 COM 1605 TH (com per msec) 3.21 MAX TH 0
-WT 5000 GVT 27.778 COM 3841 TH (com per msec) 7.682 MAX TH 0
-new binding: ['gpu_1', 'cpu_6', 'cpu_5', 'cpu_7', 'cpu_7', 'cpu_2', 'cpu_5', 'cpu_1', 'cpu_3', 'fpga_0', 'cpu_1', 'gpu_0', 'cpu_2', 'fpga_0', 'cpu_6', 'fpga_0'] renamed below
-WT 5500 GVT 37.5189 COM 3458 TH (com per msec) 6.916 MAX TH 0
-WT 6000 GVT 37.4084 COM 0 TH (com per msec) 0.0 MAX TH 0
-WT 6500 GVT 37.5049 COM 163 TH (com per msec) 0.326 MAX TH 0
-WT 7000 GVT 37.5578 COM 80 TH (com per msec) 0.16 MAX TH 0
-WT 7500 GVT 37.4888 COM 38 TH (com per msec) 0.076 MAX TH 0
-new binding: ['fpga_0', 'cpu_7', 'cpu_5', 'gpu_1', 'cpu_0', 'cpu_0', 'fpga_0', 'cpu_5', 'gpu_0', 'gpu_0', 'cpu_5', 'cpu_5', 'cpu_3', 'cpu_0', 'cpu_6', 'gpu_1'] renamed below
-OUT OF ORDER EVENT 38.0058 38.3214 38.0058 [37.5827, 37.6608, 37.6925, 37.7233, 37.7638, 37.8142, 37.9126, 38.2646] Actor(id:12,lvt:38.2646,next:38.0058)
+new binding: ['cpu_7', 'cpu_4', 'gpu_0', 'cpu_5', 'cpu_5', 'cpu_4', 'cpu_4', 'gpu_1', 'cpu_6', 'cpu_0', 'fpga_0', 'cpu_3', 'cpu_6', 'fpga_0', 'cpu_5', 'cpu_0'] renamed below
+WT 3000 GVT 15.9116 COM 1358 TH (com per msec) 2.716 MAX TH 0
+WT 3500 GVT 18.2167 COM 783 TH (com per msec) 1.566 MAX TH 0
+WT 4000 GVT 25.6105 COM 2537 TH (com per msec) 5.074 MAX TH 0
+WT 4500 GVT 26.851 COM 564 TH (com per msec) 1.128 MAX TH 0
+WT 5000 GVT 26.7114 COM 204 TH (com per msec) 0.408 MAX TH 0
+new binding: ['cpu_5', 'cpu_0', 'gpu_0', 'cpu_3', 'cpu_0', 'cpu_0', 'cpu_2', 'cpu_6', 'gpu_1', 'cpu_0', 'cpu_0', 'cpu_1', 'gpu_0', 'cpu_6', 'gpu_0', 'gpu_0'] renamed below
+WT 5500 GVT 31.3256 COM 1707 TH (com per msec) 3.414 MAX TH 0
+WT 6000 GVT 31.4551 COM 362 TH (com per msec) 0.724 MAX TH 0
+WT 6500 GVT 31.2815 COM 18 TH (com per msec) 0.036 MAX TH 0
+WT 7000 GVT 42.7953 COM 4269 TH (com per msec) 8.538 MAX TH 0
+WT 7500 GVT 50.3091 COM 2374 TH (com per msec) 4.748 MAX TH 0
+new binding: ['gpu_1', 'cpu_1', 'cpu_4', 'fpga_0', 'cpu_4', 'fpga_0', 'cpu_1', 'gpu_1', 'cpu_3', 'fpga_0', 'cpu_1', 'cpu_0', 'gpu_1', 'gpu_1', 'cpu_0', 'gpu_1'] renamed below
+WT 8000 GVT 61.8058 COM 3571 TH (com per msec) 7.142 MAX TH 0
+WT 8500 GVT 73.5169 COM 3547 TH (com per msec) 7.094 MAX TH 0
+WT 9000 GVT 81.765 COM 2583 TH (com per msec) 5.166 MAX TH 0
+WT 9500 GVT 87.5499 COM 1831 TH (com per msec) 3.662 MAX TH 0
+WT 10000 GVT 99.0455 COM 3459 TH (com per msec) 6.918 MAX TH 0
+new binding: ['fpga_0', 'cpu_3', 'cpu_3', 'gpu_0', 'cpu_5', 'cpu_1', 'cpu_0', 'gpu_0', 'cpu_3', 'gpu_1', 'cpu_4', 'cpu_7', 'cpu_2', 'cpu_7', 'gpu_0', 'gpu_1'] renamed below
+WT 10500 GVT 112.1948 COM 4628 TH (com per msec) 9.256 MAX TH 0
+WT 11000 GVT 119.6367 COM 2586 TH (com per msec) 5.172 MAX TH 0
+WT 11500 GVT 123.7534 COM 1444 TH (com per msec) 2.888 MAX TH 0
+WT 12000 GVT 123.5903 COM 88 TH (com per msec) 0.176 MAX TH 0
+WT 12500 GVT 123.744 COM 171 TH (com per msec) 0.342 MAX TH 0
+new binding: ['cpu_6', 'cpu_4', 'cpu_5', 'fpga_0', 'fpga_0', 'cpu_5', 'cpu_5', 'gpu_1', 'cpu_4', 'cpu_1', 'cpu_2', 'cpu_7', 'cpu_7', 'gpu_0', 'cpu_2', 'cpu_7'] renamed below
+WT 13000 GVT 133.692 COM 3360 TH (com per msec) 6.72 MAX TH 0
+WT 13500 GVT 133.7032 COM 46 TH (com per msec) 0.092 MAX TH 0
+WT 14000 GVT 134.1103 COM 254 TH (com per msec) 0.508 MAX TH 0
+WT 14500 GVT 133.6884 COM 9 TH (com per msec) 0.018 MAX TH 0
+WT 15000 GVT 133.7885 COM 93 TH (com per msec) 0.186 MAX TH 0
+new binding: ['fpga_0', 'cpu_4', 'cpu_6', 'gpu_1', 'cpu_1', 'fpga_0', 'cpu_6', 'cpu_4', 'cpu_3', 'fpga_0', 'gpu_0', 'cpu_1', 'gpu_0', 'cpu_2', 'gpu_0', 'cpu_5'] renamed below
+WT 15500 GVT 136.0713 COM 929 TH (com per msec) 1.858 MAX TH 0
+WT 16000 GVT 149.0824 COM 4412 TH (com per msec) 8.824 MAX TH 0
+WT 16500 GVT 150.4895 COM 528 TH (com per msec) 1.056 MAX TH 0
+WT 17000 GVT 150.7163 COM 214 TH (com per msec) 0.428 MAX TH 0
+WT 17500 GVT 150.958 COM 292 TH (com per msec) 0.584 MAX TH 0
+new binding: ['cpu_1', 'cpu_6', 'fpga_0', 'gpu_1', 'cpu_3', 'cpu_7', 'gpu_1', 'cpu_6', 'gpu_0', 'gpu_0', 'cpu_4', 'cpu_4', 'cpu_5', 'gpu_1', 'cpu_3', 'gpu_1'] renamed below
+WT 18000 GVT 150.6028 COM 156 TH (com per msec) 0.312 MAX TH 0
+WT 18500 GVT 159.0401 COM 2900 TH (com per msec) 5.8 MAX TH 0
+WT 19000 GVT 163.5068 COM 1646 TH (com per msec) 3.292 MAX TH 0
+WT 19500 GVT 176.1439 COM 4348 TH (com per msec) 8.696 MAX TH 0
+WT 20000 GVT 187.55 COM 3913 TH (com per msec) 7.826 MAX TH 0
+new binding: ['cpu_2', 'cpu_0', 'gpu_0', 'cpu_7', 'cpu_3', 'fpga_0', 'cpu_1', 'cpu_7', 'cpu_4', 'cpu_5', 'cpu_5', 'cpu_4', 'cpu_7', 'cpu_4', 'cpu_2', 'cpu_6'] renamed below
+WT 20500 GVT 191.9486 COM 1723 TH (com per msec) 3.446 MAX TH 0
+WT 21000 GVT 231.5161 COM 9174 TH (com per msec) 18.348 MAX TH 0
+WT 21500 GVT 346.3141 COM 22774 TH (com per msec) 45.548 MAX TH 0
+WT 22000 GVT 404.4389 COM 11968 TH (com per msec) 23.936 MAX TH 0
+WT 22500 GVT 413.4655 COM 3207 TH (com per msec) 6.414 MAX TH 0
+new binding: ['cpu_0', 'cpu_3', 'cpu_2', 'cpu_6', 'cpu_0', 'cpu_1', 'cpu_2', 'gpu_1', 'gpu_1', 'cpu_6', 'cpu_1', 'cpu_2', 'gpu_1', 'cpu_0', 'cpu_5', 'cpu_6'] renamed below
+WT 23000 GVT 431.5143 COM 6091 TH (com per msec) 12.182 MAX TH 0
+WT 23500 GVT 447.4113 COM 5266 TH (com per msec) 10.532 MAX TH 0
+WT 24000 GVT 455.6268 COM 2685 TH (com per msec) 5.37 MAX TH 0
+WT 24500 GVT 464.2227 COM 2775 TH (com per msec) 5.55 MAX TH 0
+WT 25000 GVT 477.888 COM 4859 TH (com per msec) 9.718 MAX TH 0
+new binding: ['cpu_3', 'cpu_7', 'cpu_1', 'gpu_0', 'cpu_7', 'gpu_0', 'gpu_0', 'cpu_1', 'gpu_1', 'cpu_7', 'cpu_6', 'fpga_0', 'cpu_4', 'cpu_7', 'cpu_2', 'fpga_0'] renamed below
+WT 25500 GVT 488.438 COM 3703 TH (com per msec) 7.406 MAX TH 0
+WT 26000 GVT 488.2174 COM 237 TH (com per msec) 0.474 MAX TH 0
+WT 26500 GVT 500.0567 COM 4100 TH (com per msec) 8.2 MAX TH 0
+WT 27000 GVT 517.6236 COM 5646 TH (com per msec) 11.292 MAX TH 0
+WT 27500 GVT 527.0317 COM 3330 TH (com per msec) 6.66 MAX TH 0
+new binding: ['cpu_0', 'gpu_1', 'cpu_0', 'gpu_1', 'cpu_4', 'cpu_4', 'cpu_0', 'gpu_1', 'cpu_1', 'gpu_1', 'gpu_0', 'fpga_0', 'cpu_2', 'cpu_4', 'cpu_2', 'cpu_3'] renamed below
+WT 28000 GVT 546.0681 COM 6259 TH (com per msec) 12.518 MAX TH 0
+WT 28500 GVT 565.6759 COM 6187 TH (com per msec) 12.374 MAX TH 0
+WT 29000 GVT 580.2288 COM 4919 TH (com per msec) 9.838 MAX TH 0
+WT 29500 GVT 587.2662 COM 2461 TH (com per msec) 4.922 MAX TH 0
+WT 30000 GVT 598.6364 COM 3893 TH (com per msec) 7.786 MAX TH 0
+new binding: ['gpu_0', 'gpu_1', 'gpu_1', 'cpu_0', 'cpu_3', 'cpu_7', 'cpu_0', 'cpu_3', 'gpu_0', 'cpu_2', 'cpu_0', 'cpu_4', 'gpu_1', 'cpu_3', 'gpu_0', 'cpu_1'] renamed below
+WT 30500 GVT 667.6138 COM 15745 TH (com per msec) 31.49 MAX TH 0
+WT 31000 GVT 735.9835 COM 15717 TH (com per msec) 31.434 MAX TH 0
+WT 31500 GVT 801.6557 COM 15074 TH (com per msec) 30.148 MAX TH 0
+WT 32000 GVT 804.2199 COM 996 TH (com per msec) 1.992 MAX TH 0
+WT 32500 GVT 804.8779 COM 406 TH (com per msec) 0.812 MAX TH 0
+new binding: ['gpu_0', 'cpu_4', 'gpu_0', 'cpu_2', 'gpu_0', 'cpu_2', 'cpu_6', 'cpu_1', 'cpu_4', 'gpu_0', 'cpu_3', 'gpu_0', 'gpu_1', 'cpu_5', 'cpu_4', 'cpu_4'] renamed below
+WT 33000 GVT 813.6188 COM 2662 TH (com per msec) 5.324 MAX TH 0
+WT 33500 GVT 837.8867 COM 7608 TH (com per msec) 15.216 MAX TH 0
+WT 34000 GVT 860.861 COM 7030 TH (com per msec) 14.06 MAX TH 0
+WT 34500 GVT 869.1236 COM 2628 TH (com per msec) 5.256 MAX TH 0
+WT 35000 GVT 881.2675 COM 4000 TH (com per msec) 8.0 MAX TH 0
+new binding: ['fpga_0', 'gpu_1', 'cpu_6', 'cpu_0', 'gpu_1', 'cpu_5', 'cpu_2', 'gpu_0', 'cpu_5', 'cpu_5', 'gpu_0', 'cpu_1', 'cpu_4', 'cpu_0', 'cpu_6', 'cpu_6'] renamed below
+WT 35500 GVT 893.8131 COM 4538 TH (com per msec) 9.076 MAX TH 0
+WT 36000 GVT 905.8266 COM 4113 TH (com per msec) 8.226 MAX TH 0
+WT 36500 GVT 910.4313 COM 1570 TH (com per msec) 3.14 MAX TH 0
+WT 37000 GVT 913.4002 COM 1102 TH (com per msec) 2.204 MAX TH 0
+WT 37500 GVT 913.4629 COM 225 TH (com per msec) 0.45 MAX TH 0
+new binding: ['cpu_5', 'cpu_1', 'gpu_1', 'cpu_1', 'cpu_5', 'cpu_2', 'cpu_5', 'fpga_0', 'gpu_1', 'cpu_3', 'cpu_5', 'cpu_4', 'cpu_2', 'cpu_7', 'cpu_7', 'fpga_0'] renamed below
+WT 38000 GVT 914.8108 COM 619 TH (com per msec) 1.238 MAX TH 0
+WT 38500 GVT 928.9511 COM 4688 TH (com per msec) 9.376 MAX TH 0
+WT 39000 GVT 935.5666 COM 2170 TH (com per msec) 4.34 MAX TH 0
+WT 39500 GVT 945.5626 COM 3298 TH (com per msec) 6.596 MAX TH 0
+WT 40000 GVT 953.1635 COM 2714 TH (com per msec) 5.428 MAX TH 0
+new binding: ['cpu_5', 'cpu_4', 'cpu_3', 'cpu_0', 'cpu_0', 'cpu_7', 'fpga_0', 'cpu_0', 'gpu_1', 'cpu_4', 'cpu_7', 'fpga_0', 'cpu_1', 'gpu_0', 'gpu_0', 'gpu_0'] renamed below
+WT 40500 GVT 965.5422 COM 3977 TH (com per msec) 7.954 MAX TH 0
+WT 41000 GVT 972.838 COM 2842 TH (com per msec) 5.684 MAX TH 0
+WT 41500 GVT 988.0076 COM 4959 TH (com per msec) 9.918 MAX TH 0
+WT 42000 GVT 991.6359 COM 1279 TH (com per msec) 2.558 MAX TH 0
+ENDED TRACE FOR Actor(id:2,lvt:999.9461,next:inf)
+END SIMULATION LOOP QUEUE EMPTY False @ CAN_END True @ WT 42238.30999961499 @ GVT 998.4074
