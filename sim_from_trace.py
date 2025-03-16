@@ -3,7 +3,6 @@
 import metasimulation.SimulationEngine.runtime_modules
 from metasimulation.SimulationEngine.commandline import *
 from metasimulation.SimulationEngine.read_solutions import *
-from table1_run import estimated_filter_speedup
 
 simulation_folder, simulation_trace, fsolutions, wops_string = validate_command_line(sys.argv)
 
