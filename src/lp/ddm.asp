@@ -28,9 +28,9 @@ ape(R) :- N = #sum{ A,A1,A2 : mutual_annoyance(A1,A2,A) },
           D = M*M,
           R = N/D.  
 
-%#show ap/1.
-%#show cu_overload/2.
-%#show cpe/1.
+#show ap/1.
+#show cu_overload/2.
+#show cpe/1.
 
 % -----
 % rules for distributing actor(s) on cu(s)
@@ -53,13 +53,11 @@ oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 % -----
 % T is the total workload of cu U
-cu_workload(U,T) :- cu(U), cu_capacity(U,C),
-    #sum{ W,A : run_on(A,U), tasks_forecast(A,W) } > C, wmean(M), T = N * M,
-    N = #count{ A : run_on(A,U) }.
+cu_workload(U,T) :- cu(U), 
+    T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }.
 
 % T is the total system workload (all tasks to be processed)
 tasks(X) :- X = #sum{ W,A : tasks_forecast(A,W) }.
-wmean(M) :- tasks(X), N=#count{ A : actor(A) }, M = X / N.
 
 % O is the overload of U
 cu_overload(U,O) :- cu(U),

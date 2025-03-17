@@ -6,7 +6,7 @@
 #include "dynstr.h"
 #include "lp/assets.h"
 
-#define TIMEOUT 15
+#define TIMEOUT 5
 #define USE_ASSETS
 
 #ifndef USE_ASSETS
@@ -208,26 +208,22 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 	}
 }
 
-static int *ddm_poll_internal(bool stop_on_optimal)
+static int *ddm_poll_internal(bool wait_until_optimal_is_found)
 {
-	// 1. invoke clingo & get the optimal as
-	static clingo_model_t const *model = NULL;
+	// 1. invoke clingo & get the optimal
+	static clingo_model_t const *model = NULL; // Memory leak here
 	clingo_model_t const *tmp_model = NULL;
 	bool result;
+
+	(void)wait_until_optimal_is_found;
 //
 //	 bool proven;
 //	 size_t costs_size = 3;
 //	 int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
 
 	// poll clingo to check if a result is ready
-	clingo_solve_handle_wait(cctx->handle, 0, &result);
-
-//	while (true) {
-//    	if (!clingo_solve_handle_resume(cctx->handle)) { goto error; }
-//    	if (!clingo_solve_handle_model(cctx->handle, &tmp_model)) { goto error; }
-//	    if (!tmp_model) { break; }
-//	    else model = tmp_model;
-//  	}
+	clingo_solve_handle_wait(cctx->handle, TIMEOUT, &result);
+	printf("result is %d\n", result);
 
 	// check whether the search has finished
 	if(result) {
@@ -238,19 +234,6 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 		// replace model with the last one (NULL means there are no more models)
 		if(tmp_model) {
 			model = tmp_model;
-			// // clingo_model_cost(model, costs, costs_size);
-			// // printf("costs: ");
-			// // for(int i=0; i<costs_size; ++i)
-			// //        printf("%li ", costs[i]);
-			// // printf("\n");
-			// if stop_on_optimal is set, then resume the search for the next model & return NULL
-			if(stop_on_optimal) {
-				if(!clingo_solve_handle_resume(cctx->handle)) {
-					perror(clingo_error_message());
-					exit(clingo_error_code());
-				}
-				return NULL;
-			}
 		}
 		// tmp_model == NULL: there are no more models (the last found is the optimal model) OR
 		// tmp_model != NULL && stop_on_optimal == false: a model has been found and it does no matter if it is
@@ -262,10 +245,7 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 //	return get_pairs(model);
 
 	// no result (yet)
-	return NULL;
-error:
-	perror(clingo_error_message());
-	exit(clingo_error_code());
+	printf("No result is ready\n");
 	return NULL;
 }
 
@@ -284,15 +264,18 @@ int *ddm_poll(void)
 		// the first usable solution is found.
 		// TODO: this may now be the best suited solution.
 		do {
+			printf("Polling indefinitely...\n");
 			ret = ddm_poll_internal(false);
 		} while(ret == NULL);
 		last_call = 0; // Reset the timer for future invocations
 	} else {
+		printf("Polling...\n");
 		ret = ddm_poll_internal(true);
 	}
 
 	if(ret != NULL) { // We have found a solution that meets the timing or optimatily requirements: prepare for next
 		          // optimization.
+		printf("Solution found\n");
 		free_clingo(cctx);
 		dynstr_fini(&clingo_program_buffer);
 	}

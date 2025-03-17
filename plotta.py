@@ -14,14 +14,16 @@ def extract_data(file_path):
     ref_val = None
     # Apertura del file in modalità lettura
     with open(file_path, "r") as f:
+        print(f'Processing {file_path}...')
         for line in f:
             # Utilizzo di una regex per trovare le parti interessanti:
             # WT <valore> ... TH (com per msec) <valore> ... MAX TH <valore>
-            m = re.search(r'GVT\s+(\d+).*?TH\s+\(com per msec\)\s+([0-9.]+).*?MAX TH\s+([0-9.]+)', line)
+            m = re.search(r'GVT\s+(\d+.?\d*).*?TH\s+\(com per msec\)\s+([0-9.]+).*?MAX TH\s+([0-9.]+)', line)
             if m:
                 wt_val = m.group(1)
                 th_val = m.group(2)
                 max_th_val = m.group(3)
+                print(wt_val, th_val, max_th_val)
                 data_points.append((wt_val, th_val))
                 # Se non abbiamo ancora registrato il valore di riferimento e il valore MAX TH è diverso da 0
                 if ref_val is None and float(max_th_val) != 0:

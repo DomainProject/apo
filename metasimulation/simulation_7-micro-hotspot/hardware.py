@@ -1,6 +1,6 @@
 cu_types = {
 'cpu' : {
-    'num_units':8,            # numer of computing unit per this device
+    'num_units':4,            # numer of computing unit per this device
     'relative_speed':1.0,     # relative speed w.r.t. to slowest device (1.0 is the slowest)
     #'capacity_cu':4,          # per computing unit capacity in terms of task units before being overloaded
     #'overload_penalty':10    # slowing factor for running as overloaded
