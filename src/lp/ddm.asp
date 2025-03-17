@@ -53,8 +53,11 @@ oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 % -----
 % T is the total workload of cu U
-cu_workload(U,T) :- cu(U), cu_capacity(U,C),
-    #sum{ W,A : run_on(A,U), tasks_forecast(A,W) } > C, wmean(M), T = N * M,
+% cu_workload(U,T) :- cu(U), cu_capacity(U,C),
+%     #sum{ W,A : run_on(A,U), tasks_forecast(A,W) } > C, wmean(M), T = N * M,
+%     N = #count{ A : run_on(A,U) }.
+cu_workload(U,T) :- cu(U), 
+    wmean(M), T = N * M,
     N = #count{ A : run_on(A,U) }.
 
 % T is the total system workload (all tasks to be processed)
