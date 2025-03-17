@@ -7,7 +7,7 @@ def assignment_renaming(assignment):
   new_assignment = []
   translation = {}
   used_labels = set([])
-  
+
   for i in assignment:
     if i not in translation:
       dev = i.split('_')[0]
@@ -29,7 +29,8 @@ def check_and_install_new_binding(operations, wct_ts, maximum_th, ground_truth, 
     old_bind = binding
     binding = assignment_renaming(binding)
     print(f"new binding: {old_bind} renamed below")
-    print(f"new binding: {binding} expected th {ground_truth[tuple(binding)]} vs max th {maximum_th}")
+    if len(ground_truth) > 0:
+        print(f"new binding: {binding} expected th {ground_truth[tuple(binding)]} vs max th {maximum_th}")
     new_bid=False
     if binding != sim_state.get_assignment() and sim_state._pending_assigment != binding:
         new_bid=True
@@ -53,19 +54,19 @@ def filter_assignment(assignment):
         used_id = set([])
         order_appearence = []
         for id in d[dev]:
-            if id not in used_id: 
+            if id not in used_id:
                 order_appearence += [id]
                 used_id.add(id)
 
-        if len(order_appearence) == 1: 
+        if len(order_appearence) == 1:
             if order_appearence[0] != 0:
                 return True
         else:
             for i in range(len(order_appearence)-1):
-                if order_appearence[i] > order_appearence[i+1]: 
+                if order_appearence[i] > order_appearence[i+1]:
                     #print(f"skipping {assignment}")
                     return True
-    
+
     return False
 
 def estimate_filter_reduction(units):

@@ -4,6 +4,7 @@
 
 #include <metis.h>
 #include <math.h>
+#include "../ddmmetis.h"
 #include "utils.h"
 
 
@@ -110,7 +111,7 @@ void compute_partition_weights(idx_t *part, idx_t total_actors, idx_t **vwgt, id
 }
 
 // Function to reassign vertices based on imbalance and minimize overload
-void rebalance_partition(idx_t *part, idx_t total_actors, idx_t **vwgt, idx_t cus, idx_t *capacity) {
+void rebalance_partition(idx_t *part, idx_t total_actors, idx_t **vwgt, idx_t cus, real_t *capacity) {
     idx_t partition_weights[cus];
     idx_t total_weight;
     double ideal_weight;
@@ -119,56 +120,57 @@ void rebalance_partition(idx_t *part, idx_t total_actors, idx_t **vwgt, idx_t cu
 
     ideal_weight = total_weight / cus;
 
+    if (part != NULL) {
+    	
+	    for (int i = 0; i < total_actors; i++) {
+	        idx_t p = part[i]; // Partition of vertex i
+	        double imbalance_ratio = (double) partition_weights[p] / ideal_weight - 1.0;
 
-    for (int i = 0; i < total_actors; i++) {
-        idx_t p = part[i]; // Partition of vertex i
-        double imbalance_ratio = (double) partition_weights[p] / ideal_weight - 1.0;
+	        // Adjust weight based on imbalance ratio
+	        if (imbalance_ratio > 0) {
+	            // Overloaded partition → increase vertex weight to discourage placement
+	            (*vwgt)[i] = max(1, round((*vwgt)[i] * (1 + imbalance_ratio * 1.0)));
+	        } else {
+	            // Underloaded partition → decrease vertex weight to encourage placement
+	            (*vwgt)[i] = max(1, round((*vwgt)[i] * (1 + imbalance_ratio * 1.0)));
+	        }
+	    }
 
-        // Adjust weight based on imbalance ratio
-        if (imbalance_ratio > 0) {
-            // Overloaded partition → increase vertex weight to discourage placement
-            (*vwgt)[i] = max(1, round((*vwgt)[i] * (1 + imbalance_ratio * 1.0)));
-        } else {
-            // Underloaded partition → decrease vertex weight to encourage placement
-            (*vwgt)[i] = max(1, round((*vwgt)[i] * (1 + imbalance_ratio * 1.0)));
-        }
-    }
+	    for (int i = 0; i < total_actors; i++) {
+	        int p = part[i];
+	        // Check if the partition is overloaded or underloaded
+	        double imbalance_ratio = (double) partition_weights[p] / ideal_weight - 1.0;
 
-    for (int i = 0; i < total_actors; i++) {
-        int p = part[i];
-        // Check if the partition is overloaded or underloaded
-        double imbalance_ratio = (double) partition_weights[p] / ideal_weight - 1.0;
+	        if (imbalance_ratio > 0) {
+	            // If the partition is overloaded, try moving the vertex to another partition
+	            idx_t best_partition = p;
+	            double min_diff = imbalance_ratio;
+	            for (int j = 0; j < cus; j++) {
+	                if (j != p && capacity[j] > 0.0f) {
+	                    // Compute the impact of moving vertex i to partition j
+	                    double temp_imbalance = (double) (partition_weights[j] + (*vwgt)[i]) / ideal_weight - 1.0;
+	                    if (temp_imbalance < min_diff) {
+	                        best_partition = j;
+	                        min_diff = temp_imbalance;
+	                    }
+	                }
+	            }
 
-        if (imbalance_ratio > 0) {
-            // If the partition is overloaded, try moving the vertex to another partition
-            idx_t best_partition = p;
-            double min_diff = imbalance_ratio;
-            for (int j = 0; j < cus; j++) {
-                if (j != p && capacity[j] > 0) {
-                    // Compute the impact of moving vertex i to partition j
-                    double temp_imbalance = (double) (partition_weights[j] + (*vwgt)[i]) / ideal_weight - 1.0;
-                    if (temp_imbalance < min_diff) {
-                        best_partition = j;
-                        min_diff = temp_imbalance;
-                    }
-                }
-            }
-
-            // Move the vertex to the best partition
-            if (best_partition != p) {
-                part[i] = best_partition;
-                partition_weights[p] -= (*vwgt)[i];
-                partition_weights[best_partition] += (*vwgt)[i];
-                capacity[best_partition]--;
-                capacity[p]++;
-            }
-        }
-    }
+	            // Move the vertex to the best partition
+	            if (best_partition != p) {
+	                part[i] = best_partition;
+	                partition_weights[p] -= (*vwgt)[i];
+	                partition_weights[best_partition] += (*vwgt)[i];
+	                capacity[best_partition] -= (double)(*vwgt)[i] / total_weight;
+	                capacity[p] += (double)(*vwgt)[i] / total_weight;
+	            }
+	        }
+	    }
+	}
 }
 
-
-void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, idx_t *capacity,
-    real_t input_comm_cost_matrix[actors][actors], real_t input_anno_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real_t *capacity,
+    real_t input_comm_cost_matrix[total_actors][total_actors], real_t input_anno_matrix[total_actors][total_actors], real_t input_msg_exch_cost[n_cus][n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -302,7 +304,7 @@ void metis_heterogeneous_multilevel(idx_t total_actors, idx_t n_cus, idx_t *task
 
 
 void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
-    real_t input_comm_cost_matrix[actors][actors], real_t input_msg_exch_cost[n_cus][n_cus])
+    real_t input_comm_cost_matrix[total_actors][total_actors], real_t input_msg_exch_cost[n_cus][n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -366,7 +368,7 @@ void metis_communication(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast,
 	free(new_adjwgt);
 }
 
-void metis_baseline(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real_t input_comm_cost_matrix[actors][actors], real_t input_tpwgts[n_cus])
+void metis_baseline(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real_t input_comm_cost_matrix[total_actors][total_actors], real_t input_tpwgts[n_cus])
 {
 	idx_t nParts = n_cus; // Number of partitions (number of CUs)
 
@@ -382,7 +384,10 @@ void metis_baseline(idx_t total_actors, idx_t n_cus, idx_t *tasks_forecast, real
 
 	real_t sum_tpwgts = 0.;
 	for (int i=0; i < n_cus; i++) sum_tpwgts += tpwgts[i];
-	if (sum_tpwgts != 1.0f) fprintf(stderr, "Sum of tpwgts is not 1! Impossible to use in METIS\n");
+	if (sum_tpwgts != 1.0f) {
+		tpwgts = NULL; /// just to make sure that it is not actually used
+		fprintf(stderr, "Sum of tpwgts is not 1! Cannot be used in METIS, setting it to NULL\n");
+	}
 
 	if(input_comm_cost_matrix != NULL)
 		memcpy(comm_cost_matrix, input_comm_cost_matrix, sizeof(comm_cost_matrix));

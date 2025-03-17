@@ -37,7 +37,7 @@ class DdmOperations(WindowOperations):
             actor_matrix.append(matrix_row)
 
         for i in range(num_actors):
-            print(str(actor_matrix[i]).replace('(','{').replace('[','{').replace(')','}').replace(']','}'))    
+            print(str(actor_matrix[i]).replace('(','{').replace('[','{').replace(')','}').replace(']','}'))
 
         task_forecast = self.sim_state._executed_events_per_actor[:]
         self.sim_state._executed_events_per_actor = [0]*num_actors
@@ -53,7 +53,7 @@ class DdmOperations(WindowOperations):
             if self.sim_state._cu_units_data[k]["executed"] != 0:
                 non_zero_cap = self.sim_state._cu_units_data[k]["executed"]
                 non_zero_cu  = k
-                capacity += [int(self.sim_state._cu_units_data[k]["executed"]*1.01)] 
+                capacity += [int(self.sim_state._cu_units_data[k]["executed"]*1.01)]
             else:
                 capacity += [0]
             self.sim_state._cu_units_data[k]["executed"] = 0

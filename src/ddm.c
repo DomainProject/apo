@@ -6,7 +6,7 @@
 #include "dynstr.h"
 #include "lp/assets.h"
 
-#define TIMEOUT 10
+#define TIMEOUT 5
 #define USE_ASSETS
 
 #ifndef USE_ASSETS
@@ -181,15 +181,19 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 		}
 	}
 
-//#ifndef USE_ASSETS
+#ifndef USE_ASSETS
+	printf("Writing program to temp file\n");
 	FILE *file = fopen("ddm_tmp.asp", "w");
 	if(file == NULL) {
 		perror("Error opening file");
 		exit(errno);
 	}
 	fprintf(file, "%s\n", dynstr_getbuff(clingo_program_buffer));
-	fclose(file);
-//#endif
+	fflush(file);
+    printf("File written\n");
+    fclose(file);
+//    exit(0);
+#endif
 
 	// initialize clingo w/program in prog_buff
 	const char *argv[] = {"--opt-mode", "opt"};
@@ -210,7 +214,7 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 	static clingo_model_t const *model = NULL;
 	clingo_model_t const *tmp_model = NULL;
 	//bool result;
-	
+	(void)stop_on_optimal;
 	// bool proven;
 	// size_t costs_size = 3;
 	// int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
@@ -281,15 +285,18 @@ int *ddm_poll(void)
 		// the first usable solution is found.
 		// TODO: this may now be the best suited solution.
 		do {
+			printf("Polling indefinitely...\n");
 			ret = ddm_poll_internal(false);
 		} while(ret == NULL);
 		last_call = 0; // Reset the timer for future invocations
 	} else {
+		printf("Polling...\n");
 		ret = ddm_poll_internal(true);
 	}
 
 	if(ret != NULL) { // We have found a solution that meets the timing or optimatily requirements: prepare for next
 		          // optimization.
+		printf("Solution found\n");
 		free_clingo(cctx);
 		dynstr_fini(&clingo_program_buffer);
 	}

@@ -1,3 +1,8 @@
+*.plt
+*.dat
+*.log
+*.pdf
+application.py
 METIS/
 res_path/
 GKlib/

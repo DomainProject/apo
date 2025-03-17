@@ -1,16 +1,14 @@
-import sys
-import os
+#!/usr/bin/env python3
 
 import metasimulation.SimulationEngine.runtime_modules
-from metasimulation.SimulationEngine.read_solutions import *
 from metasimulation.SimulationEngine.commandline import *
+from metasimulation.SimulationEngine.read_solutions import *
 
 simulation_folder, simulation_trace, fsolutions, wops_string = validate_command_line(sys.argv)
 
 global_constants_parameter_module = metasimulation.SimulationEngine.runtime_modules.global_constants_parameter_module
 hardware_parameter_module = metasimulation.SimulationEngine.runtime_modules.hardware_parameter_module
 
-import gc
 import itertools
 
 from metasimulation.SimulationEngine.assignment import *
@@ -32,7 +30,7 @@ import metasimulation.SimulationEngine.simloop
 
 
 import time
-import math 
+import math
 
 
 sim_state = SimulationState(simulation_trace, verbose=(len(sys.argv) != 4))
@@ -62,7 +60,7 @@ if wops_string not in operations_map:
 
 maximum_th, ground_truth = load_ground_truth(fsolutions)
 if "ddm" in wops_string and "c" in wops_string:
-    operations = operations_map[wops_string](sim_state, ddm_conf=int(wops_string[-1]))    
+    operations = operations_map[wops_string](sim_state, ddm_conf=int(wops_string[-1]))
 else:
     operations = operations_map[wops_string](sim_state)
 
@@ -92,7 +90,7 @@ childs = []
 if processes > 1:
     print("simulated cases /total cases - skipped by fiter actual expected ETA dd:hh:mm:ss")
     for i in range(processes-1):
-        pid = os.fork() 
+        pid = os.fork()
         if pid > 0:
             who_am_i += 1
             childs += [pid]
@@ -132,9 +130,9 @@ for current_assignment in to_be_evaluated_assignments:
             cur_reb_period = rebalance_period
     else:
         print(f"BEGIN SIMULATION LOOP")
-    
+
     skip = skip_filter or skip_parallel
-    if not skip: 
+    if not skip:
         results[tuple(sim_state.get_assignment())] = []
         wct_ts = metasimulation.SimulationEngine.simloop.loop(sim_state, evaluate_all, maximum_th, ground_truth, rebalance_period, operations, results)
 
@@ -160,7 +158,7 @@ for current_assignment in to_be_evaluated_assignments:
 
         if skipped != evaluated_tests:
             curr_exec_time = sum_elapsed/(evaluated_tests-skipped)
-            eta_max_sec = remaining*curr_exec_time 
+            eta_max_sec = remaining*curr_exec_time
             eta_seconds = remaining * (curr_exec_time) / (processes * estimated_filter_speedup)
             eta_minutes = math.floor(eta_seconds/60.0)
             eta_seconds -= eta_minutes*60
@@ -173,7 +171,7 @@ for current_assignment in to_be_evaluated_assignments:
                   f"{'{:.2f}'.format(estimated_filter_skipped/all_tests_count)} ETA {eta_days}d:{eta_hours}h:{eta_minutes}m:{int(eta_seconds)}s "+
                   f"SINGLE TEST {'{:.2f}'.format(curr_exec_time)} ACTUAL USAGE {int(100*sum_elapsed/(time.time()-very_start_time))}% "+" "*20, end='')
 
-        #print(current_assignment, results[current_assignment]) 
+        #print(current_assignment, results[current_assignment])
 
 if who_am_i == (processes -1):
     for pid in childs:
