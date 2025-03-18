@@ -55,11 +55,12 @@ with open(ofile, "w") as f:
             else:
                 receiver = random.randint(0, hotspot_partition - 1)
 
-        f.write(f"{timestamp:.4f},{sender},{timestamp+0.001:.4f},{receiver}\n")
+        f.write(f"{timestamp},{sender},{timestamp+random.expovariate(event_rate)},{receiver}\n")
         evt_count += 1
 
         # Generate and push the next event for the current sender.
         next_time = timestamp + random.expovariate(event_rate)
+        f.write(f"{timestamp},{sender},{next_time},{sender}\n")
         if next_time <= total_duration:
             heapq.heappush(heap, (next_time, sender))
 
