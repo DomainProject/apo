@@ -9,6 +9,7 @@ class RandomOperations(WindowOperations):
     def __init__(self, sim_state):
         print(f"initialize Random...", end='')
         self.sim_state = sim_state
+        random.seed(a=879156, version=2)
         print(f"done")
 
     def on_window(self, cu_units_data, wct_ts, ending_simulation, traces, committed_idxs, time_window_size,

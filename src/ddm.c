@@ -222,7 +222,8 @@ static int *ddm_poll_internal(bool stop_on_optimal)
 	// poll clingo to check if a result is ready
 	//clingo_solve_handle_wait(cctx->handle, 0, &result);
 
-	while (true) {
+	time_t start_time = time(NULL);
+	while (difftime(time(NULL), start_time) < 5) {
     	if (!clingo_solve_handle_resume(cctx->handle)) { goto error; }
     	if (!clingo_solve_handle_model(cctx->handle, &tmp_model)) { goto error; }
 	    if (!tmp_model) { break; }
