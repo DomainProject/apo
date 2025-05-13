@@ -67,6 +67,7 @@ class DdmOperations(WindowOperations):
         #for i in range(len(capacity)): capacity[i] = float(capacity[i])/total_capacity
         #for i in range(len(capacity)): capacity[i] = capacity[i]
         print("capacity", capacity)
+        print("capacity", self.sim_state.get_cunits())
         print("task_forecast", task_forecast)
 
 

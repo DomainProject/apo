@@ -71,6 +71,7 @@ def main():
         plt_file.write("set xlabel 'Simulation Time'\n")
         plt_file.write("set ylabel 'Throughput (task/msec)'\n")
         plt_file.write("set grid y\n")
+        plt_file.write("set samples 5000\n")
         plt_file.write(f"set xrange [0:{min_end_sim_time}]\n")
         plt_file.write(f"set yrange [0:{overall_ref*1.1}]\n")
         plt_file.write("set key center below\n")
@@ -80,7 +81,7 @@ def main():
         # Costruzione del comando di plot che include ogni file .dat generato
         plot_cmd = "plot "
         for dat, title in dat_files:
-            plot_cmd += f"'{dat}' using 1:2 with lines title '{title}', "
+            plot_cmd += f"'{dat}' using 1:2 smooth unique with lines title '{title}', "
         # Rimozione della virgola finale e aggiunta del comando di pausa
         plot_cmd = plot_cmd.rstrip(", ") + "\n"
         plt_file.write(plot_cmd)
