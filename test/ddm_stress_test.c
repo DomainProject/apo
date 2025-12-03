@@ -6,25 +6,58 @@
 #include <time.h>
 #include <float.h>
 
-#define NCUS 4
-#define NACT 8
+#define NCUS 32
+#define NACT 128
 
 #define ROLLBACK_PROBABILITY 0.1
-#define TOTAL_MESSAGES 10000
+#define TOTAL_MESSAGES 100000
 #define ROLLBACK_COST 10
 
 #define TOLERANCE_FACTOR 1.2 // Used to see if a DDM assignment is acceptable
 
-static enum cu_type cus[NCUS] = {1, 1, 2, 4};
-static int msg_exch_cost[NCUS][NCUS] = {
-    //        C  C  G  F
-    /*CPU*/ {1, 1, 2, 2},
-    /*CPU*/ {1, 1, 2, 2},
-    /*GPU*/ {2, 2, 4, 4},
-    /*FPGA*/ {2, 2, 4, 4}};
-static short runnable_on[NACT] = {7, 7, 7, 7, 7, 7, 7, 7};
-static int cu_capacity[NCUS] = {100, 100, 100, 100};
+static enum cu_type cus[NCUS];
+static int msg_exch_cost[NCUS][NCUS];
 
+static int default_msg_exch_cost[5][5] = {
+	//             C  G  F
+	/* INV */  {-1, -1, -1, -1, -1},
+	/*CPU*/    {-1,  1,  2, -1,  2},
+	/*GPU*/    {-1,  2,  4, -1,  4},
+	/* INV */  {-1, -1, -1, -1, -1},
+	/*FPGA*/   {-1,  2,  4, -1,  4},
+};
+
+static short runnable_on[NACT];
+static int cu_capacity[NCUS];
+
+
+void init_scenario(void)
+{
+	for(int i = 0; i < NACT; i++) {
+		runnable_on[i] = 0;
+		for(int j = 0; j < 3; j++) {
+			if((double)rand() / RAND_MAX < 0.75)
+				runnable_on[i] |= (1 << j);
+		}
+	}
+
+	for(int i = 0; i < NCUS; i++) {
+		cus[i] = (enum cu_type)(1 << (rand() % 3));
+	}
+
+	for(int i = 0; i < NCUS; i++) {
+		for(int j = 0; j < NCUS; j++) {
+			int cu1 = cus[i];
+			int cu2 = cus[j];
+			int cross_cost = default_msg_exch_cost[cu1][cu2];
+			msg_exch_cost[i][j] = cross_cost;
+		}
+	}
+
+	for(int i = 0; i < NCUS; i++) {
+		cu_capacity[i] = 2000 + rand() % 3000;
+	}
+}
 
 // Used by quicksort below
 static int cmp_int(const void *a, const void *b)
@@ -195,13 +228,13 @@ static bool is_cost_acceptable(double cost, struct actor_matrix actors[8][8], co
 	}
 }
 
+struct actor_matrix actors[NACT][NACT];
+int tasks_forecast[NACT];
 
 
 int main(int argc, char **argv)
 {
 	// <annoyance,msg_exchange_rate>
-	struct actor_matrix actors[NACT][NACT];
-	int tasks_forecast[NACT];
 	int *assignment;
 
 	time_t seed = time(NULL);
@@ -210,6 +243,9 @@ int main(int argc, char **argv)
 		seed = atol(argv[1]);
 	}
 	srand(seed);
+	printf("Seed: %ld\n", seed);
+
+	init_scenario();
 	ddm_init(NCUS, NACT, cus, msg_exch_cost, runnable_on);
 
 	generate_random_tasks_forecast(tasks_forecast);
@@ -217,31 +253,34 @@ int main(int argc, char **argv)
 	ddm_optimize(NACT, actors, tasks_forecast, NCUS, cu_capacity);
 	while((assignment = ddm_poll()) == NULL)
 		;
+
+	for(int i = 0; i < NACT; ++i) {
+		printf("%2d -> %2d\n", i, assignment[i]);
+	}
+
 	double total_cost = evaluate_assignment(assignment, actors, tasks_forecast);
 	double reference_cost = DBL_MAX;
 
-	if(!is_cost_acceptable(total_cost, actors, tasks_forecast, &reference_cost)) {
-		printf("Cost with the found assignment: %.2f\n", total_cost);
-		for(int i = 0; i < NACT; ++i) {
-			printf("%2d -> %2d\n", i, assignment[i]);
-		}
-		printf("Seed: %ld\n", seed);
-
-		// Print actors and task forecast
-		printf("Actor matrix:\n");
-		for(int i = 0; i < NACT; i++) {
-			for(int j = 0; j < NACT; j++) {
-				printf("(%d, %d) ", actors[i][j].annoyance, actors[i][j].msg_exchange_rate);
-			}
-			printf("\n");
-		}
-		printf("Tasks forecast:\n");
-		for(int i = 0; i < NACT; i++)
-			printf("%d ", tasks_forecast[i]);
-		printf("\n");
-	} else {
-		printf("Assignment with cost %.2f is acceptable (reference cost is %.2f).\n", total_cost, reference_cost);
-	}
+	// if(!is_cost_acceptable(total_cost, actors, tasks_forecast, &reference_cost)) {
+	// 	printf("Cost with the found assignment: %.2f\n", total_cost);
+	// 	for(int i = 0; i < NACT; ++i) {
+	// 		printf("%2d -> %2d\n", i, assignment[i]);
+	// 	}
+	// 	// Print actors and task forecast
+	// 	printf("Actor matrix:\n");
+	// 	for(int i = 0; i < NACT; i++) {
+	// 		for(int j = 0; j < NACT; j++) {
+	// 			printf("(%d, %d) ", actors[i][j].annoyance, actors[i][j].msg_exchange_rate);
+	// 		}
+	// 		printf("\n");
+	// 	}
+	// 	printf("Tasks forecast:\n");
+	// 	for(int i = 0; i < NACT; i++)
+	// 		printf("%d ", tasks_forecast[i]);
+	// 	printf("\n");
+	// } else {
+	// 	printf("Assignment with cost %.2f is acceptable (reference cost is %.2f).\n", total_cost, reference_cost);
+	// }
 
 	free(assignment);
 

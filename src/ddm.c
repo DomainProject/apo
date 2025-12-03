@@ -6,8 +6,10 @@
 #include "dynstr.h"
 #include "lp/assets.h"
 
-#define TIMEOUT 5
+#define TIMEOUT 2
 #define USE_ASSETS
+
+#define DUMP_ASP_PROGRAM
 
 #ifndef USE_ASSETS
 static unsigned char *base_program = NULL;
@@ -181,7 +183,7 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 		}
 	}
 
-#ifndef USE_ASSETS
+#ifdef DUMP_ASP_PROGRAM
 	printf("Writing program to temp file\n");
 	FILE *file = fopen("ddm_tmp.asp", "w");
 	if(file == NULL) {
@@ -225,12 +227,20 @@ static int *ddm_poll_internal(bool wait_until_optimal_is_found)
 	clingo_solve_handle_wait(cctx->handle, TIMEOUT, &result);
 	printf("result is %d\n", result);
 
-	// check whether the search has finished
+	// check whether the search has finished and is satisfiable
 	if(result) {
 		if(!clingo_solve_handle_model(cctx->handle, &tmp_model)) {
 			perror(clingo_error_message());
 			exit(clingo_error_code());
 		}
+
+		clingo_solve_result_bitset_t sat;
+		clingo_solve_handle_get(cctx->handle, &sat);
+		if(sat & clingo_solve_result_unsatisfiable) {
+			fprintf(stderr, "The problem is unsatisfiable\n");
+			abort();
+		}
+
 		// replace model with the last one (NULL means there are no more models)
 		if(tmp_model) {
 			model = tmp_model;
