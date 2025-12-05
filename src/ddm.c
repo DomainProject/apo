@@ -1,7 +1,9 @@
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <errno.h>
+
 #include "ddm.h"
 #include "dynstr.h"
 #include "lp/assets.h"
@@ -155,33 +157,67 @@ void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][tot
 	// Reset program buffer
 	dynstr_strcpy(&clingo_program_buffer, clingo_base_program_buffer);
 
-	// tasks_forecast/2
-	for(int i = 0; i < total_actors; ++i)
-		dynstr_printcat(clingo_program_buffer, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]);
+	size_t facts_buffer_size = 0;
+	char temp_line_buffer[256]; // Buffer for calculating line lengths
 
-	// cu_capacity/2
-	for(int i = 0; i < total_cus; ++i)
-		dynstr_printcat(clingo_program_buffer, "cu_capacity(%d,%d).\n", i, cu_capacity[i]);
+	// Calculate total size for tasks_forecast facts
+	for (int i = 0; i < total_actors; ++i) {
+		facts_buffer_size += sprintf(temp_line_buffer, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]);
+	}
 
-	for(int i = 0; i < total_actors; ++i) {
-		for(int j = 0; j < total_actors; ++j) {
-			// msg_exchange_rate/3
-			if(actors[i][j].msg_exchange_rate) {
-				dynstr_printcat(clingo_program_buffer, "msg_exch_rate(%d,%d,%d).\n", i, j,
-				    actors[i][j].msg_exchange_rate);
+	// Calculate total size for cu_capacity facts
+	for (int i = 0; i < total_cus; ++i) {
+		facts_buffer_size += sprintf(temp_line_buffer, "cu_capacity(%d,%d).\n", i, cu_capacity[i]);
+	}
+
+	// Calculate total size for msg_exch_rate and mutual_annoyance facts
+	for (int i = 0; i < total_actors; ++i) {
+		for (int j = 0; j < total_actors; ++j) {
+			if (actors[i][j].msg_exchange_rate) {
+				facts_buffer_size += sprintf(temp_line_buffer, "msg_exch_rate(%d,%d,%d).\n", i, j,
+					actors[i][j].msg_exchange_rate);
+			}
+			if (actors[i][j].annoyance) {
+				facts_buffer_size += sprintf(temp_line_buffer, "mutual_annoyance(%d,%d,%d).\n", i, j,
+					actors[i][j].annoyance);
 			}
 		}
 	}
 
-	for(int i = 0; i < total_actors; ++i) {
-		for(int j = 0; j < total_actors; ++j) {
-			// mutual_annoyance/3
-			if(actors[i][j].annoyance) {
-				dynstr_printcat(clingo_program_buffer, "mutual_annoyance(%d,%d,%d).\n", i, j,
-				    actors[i][j].annoyance);
+	// Allocate a single buffer for all new facts
+	char *facts_buffer = malloc(facts_buffer_size + 1);
+	if (facts_buffer == NULL) {
+		perror("ddm_optimize: could not allocate memory for facts buffer");
+		exit(errno); // Or a more graceful exit
+	}
+
+	// Generate all facts into the buffer
+	char *current_pos = facts_buffer;
+	for (int i = 0; i < total_actors; ++i) {
+		current_pos += sprintf(current_pos, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]);
+	}
+
+	for (int i = 0; i < total_cus; ++i) {
+		current_pos += sprintf(current_pos, "cu_capacity(%d,%d).\n", i, cu_capacity[i]);
+	}
+
+	for (int i = 0; i < total_actors; ++i) {
+		for (int j = 0; j < total_actors; ++j) {
+			if (actors[i][j].msg_exchange_rate) {
+				current_pos += sprintf(current_pos, "msg_exch_rate(%d,%d,%d).\n", i, j,
+					actors[i][j].msg_exchange_rate);
+			}
+			if (actors[i][j].annoyance) {
+				current_pos += sprintf(current_pos, "mutual_annoyance(%d,%d,%d).\n", i, j,
+					actors[i][j].annoyance);
 			}
 		}
 	}
+	*current_pos = '\0';
+
+	// Append the buffer to the clingo program buffer and free it
+	dynstr_strcat(clingo_program_buffer, facts_buffer, facts_buffer_size);
+	free(facts_buffer);
 
 #ifdef DUMP_ASP_PROGRAM
 	printf("Writing program to temp file\n");

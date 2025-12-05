@@ -7,7 +7,7 @@
 #include <float.h>
 
 #define NCUS 32
-#define NACT 128
+#define NACT 2048
 
 #define ROLLBACK_PROBABILITY 0.1
 #define TOTAL_MESSAGES 100000
