@@ -1,55 +1,32 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 #include "ddm.h"
 #include "dynstr.h"
 #include "lp/assets.h"
+#include "aspsolver/asp_solver.h"
 
-#define TIMEOUT 2
-#define USE_ASSETS
+#include <unistd.h>
 
-#define DUMP_ASP_PROGRAM
+#define TIMEOUT 2.0
+#define DUMP_PROGRAM
 
-#ifndef USE_ASSETS
-static unsigned char *base_program = NULL;
-#else
 static const unsigned char *base_program = LDVAR(ddm_asp);
-#endif
-
-static clingo_ctx *cctx;
+asp_solver_t *solver;
 struct dynstr *clingo_base_program_buffer;
-struct dynstr *clingo_program_buffer;
 
-static int *get_pairs(clingo_model_t const *model)
+
+static void get_pairs(const clingo_symbol_t *atoms, size_t atoms_n, int **pairs)
 {
-	clingo_symbol_t *atoms = NULL;
-	size_t atoms_n;
 	clingo_symbol_t const *it, *ie;
 	char str[50];
 
-	// determine the number of (shown) symbols in the model
-	if(!clingo_model_symbols_size(model, clingo_show_type_shown, &atoms_n)) {
-		goto error3;
-	}
-
-	// allocate required memory to hold all the symbols
-	if(!(atoms = malloc(sizeof(*atoms) * atoms_n))) {
-		clingo_set_error(clingo_error_bad_alloc, "could not allocate memory for atoms");
-		goto error2;
-	}
-
-	int *pairs = malloc(sizeof(int) * atoms_n);
-	if(!pairs) {
+	*pairs = malloc(sizeof(int) * atoms_n);
+	if(!*pairs) {
 		perror("ddm_init: could not allocate memory for prog_buff");
-		goto error;
-	}
-
-	// retrieve the symbols in the model
-	if(!clingo_model_symbols(model, clingo_show_type_shown, atoms, atoms_n)) {
-		goto error;
+		return;
 	}
 
 	for(it = atoms, ie = atoms + atoms_n; it != ie; ++it) {
@@ -68,59 +45,24 @@ static int *get_pairs(clingo_model_t const *model)
 		char *atom = str + 7; // skip run_on(
 		char *snd, *end;
 
-		if(str[0] == 'r' && str[1] == 'u' && str[2] == 'n' ){
-			//printf("ATOM %s\n",str);
+		if(str[0] == 'r' && str[1] == 'u' && str[2] == 'n') {
 			int idx = (int)strtol(atom, &snd, 10);
-			pairs[idx] = (int)strtol(++snd, &end, 10);
-			//printf("IDX:%u VAL:%u\n", idx, pairs[idx]);
+			*pairs[idx] = (int)strtol(++snd, &end, 10);
 		}
 	}
-
-	// number of atoms in the model
-	free(atoms);
-	return pairs;
+	return;
 
 error:
-	free(pairs);
-error2:
-	free(atoms);
-error3:
-	return NULL;
+	free(*pairs);
+	*pairs = NULL;
 }
-
-
 void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_exch_cost[total_cus][total_cus],
     short runnable_on[total_actors])
 {
-	/*  ------------- BEGIN TEMPORARY CODE -----------  */
-#ifndef USE_ASSETS
-	int fd = open("lp/ddm.asp", O_RDONLY);
-	if(fd == -1) {
-		perror("open error");
-		exit(errno);
-	}
-
-	int len = lseek(fd, 0, SEEK_END);
-	base_program = (unsigned char *)mmap(0, len, PROT_READ, MAP_PRIVATE, fd, 0);
-
-	// the code above should be replaced by:
-#else
 	size_t len = LDLEN(ddm_asp);
-#endif
-	/*  ------------- END TEMPORARY CODE -------------  */
-
-	// Copy the ASP rules to solve the optimization problem to prog_buff
 	dynstr_init(&clingo_base_program_buffer, len);
 	dynstr_strcat(clingo_base_program_buffer, (const char *)base_program, len);
-
-	/* --- adding facts --- */
-	dynstr_printcat(clingo_base_program_buffer, "\n%%%%%% facts\n");
-
-	/* --- HW platform dependent facts --- */
-	// cu/1
 	dynstr_printcat(clingo_base_program_buffer, "cu(0..%d).\n", total_cus - 1);
-
-	// cu_type/2
 	for(int i = 0; i < total_cus; ++i)
 		switch(cus[i]) {
 			case CPU:
@@ -133,206 +75,66 @@ void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_
 				dynstr_printcat(clingo_base_program_buffer, "cu_type(%d,fpga).\n", i);
 				break;
 		}
-
-	// msg_exch_cost/3
 	for(int i = 0; i < total_cus; ++i)
 		for(int j = 0; j < total_cus; ++j)
 			dynstr_printcat(clingo_base_program_buffer, "msg_exch_cost(%d,%d,%d).\n", i, j,
 			    msg_exch_cost[i][j]);
 
-	/* --- Actors dependent facts --- */
-	// actor/1
 	dynstr_printcat(clingo_base_program_buffer, "actor(0..%d).\n", total_actors - 1);
-
-	// runnable_on_class/2
 	for(int i = 0; i < total_actors; ++i)
 		dynstr_printcat(clingo_base_program_buffer, "runnable_on(%d,%d).\n", i, runnable_on[i]);
+
+	solver = asp_solver_create(dynstr_getbuff(clingo_base_program_buffer));
 }
 
 
-// Restituisce un vettore in cui nella posizione i-esima è conservato il dispositivo su cui deve girare l'attore i-esimo
 void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], int total_cus, int cu_capacity[total_cus])
 {
-	// Reset program buffer
-	dynstr_strcpy(&clingo_program_buffer, clingo_base_program_buffer);
+	// Reset solver
+	asp_solver_begin_session(solver);
 
-	size_t facts_buffer_size = 0;
-	char temp_line_buffer[256]; // Buffer for calculating line lengths
-
-	// Calculate total size for tasks_forecast facts
+	// Inject facts
 	for (int i = 0; i < total_actors; ++i) {
-		facts_buffer_size += sprintf(temp_line_buffer, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]);
+		asp_inject_fact_u2(solver, "tasks_forecast", i, tasks_forecast[i]);
 	}
-
-	// Calculate total size for cu_capacity facts
 	for (int i = 0; i < total_cus; ++i) {
-		facts_buffer_size += sprintf(temp_line_buffer, "cu_capacity(%d,%d).\n", i, cu_capacity[i]);
+		asp_inject_fact_u2(solver, "cu_capacity", i, cu_capacity[i]);
 	}
-
-	// Calculate total size for msg_exch_rate and mutual_annoyance facts
 	for (int i = 0; i < total_actors; ++i) {
 		for (int j = 0; j < total_actors; ++j) {
 			if (actors[i][j].msg_exchange_rate) {
-				facts_buffer_size += sprintf(temp_line_buffer, "msg_exch_rate(%d,%d,%d).\n", i, j,
-					actors[i][j].msg_exchange_rate);
+				asp_inject_fact_u3(solver, "msg_exch_rate", i, j, actors[i][j].msg_exchange_rate);
 			}
 			if (actors[i][j].annoyance) {
-				facts_buffer_size += sprintf(temp_line_buffer, "mutual_annoyance(%d,%d,%d).\n", i, j,
-					actors[i][j].annoyance);
+				asp_inject_fact_u3(solver, "mutual_annoyance", i, j, actors[i][j].annoyance);
 			}
 		}
 	}
 
-	// Allocate a single buffer for all new facts
-	char *facts_buffer = malloc(facts_buffer_size + 1);
-	if (facts_buffer == NULL) {
-		perror("ddm_optimize: could not allocate memory for facts buffer");
-		exit(errno); // Or a more graceful exit
-	}
-
-	// Generate all facts into the buffer
-	char *current_pos = facts_buffer;
-	for (int i = 0; i < total_actors; ++i) {
-		current_pos += sprintf(current_pos, "tasks_forecast(%d,%d).\n", i, tasks_forecast[i]);
-	}
-
-	for (int i = 0; i < total_cus; ++i) {
-		current_pos += sprintf(current_pos, "cu_capacity(%d,%d).\n", i, cu_capacity[i]);
-	}
-
-	for (int i = 0; i < total_actors; ++i) {
-		for (int j = 0; j < total_actors; ++j) {
-			if (actors[i][j].msg_exchange_rate) {
-				current_pos += sprintf(current_pos, "msg_exch_rate(%d,%d,%d).\n", i, j,
-					actors[i][j].msg_exchange_rate);
-			}
-			if (actors[i][j].annoyance) {
-				current_pos += sprintf(current_pos, "mutual_annoyance(%d,%d,%d).\n", i, j,
-					actors[i][j].annoyance);
-			}
-		}
-	}
-	*current_pos = '\0';
-
-	// Append the buffer to the clingo program buffer and free it
-	dynstr_strcat(clingo_program_buffer, facts_buffer, facts_buffer_size);
-	free(facts_buffer);
-
-#ifdef DUMP_ASP_PROGRAM
-	printf("Writing program to temp file\n");
-	FILE *file = fopen("ddm_tmp.asp", "w");
-	if(file == NULL) {
-		perror("Error opening file");
-		exit(errno);
-	}
-	fprintf(file, "%s\n", dynstr_getbuff(clingo_program_buffer));
-	fflush(file);
-    printf("File written\n");
-    fclose(file);
-//    exit(0);
+#ifdef DUMP_PROGRAM
+	asp_solver_dump(solver, "ddm_tmp.asp");
 #endif
 
-	// initialize clingo w/program in prog_buff
-	const char *argv[] = {"--opt-mode", "opt"};
-	const int argc = 2;
-	init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_async | clingo_solve_mode_yield, &cctx);
-//	init_clingo_mode(dynstr_getbuff(clingo_program_buffer), argc, argv, clingo_solve_mode_yield, &cctx);
-
-	// get the first model
-	if(!clingo_solve_handle_resume(cctx->handle)) {
-		perror(clingo_error_message());
-		exit(clingo_error_code());
-	}
+	asp_solver_run_async(solver, TIMEOUT);
 }
 
-static int *ddm_poll_internal(bool wait_until_optimal_is_found)
+enum result ddm_poll(int **assignment)
 {
-	// 1. invoke clingo & get the optimal
-	static clingo_model_t const *model = NULL; // Memory leak here
-	clingo_model_t const *tmp_model = NULL;
-	bool result;
-
-	(void)wait_until_optimal_is_found;
-//
-//	 bool proven;
-//	 size_t costs_size = 3;
-//	 int64_t *costs = (int64_t *)malloc(sizeof(int64_t) * costs_size);
-
-	// poll clingo to check if a result is ready
-	clingo_solve_handle_wait(cctx->handle, TIMEOUT, &result);
-	printf("result is %d\n", result);
-
-	// check whether the search has finished and is satisfiable
-	if(result) {
-		if(!clingo_solve_handle_model(cctx->handle, &tmp_model)) {
-			perror(clingo_error_message());
-			exit(clingo_error_code());
-		}
-
-		clingo_solve_result_bitset_t sat;
-		clingo_solve_handle_get(cctx->handle, &sat);
-		if(sat & clingo_solve_result_unsatisfiable) {
-			fprintf(stderr, "The problem is unsatisfiable\n");
-			abort();
-		}
-
-		// replace model with the last one (NULL means there are no more models)
-		if(tmp_model) {
-			model = tmp_model;
-		}
-		// tmp_model == NULL: there are no more models (the last found is the optimal model) OR
-		// tmp_model != NULL && stop_on_optimal == false: a model has been found and it does no matter if it is
-		// the optimal model
-		// 2. extract pairs <actor,cu> from the as (run_on/2 facts)
-		return get_pairs(model);
+	const clingo_symbol_t *model;
+	size_t count;
+	asp_result_t status = asp_solver_poll(solver, &model, &count);
+	if (status == ASP_TIMEOUT_FOUND || status == ASP_OPT) {
+		get_pairs(model, count, assignment);
+		return FOUND;
 	}
-
-//	return get_pairs(model);
-
-	// no result (yet)
-	printf("No result is ready\n");
-	return NULL;
+	if(status == ASP_TIMEOUT_NOSOL || status == ASP_UNSATISFIABLE) {
+		return UNSAT;
+	}
+	return SEARCHING;
 }
 
-
-int *ddm_poll(void)
+void ddm_destroy(void)
 {
-	static time_t last_call = 0;
-	time_t now = time(NULL);
-	int *ret;
-
-	if(last_call == 0) // First invocation
-		last_call = now;
-
-	if((now - last_call) >= TIMEOUT) { // time returns a UNIX timestamp, so this waits at most TIMEOUT seconds
-		// If the timeout is too short, we might not have found even a single solution. Stop the world until
-		// the first usable solution is found.
-		// TODO: this may now be the best suited solution.
-		do {
-			printf("Polling indefinitely...\n");
-			ret = ddm_poll_internal(false);
-		} while(ret == NULL);
-		last_call = 0; // Reset the timer for future invocations
-	} else {
-		printf("Polling...\n");
-		ret = ddm_poll_internal(true);
-	}
-
-	if(ret != NULL) { // We have found a solution that meets the timing or optimatily requirements: prepare for next
-		          // optimization.
-		printf("Solution found\n");
-		free_clingo(cctx);
-		dynstr_fini(&clingo_program_buffer);
-	}
-	return ret;
+	asp_solver_destroy(solver);
 }
-
-//
-//int *ddm_poll(void){
-//  int *ret = ddm_poll_internal(true);
-//  // free the solve handle
-//  free_clingo(cctx);
-//  dynstr_fini(&clingo_program_buffer);
-//  return ret;
-//}

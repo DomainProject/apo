@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../src/ddm.h"
 
+#include <unistd.h>
+
 #define NCUS 25
 #define NACT 8
 
@@ -38,14 +40,24 @@ int main(void)
 	};
 
 	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
-	int *res;
 
-	while((res = ddm_poll()) == NULL);
+	int *assignment;
+	enum result res;
+	while((res = ddm_poll(&assignment)) == SEARCHING) {
+		usleep(100000);
+	}
+
+	if(res == UNSAT) {
+		fprintf(stderr, "Unable to find a satisfiable solution\n");
+		return 0;
+	}
 
 	for(int i = 0; i < total_actors; ++i) {
-		printf("%2d -> %2d\n", i, res[i]);
+		printf("%2d -> %2d\n", i, assignment[i]);
 	}
-	free(res);
+	free(assignment);
+
+	ddm_destroy();
 
 	return 0;
 }

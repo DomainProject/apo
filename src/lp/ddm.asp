@@ -1,5 +1,5 @@
 % utility directives
-#show run_on/2.
+%#show run_on/2.
 
 apt(1000).
 cpt(1000).

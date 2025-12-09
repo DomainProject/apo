@@ -5,6 +5,8 @@
 #include "../src/ddm.h"
 #include <time.h>
 #include <float.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #define NCUS 32
 #define NACT 2048
@@ -250,13 +252,21 @@ int main(int argc, char **argv)
 
 	generate_random_tasks_forecast(tasks_forecast);
 	generate_random_actor_matrix(actors, tasks_forecast);
-	ddm_optimize(NACT, actors, tasks_forecast, NCUS, cu_capacity);
-	while((assignment = ddm_poll()) == NULL)
-		;
+
+	enum result res;
+	while((res = ddm_poll(&assignment)) == SEARCHING) {
+		usleep(100000);
+	}
+
+	if(res == UNSAT) {
+		fprintf(stderr, "Unable to find a satisfiable solution\n");
+		return 0;
+	}
 
 	for(int i = 0; i < NACT; ++i) {
 		printf("%2d -> %2d\n", i, assignment[i]);
 	}
+	free(assignment);
 
 	double total_cost = evaluate_assignment(assignment, actors, tasks_forecast);
 	double reference_cost = DBL_MAX;
