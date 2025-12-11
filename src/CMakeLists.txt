@@ -31,9 +31,9 @@ target_include_directories(domainddm PUBLIC ${Clingo_INCLUDE_DIRS})
 
 target_link_libraries(domainddm    PRIVATE ${Clingo_LIBRARIES} resources aspsolver)
 
-add_library(ddmmetis SHARED ./ddmmetis/ddmmetis.c ./ddmmetis/utils.c)
-target_include_directories(ddmmetis PUBLIC ${Metis_INCLUDE_DIR})
-target_link_libraries(ddmmetis PRIVATE ${Metis_LIBRARY} ${GKlib_LIBRARY})
+#add_library(ddmmetis SHARED ./ddmmetis/ddmmetis.c ./ddmmetis/utils.c)
+#target_include_directories(ddmmetis PUBLIC ${Metis_INCLUDE_DIR})
+#target_link_libraries(ddmmetis PRIVATE ${Metis_LIBRARY} ${GKlib_LIBRARY})
 
 add_subdirectory(lp)
 add_subdirectory(aspsolver)

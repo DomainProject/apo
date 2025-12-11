@@ -47,7 +47,7 @@ static void get_pairs(const clingo_symbol_t *atoms, size_t atoms_n, int **pairs)
 
 		if(str[0] == 'r' && str[1] == 'u' && str[2] == 'n') {
 			int idx = (int)strtol(atom, &snd, 10);
-			*pairs[idx] = (int)strtol(++snd, &end, 10);
+			(*pairs)[idx] = (int)strtol(++snd, &end, 10);
 		}
 	}
 	return;

@@ -6,6 +6,12 @@
 #include <pthread.h>
 #include <string.h>
 
+#define VERBOSE
+
+#ifdef VERBOSE
+#include "timer.h"
+#endif
+
 struct asp_solver {
 	// reference to the global read-only program
 	const char *base_source;
@@ -235,6 +241,23 @@ void asp_inject_fact_u3(asp_solver_t *ctx, const char *predicate, unsigned int v
 	inject_symbol(ctx->backend, predicate, args, 3);
 }
 
+/* common internal function to ground a program */
+static bool ground_program(asp_solver_t *ctx, clingo_part_t parts[])
+{
+	bool ret;
+
+#ifdef VERBOSE
+	printf("Start grounding... ");
+	fflush(stdout);
+	timer_uint timer = timer_new();
+#endif
+	if(!(ret = clingo_control_ground(ctx->ctl, parts, 1, NULL, NULL)))
+		check_clingo_panic();
+#ifdef VERBOSE
+	printf("done in %f seconds.\n", (double)timer_value(timer)/100000.);
+#endif
+	return ret;
+}
 
 /*
  * common internal launcher for solve requests
@@ -249,8 +272,7 @@ static void internal_start_solve(asp_solver_t *ctx)
 		ctx->backend_open = false;
 	}
 
-	if(!clingo_control_ground(ctx->ctl, parts, 1, NULL, NULL))
-		check_clingo_panic();
+	ground_program(ctx, parts);
 
 	/* async is ALWAYS enabled. this forces clingo to allocate a solve handle,
 	   preventing "handle is NULL" errors even for synchronous runs. */
@@ -322,7 +344,10 @@ asp_result_t asp_solver_poll(asp_solver_t *ctx, const clingo_symbol_t **model, s
 		if(elapsed > ctx->timeout_sec) {
 			clingo_solve_handle_cancel(ctx->solve_handle);
 			// we must wait for the cancellation to propagate so the model state is stable.
-			clingo_solve_handle_wait(ctx->solve_handle, 0, NULL);
+			bool success;
+			clingo_solve_handle_wait(ctx->solve_handle, 0, &success);
+			if(!success)
+				check_clingo_panic();
 
 			result = ctx->has_solution ? ASP_TIMEOUT_FOUND : ASP_TIMEOUT_NOSOL;
 		} else if(ctx->has_solution) {
@@ -348,7 +373,7 @@ asp_result_t asp_solver_poll(asp_solver_t *ctx, const clingo_symbol_t **model, s
 bool asp_solver_dump(asp_solver_t *ctx, const char *filepath)
 {
 	FILE *f;
-	clingo_symbolic_atoms_t *atoms;
+	const clingo_symbolic_atoms_t *atoms;
 	clingo_symbolic_atom_iterator_t it, end;
 	clingo_part_t parts[] = {{"base", NULL, 0}};
 
@@ -371,7 +396,7 @@ bool asp_solver_dump(asp_solver_t *ctx, const char *filepath)
 	}
 
 	/* we must ground to populate the symbolic atoms (signatures and facts) */
-	if(!clingo_control_ground(ctx->ctl, parts, 1, NULL, NULL)) {
+	if(!ground_program(ctx, parts)) {
 		fclose(f);
 		return false;
 	}
@@ -410,7 +435,7 @@ bool asp_solver_dump(asp_solver_t *ctx, const char *filepath)
 			}
 		}
 	}
-
+	fflush(f);
 	fclose(f);
 	return true;
 }
