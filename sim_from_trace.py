@@ -19,10 +19,10 @@ from metasimulation.window_operations.null_operations  import NullOperations
 
 from metasimulation.window_operations.ddm_operations import DdmOperations
 
-from metasimulation.window_operations.metis_hete_asplike import MetisHeterogeneousOperations
-from metasimulation.window_operations.metis_hete_comm    import MetisCommunicationOperations
-from metasimulation.window_operations.metis_homo_comm  import MetisHomogeneousCommunicationOperations
-from metasimulation.window_operations.metis_homo_node  import MetisHomogeneousNodesOperations
+# from metasimulation.window_operations.metis_hete_asplike import MetisHeterogeneousOperations
+# from metasimulation.window_operations.metis_hete_comm    import MetisCommunicationOperations
+# from metasimulation.window_operations.metis_homo_comm  import MetisHomogeneousCommunicationOperations
+# from metasimulation.window_operations.metis_homo_node  import MetisHomogeneousNodesOperations
 
 from metasimulation.window_operations.random_operations import RandomOperations
 
@@ -38,12 +38,12 @@ sim_state.init_simulator_queue()
 
 operations_map = {
    "ddm":                     DdmOperations,
-   "metis-hete-asplike":   MetisHeterogeneousOperations,
+   # "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,
-   "metis-hete-comm":      MetisCommunicationOperations,
-   "metis-homo-comm":      MetisHomogeneousCommunicationOperations,
-   "metis-homo-node":      MetisHomogeneousNodesOperations,
+   # "metis-hete-comm":      MetisCommunicationOperations,
+   # "metis-homo-comm":      MetisHomogeneousCommunicationOperations,
+   # "metis-homo-node":      MetisHomogeneousNodesOperations,
 
 }
 

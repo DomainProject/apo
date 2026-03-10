@@ -14,7 +14,11 @@ _domainddm = None
 
 def ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on):
     global _domainddm
-    _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
+    try:
+        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
+    except OSError:
+        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.dylib')
+
 
 
     arr_cus = (ctypes.c_int * total_cus)(*cus)
