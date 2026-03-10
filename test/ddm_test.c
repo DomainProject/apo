@@ -39,23 +39,25 @@ int main(void)
 	    {{675, 1920}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 21354}}
 	};
 
-	ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
+	for(int i = 0; i < 100; i++) {
+		ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity);
 
-	int *assignment;
-	enum result res;
-	while((res = ddm_poll(&assignment)) == SEARCHING) {
-		usleep(100000);
-	}
+		int *assignment;
+		enum result res;
+		while((res = ddm_poll(&assignment)) == SEARCHING) {
+			usleep(100000);
+		}
 
-	if(res == UNSAT) {
-		fprintf(stderr, "Unable to find a satisfiable solution\n");
-		return 0;
-	}
+		if(res == UNSAT) {
+			fprintf(stderr, "Unable to find a satisfiable solution\n");
+			return 0;
+		}
 
-	for(int i = 0; i < total_actors; ++i) {
-		printf("%2d -> %2d\n", i, assignment[i]);
+		for(int i = 0; i < total_actors; ++i) {
+			printf("%2d -> %2d\n", i, assignment[i]);
+		}
+		free(assignment);
 	}
-	free(assignment);
 
 	ddm_destroy();
 

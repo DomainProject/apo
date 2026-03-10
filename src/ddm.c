@@ -8,6 +8,7 @@
 #include "lp/assets.h"
 #include "aspsolver/asp_solver.h"
 
+#include <string.h>
 #include <unistd.h>
 
 #define TIMEOUT 2.0
@@ -21,7 +22,7 @@ struct dynstr *clingo_base_program_buffer;
 static void get_pairs(const clingo_symbol_t *atoms, size_t atoms_n, int **pairs)
 {
 	clingo_symbol_t const *it, *ie;
-	char str[50];
+	char *str = NULL;
 
 	*pairs = malloc(sizeof(int) * atoms_n);
 	if(!*pairs) {
@@ -37,22 +38,30 @@ static void get_pairs(const clingo_symbol_t *atoms, size_t atoms_n, int **pairs)
 			goto error;
 		}
 
+		str = malloc(n);
+		if(!str) {
+			goto error;
+		}
+
 		// retrieve the symbol's string
 		if(!clingo_symbol_to_string(*it, str, n)) {
 			goto error;
 		}
 
-		char *atom = str + 7; // skip run_on(
-		char *snd, *end;
-
-		if(str[0] == 'r' && str[1] == 'u' && str[2] == 'n') {
+		if(strncmp(str, "run_on(", 7) == 0) {
+			char *atom = str + 7;
+			char *snd, *end;
 			int idx = (int)strtol(atom, &snd, 10);
 			(*pairs)[idx] = (int)strtol(++snd, &end, 10);
 		}
+		free(str);
+		str = NULL;
 	}
 	return;
 
 error:
+	if(str)
+		free(str);
 	free(*pairs);
 	*pairs = NULL;
 }
@@ -132,6 +141,11 @@ enum result ddm_poll(int **assignment)
 		return UNSAT;
 	}
 	return SEARCHING;
+}
+
+void ddm_free_assignment(int *assignment)
+{
+	free(assignment);
 }
 
 void ddm_destroy(void)

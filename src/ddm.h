@@ -15,5 +15,6 @@ extern void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, i
 extern void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], int total_cus, int cu_capacity[total_cus] );
 extern enum result ddm_poll(int **assignment);
+extern void ddm_free_assignment(int *assignment);
 
 extern void ddm_destroy(void);
