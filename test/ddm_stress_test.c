@@ -35,7 +35,7 @@ void init_scenario(void)
 {
 
     #if __APPLE__
-      sranddev()
+      sranddev();
     #elif __linux__
       srand(time(NULL));
 	#endif	
