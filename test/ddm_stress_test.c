@@ -6,8 +6,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define NCUS 32
-#define NACT 128
+#define NCUS 16
+#define NACT 64
 
 #define ROLLBACK_PROBABILITY 0.1
 #define TOTAL_MESSAGES 100000
@@ -33,8 +33,11 @@ static int cu_capacity[NCUS];
 
 void init_scenario(void)
 {
+    sranddev();
+
 	for(int i = 0; i < NACT; i++) {
-		runnable_on[i] = 0;
+		//runnable_on[i] = 0;
+		runnable_on[i] = ((double)rand() / RAND_MAX) * 7 + 1;
 		for(int j = 0; j < 3; j++) {
 			if((double)rand() / RAND_MAX < 0.75)
 				runnable_on[i] |= 1 << j;
@@ -260,38 +263,19 @@ int main(int argc, char **argv)
 	}
 
 	if(res == UNSAT) {
-		fprintf(stderr, "Unable to find a satisfiable solution\n");
-		return 0;
+		fprintf(stderr, "Unable to find a solution: UNSAT\n");
+		return 0; 
+	} else if(res == TIMEOUT) {
+        fprintf(stderr, "Unable to find a solution: TIMEOUT\n");
+		return 0; 
 	}
 
 	for(int i = 0; i < NACT; ++i) {
 		printf("%2d -> %2d\n", i, assignment[i]);
 	}
-	free(assignment);
 
 	double total_cost = evaluate_assignment(assignment, actors, tasks_forecast);
 	double reference_cost = DBL_MAX;
-
-	// if(!is_cost_acceptable(total_cost, actors, tasks_forecast, &reference_cost)) {
-	// 	printf("Cost with the found assignment: %.2f\n", total_cost);
-	// 	for(int i = 0; i < NACT; ++i) {
-	// 		printf("%2d -> %2d\n", i, assignment[i]);
-	// 	}
-	// 	// Print actors and task forecast
-	// 	printf("Actor matrix:\n");
-	// 	for(int i = 0; i < NACT; i++) {
-	// 		for(int j = 0; j < NACT; j++) {
-	// 			printf("(%d, %d) ", actors[i][j].annoyance, actors[i][j].msg_exchange_rate);
-	// 		}
-	// 		printf("\n");
-	// 	}
-	// 	printf("Tasks forecast:\n");
-	// 	for(int i = 0; i < NACT; i++)
-	// 		printf("%d ", tasks_forecast[i]);
-	// 	printf("\n");
-	// } else {
-	// 	printf("Assignment with cost %.2f is acceptable (reference cost is %.2f).\n", total_cost, reference_cost);
-	// }
 
 	free(assignment);
 

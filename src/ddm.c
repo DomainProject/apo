@@ -137,10 +137,14 @@ enum result ddm_poll(int **assignment)
 		get_pairs(model, count, assignment);
 		return FOUND;
 	}
-	if(status == ASP_TIMEOUT_NOSOL || status == ASP_UNSATISFIABLE) {
+	if(status == ASP_TIMEOUT_NOSOL) {
+		return TIMEOUT;
+	} else if(status == ASP_UNSATISFIABLE) {
 		return UNSAT;
-	}
+	} 
+	
 	return SEARCHING;
+	
 }
 
 void ddm_free_assignment(int *assignment)
