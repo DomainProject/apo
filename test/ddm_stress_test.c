@@ -33,7 +33,13 @@ static int cu_capacity[NCUS];
 
 void init_scenario(void)
 {
-    sranddev();
+
+    #if __APPLE__
+      sranddev()
+    #elif __linux__
+      srand(time(NULL));
+	#endif	
+
 
 	for(int i = 0; i < NACT; i++) {
 		//runnable_on[i] = 0;
