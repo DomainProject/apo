@@ -1,13 +1,13 @@
 % utility directives
-#show run_on/2.
+%#show run_on/2.
 
 apt(1000).
 cpt(1000).
 
-powercap(35000).
-consumption(cpu, 5).
-consumption(gpu, 2).
-consumption(fpga, 1).
+%powercap(100000000).
+%consumption(cpu, 5).
+%consumption(gpu, 2).
+%consumption(fpga, 1).
 
 % -----
 % parameters
@@ -57,7 +57,7 @@ oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 
 % Discard solutions exceeding power cap
-:- #sum{ W*C,A : run_on(A,U), tasks_forecast(A,W), consumption(D,C), cu_type(U,D) } > PC, powercap(PC).
+%:- #sum{ W*C,A : run_on(A,U), tasks_forecast(A,W), consumption(D,C), cu_type(U,D) } > PC, powercap(PC).
 
 % -----
 % T is the total workload of cu U

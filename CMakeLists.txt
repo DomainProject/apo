@@ -3,6 +3,7 @@ project("ddm" LANGUAGES C DESCRIPTION "DDM")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set (CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_compile_options(-Wall -Wextra -pedantic -fmacro-prefix-map=${CMAKE_SOURCE_DIR}=)
 

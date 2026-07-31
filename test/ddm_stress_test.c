@@ -1,13 +1,13 @@
 #include <stdlib.h>
-#include <assert.h>
 #include <stdio.h>
-#include <string.h>
 #include "../src/ddm.h"
 #include <time.h>
 #include <float.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #define NCUS 32
-#define NACT 2048
+#define NACT 128
 
 #define ROLLBACK_PROBABILITY 0.1
 #define TOTAL_MESSAGES 100000
@@ -37,7 +37,7 @@ void init_scenario(void)
 		runnable_on[i] = 0;
 		for(int j = 0; j < 3; j++) {
 			if((double)rand() / RAND_MAX < 0.75)
-				runnable_on[i] |= (1 << j);
+				runnable_on[i] |= 1 << j;
 		}
 	}
 
@@ -250,13 +250,24 @@ int main(int argc, char **argv)
 
 	generate_random_tasks_forecast(tasks_forecast);
 	generate_random_actor_matrix(actors, tasks_forecast);
+
 	ddm_optimize(NACT, actors, tasks_forecast, NCUS, cu_capacity);
-	while((assignment = ddm_poll()) == NULL)
-		;
+
+	enum result res;
+	while((res = ddm_poll(&assignment)) == SEARCHING) {
+		printf(".");
+		usleep(100000);
+	}
+
+	if(res == UNSAT) {
+		fprintf(stderr, "Unable to find a satisfiable solution\n");
+		return 0;
+	}
 
 	for(int i = 0; i < NACT; ++i) {
 		printf("%2d -> %2d\n", i, assignment[i]);
 	}
+	free(assignment);
 
 	double total_cost = evaluate_assignment(assignment, actors, tasks_forecast);
 	double reference_cost = DBL_MAX;

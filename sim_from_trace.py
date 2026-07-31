@@ -19,15 +19,16 @@ from metasimulation.window_operations.null_operations  import NullOperations
 
 from metasimulation.window_operations.ddm_operations import DdmOperations
 
-from metasimulation.window_operations.metis_hete_asplike import MetisHeterogeneousOperations
-from metasimulation.window_operations.metis_hete_comm    import MetisCommunicationOperations
-from metasimulation.window_operations.metis_homo_comm  import MetisHomogeneousCommunicationOperations
-from metasimulation.window_operations.metis_homo_node  import MetisHomogeneousNodesOperations
+# from metasimulation.window_operations.metis_hete_asplike import MetisHeterogeneousOperations
+# from metasimulation.window_operations.metis_hete_comm    import MetisCommunicationOperations
+# from metasimulation.window_operations.metis_homo_comm  import MetisHomogeneousCommunicationOperations
+# from metasimulation.window_operations.metis_homo_node  import MetisHomogeneousNodesOperations
 
 from metasimulation.window_operations.random_operations import RandomOperations
 
 import metasimulation.SimulationEngine.simloop
 
+import struct, os, glob
 
 import time
 import math
@@ -38,12 +39,12 @@ sim_state.init_simulator_queue()
 
 operations_map = {
    "ddm":                     DdmOperations,
-   "metis-hete-asplike":   MetisHeterogeneousOperations,
+   # "metis-hete-asplike":   MetisHeterogeneousOperations,
    "random":               RandomOperations,
    "null":                 NullOperations,
-   "metis-hete-comm":      MetisCommunicationOperations,
-   "metis-homo-comm":      MetisHomogeneousCommunicationOperations,
-   "metis-homo-node":      MetisHomogeneousNodesOperations,
+   # "metis-hete-comm":      MetisCommunicationOperations,
+   # "metis-homo-comm":      MetisHomogeneousCommunicationOperations,
+   # "metis-homo-node":      MetisHomogeneousNodesOperations,
 
 }
 
@@ -102,6 +103,7 @@ all_tests_count = len(sim_state.get_cunits_data().keys())**sim_state.get_num_act
 # estimated_filter_skipped = all_tests_count/estimated_filter_speedup
 very_start_time = time.time()
 
+
 for current_assignment in to_be_evaluated_assignments:
 
     skip = False
@@ -128,6 +130,8 @@ for current_assignment in to_be_evaluated_assignments:
     if not skip:
         results[tuple(sim_state.get_assignment())] = []
         wct_ts = metasimulation.SimulationEngine.simloop.loop(sim_state, evaluate_all, maximum_th, ground_truth, rebalance_period, operations, results)
+        ddm_time = DdmOperations._ddm_total
+        print(f"DDM_TIME:{ddm_time:.9f}")
 
     # build application.py for throughput estimator
     if not evaluate_all:

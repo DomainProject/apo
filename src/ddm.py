@@ -14,7 +14,11 @@ _domainddm = None
 
 def ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on):
     global _domainddm
-    _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
+    try:
+        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.so')
+    except OSError:
+        _domainddm = ctypes.CDLL(f'./cmake-build-debug/src/libdomainddm.dylib')
+
 
 
     arr_cus = (ctypes.c_int * total_cus)(*cus)
@@ -43,8 +47,11 @@ def ddm_init(total_cus, total_actors, cus, msg_exch_cost, runnable_on):
     _domainddm.ddm_optimize.restype = None
 
     # extern int *ddm_poll(void);
-    _domainddm.ddm_poll.argtypes = []
-    _domainddm.ddm_poll.restype = ctypes.POINTER(ctypes.c_int)
+    _domainddm.ddm_poll.argtypes = [ctypes.POINTER(ctypes.POINTER(ctypes.c_int))]
+    _domainddm.ddm_poll.restype = ctypes.c_int
+
+    _domainddm.ddm_free_assignment.argtypes = [ctypes.POINTER(ctypes.c_int)]
+    _domainddm.ddm_free_assignment.restype = None
 
     _domainddm.ddm_init(total_cus, total_actors, arr_cus, arr_msg_exch, arr_run)
 
@@ -64,11 +71,15 @@ def ddm_optimize(total_actors, actors, tasks_forecast, total_cus, cu_capacity):
 
 def ddm_poll():
     global last_ddm_total_actors_invocation
-    ret = _domainddm.ddm_poll()
-    if not ret:
+    assignment = ctypes.POINTER(ctypes.c_int)()
+    ret = _domainddm.ddm_poll(ctypes.byref(assignment))
+    if ret == 1: # UNSAT
+        return []
+    if not assignment:
         return None
     # Convert the ctype returned by the C function to a Python list
-    ret = [ret[i] for i in range(last_ddm_total_actors_invocation)]
+    ret = [assignment[i] for i in range(last_ddm_total_actors_invocation)]
+    _domainddm.ddm_free_assignment(assignment)
     return ret
 
 

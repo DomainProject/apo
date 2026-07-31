@@ -9,5 +9,10 @@ target_link_libraries(ddm_stress_test PRIVATE domainddm)
 add_executable(ddm_test ddm_test.c)
 target_link_libraries(ddm_test PRIVATE domainddm)
 
+if(Metis_FOUND)
 add_executable(metis_test metis_test.c)
 target_link_libraries(metis_test PRIVATE ddmmetis)
+endif ()
+
+add_executable(aspsolver_test aspsolver_test.c)
+target_link_libraries(aspsolver_test PRIVATE aspsolver)
