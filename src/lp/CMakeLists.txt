@@ -16,4 +16,4 @@ add_custom_target(copy_assets
 add_custom_command(
         OUTPUT resources.c
         COMMAND embedfiles ${res_files}
-        DEPENDS copy_assets ${res_files} embedfiles)
+        DEPENDS copy_assets embedfiles ${CMAKE_CURRENT_SOURCE_DIR}/${res_files})
