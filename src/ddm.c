@@ -11,7 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define TIMEOUT 2.0
+#define TIMEOUT 10.0
 #define DUMP_PROGRAM
 
 static const unsigned char *base_program = LDVAR(ddm_asp);
@@ -141,10 +141,10 @@ enum result ddm_poll(int **assignment)
 		return TIMEOUT;
 	} else if(status == ASP_UNSATISFIABLE) {
 		return UNSAT;
-	} 
-	
+	}
+
 	return SEARCHING;
-	
+
 }
 
 void ddm_free_assignment(int *assignment)

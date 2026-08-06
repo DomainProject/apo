@@ -38,7 +38,7 @@ void init_scenario(void)
       sranddev();
     #elif __linux__
       srand(time(NULL));
-	#endif	
+	#endif
 
 
 	for(int i = 0; i < NACT; i++) {
@@ -270,10 +270,11 @@ int main(int argc, char **argv)
 
 	if(res == UNSAT) {
 		fprintf(stderr, "Unable to find a solution: UNSAT\n");
-		return 0; 
-	} else if(res == TIMEOUT) {
-        fprintf(stderr, "Unable to find a solution: TIMEOUT\n");
-		return 0; 
+		return 0;
+	}
+	if(res == TIMEOUT) {
+		fprintf(stderr, "Unable to find a solution: TIMEOUT\n");
+		return 0;
 	}
 
 	for(int i = 0; i < NACT; ++i) {
