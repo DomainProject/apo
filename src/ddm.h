@@ -8,7 +8,7 @@ struct actor_matrix {
 	int msg_exchange_rate;
 };
 
-enum result {SEARCHING, UNSAT, FOUND};
+enum result {SEARCHING, UNSAT, TIMEOUT, FOUND};
 
 extern void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_exch_cost[total_cus][total_cus],
     short runnable_on[total_actors]);
