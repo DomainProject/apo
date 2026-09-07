@@ -4,11 +4,6 @@
 apt(1000).
 cpt(1000).
 
-%powercap(100000000).
-%consumption(cpu, 5).
-%consumption(gpu, 2).
-%consumption(fpga, 1).
-
 % -----
 % parameters
 % overload magnitude (om) & priority (op)
@@ -56,11 +51,11 @@ oct_dev(5,cpu).                 oct_dev(5,fpga).
 oct_dev(7,cpu). oct_dev(7,gpu). oct_dev(7,fpga).
 
 
-% Discard solutions exceeding power cap
-%:- #sum{ W*C,A : run_on(A,U), tasks_forecast(A,W), consumption(D,C), cu_type(U,D) } > PC, powercap(PC).
-
 % -----
 % T is the total workload of cu U
+% no approximation - sum of task forecast values
+% cu_workload(U,T) :- cu(U), 
+%     T = #sum{ W,A : run_on(A,U), tasks_forecast(A,W) }.
 % cu_workload(U,T) :- cu(U), cu_capacity(U,C),
 %     #sum{ W,A : run_on(A,U), tasks_forecast(A,W) } > C, wmean(M), T = N * M,
 %     N = #count{ A : run_on(A,U) }.
@@ -107,3 +102,11 @@ a_cc(A1,A2,C) :- msg_exch_rate(A1,A2,R),
 #minimize{ AM*C@AP,A1,A2 : mutual_annoyance(A1,A2,C),
                        run_on(A1,U1), run_on(A2,U2),
                        U1 != U2, am(AM), ap(AP)   }.
+
+%powercap(100000000).
+%consumption(cpu, 5).
+%consumption(gpu, 2).
+%consumption(fpga, 1).
+
+% Discard solutions exceeding power cap
+%:- #sum{ W*C,A : run_on(A,U), tasks_forecast(A,W), consumption(D,C), cu_type(U,D) } > PC, powercap(PC).
