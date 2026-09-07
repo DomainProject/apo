@@ -15,13 +15,13 @@
     cu_type(U1,T1), cu_type(U2,T2), T1!=T2. 
 
 % computing units with same capacity belong to the same cluster
- :- cluster_of_cu(U1,C), cluster_of_cu(U2,C), U1!=U2,
-    cu_capacity(U1,C1), cu_capacity(U2,C2), C1!=C2. 
+% :- cluster_of_cu(U1,C), cluster_of_cu(U2,C), U1!=U2,
+%    cu_capacity(U1,C1), cu_capacity(U2,C2), C1!=C2. 
 
 % computing units of the same type, capacity and comm. cost
 % belong to the same cluster
  :- cluster_of_cu(U1,C1), cluster_of_cu(U2,C2), C1!=C2,
-    same_capacity(U1,U2), 
+    %same_capacity(U1,U2), 
     same_type(U1,U2),
     same_comc(U1,U2).
 
