@@ -15,6 +15,7 @@
 #define DUMP_PROGRAM
 
 static const unsigned char *base_program = LDVAR(ddm_asp);
+// static const unsigned char *base_program = LDVAR(ddm_clusters_asp);
 asp_solver_t *solver;
 struct dynstr *clingo_base_program_buffer;
 
