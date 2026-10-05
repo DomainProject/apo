@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 set(res_files
-        ddm.asp
+        ddm_clusters.asp
 )
 
 add_library(resources STATIC resources.c)

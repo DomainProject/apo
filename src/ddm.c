@@ -14,8 +14,8 @@
 #define TIMEOUT 10.0
 #define DUMP_PROGRAM
 
-static const unsigned char *base_program = LDVAR(ddm_asp);
-// static const unsigned char *base_program = LDVAR(ddm_clusters_asp);
+//static const unsigned char *base_program = LDVAR(ddm_asp);
+static const unsigned char *base_program = LDVAR(ddm_clusters_asp);
 asp_solver_t *solver;
 struct dynstr *clingo_base_program_buffer;
 
@@ -69,7 +69,8 @@ error:
 void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_exch_cost[total_cus][total_cus],
     short runnable_on[total_actors])
 {
-	size_t len = LDLEN(ddm_asp);
+	//size_t len = LDLEN(ddm_asp);
+	size_t len = LDLEN(ddm_clusters_asp);
 	dynstr_init(&clingo_base_program_buffer, len);
 	dynstr_strcat(clingo_base_program_buffer, (const char *)base_program, len);
 	dynstr_printcat(clingo_base_program_buffer, "cu(0..%d).\n", total_cus - 1);
@@ -98,11 +99,14 @@ void ddm_init(int total_cus, int total_actors, const enum cu_type *cus, int msg_
 }
 
 
+
 void ddm_optimize(int total_actors, struct actor_matrix actors[total_actors][total_actors],
     int tasks_forecast[total_actors], int total_cus, int cu_capacity[total_cus])
 {
 	// Reset solver
 	asp_solver_begin_session(solver);
+
+	asp_solver_add_constant(solver, "n", total_actors);
 
 	// Inject facts
 	for (int i = 0; i < total_actors; ++i) {

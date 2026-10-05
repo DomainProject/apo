@@ -439,3 +439,11 @@ bool asp_solver_dump(asp_solver_t *ctx, const char *filepath)
 	fclose(f);
 	return true;
 }
+
+void asp_solver_add_constant(asp_solver_t *ctx, const char *name, int value)
+{
+        char buf[64];
+        snprintf(buf, sizeof(buf), "#const %s = %d.", name, value);
+        clingo_control_add(ctx->ctl, "base", NULL, 0, buf);
+        check_clingo_panic();
+}

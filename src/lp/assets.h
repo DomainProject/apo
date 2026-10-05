@@ -13,6 +13,7 @@
 
 // Define resources variables
 EXTLD(ddm_asp)
+EXTLD(ddm_clusters_asp)
 
 // Use this code to access the resources
 //  size_t length = LDLEN(ddm_asp);

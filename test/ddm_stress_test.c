@@ -216,7 +216,7 @@ static void rec_enum_assignments(int idx, int assignment[NACT], struct actor_mat
     (computed by enumeration) scaled by a tolerance factor. If the found cost exceeds
     the reference by more than TOLERANCE_FACTOR, the assignment is flagged as suboptimal.
 */
-static bool is_cost_acceptable(double cost, struct actor_matrix actors[8][8], const int tasks_forecast[NACT], double *ref_cost)
+static bool is_cost_acceptable(double cost, struct actor_matrix actors[NACT][NACT], const int tasks_forecast[NACT], double *ref_cost)
 {
 	// Enumerate all possible assignments and test them with this configuration.
 	int assignment[NACT] = {0};

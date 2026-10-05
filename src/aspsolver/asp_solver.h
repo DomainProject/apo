@@ -80,3 +80,5 @@ asp_result_t asp_solver_poll(asp_solver_t *ctx, const clingo_symbol_t **model, s
  * returns true on success, false on failure (file io or clingo error).
  */
 bool asp_solver_dump(asp_solver_t *ctx, const char *filepath);
+
+void asp_solver_add_constant(asp_solver_t *ctx, const char *name, int value);
