@@ -134,6 +134,11 @@ N { run_on(A,U) : acu_runnable_on(A,U) } N :-
 % an actor runs on a single CU
 :- run_on(A,U1), run_on(A,U2), U1!=U2.
 
+% assigned_to_a_cu(A) holds if A has been assigned to a cu
+assigned_to_a_cu(A) :- run_on(A,U).
+% all actors must run on a cu
+:- actor(A), not assigned_to_a_cu(A).
+
 % utility predicate (to simplify the rule above)
 acu_runnable_on(A,U) :- 
     cu(U), 
